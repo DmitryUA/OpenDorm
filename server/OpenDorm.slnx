@@ -2,4 +2,7 @@
   <Folder Name="/src/">
     <Project Path="OpenDorm.Domain/OpenDorm.Domain.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="OpenDorm.Domain.Tests/OpenDorm.Domain.Tests.csproj" />
+  </Folder>
 </Solution>
