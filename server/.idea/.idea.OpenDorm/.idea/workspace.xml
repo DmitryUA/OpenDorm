@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="f6a76ac5-5a96-4e65-bebe-a80ad6000de6" name="Changes" comment="" />
+    <list default="true" id="f6a76ac5-5a96-4e65-bebe-a80ad6000de6" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.OpenDorm/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.OpenDorm/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenDorm.slnx" beforeDir="false" afterPath="$PROJECT_DIR$/OpenDorm.slnx" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -54,6 +60,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="chore: init empty backend solution (.slnx)" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: init empty backend solution (.slnx)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -1,1 +1,5 @@
-<Solution />
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="OpenDorm.Domain/OpenDorm.Domain.csproj" />
+  </Folder>
+</Solution>
