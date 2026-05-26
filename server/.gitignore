@@ -1,0 +1,21 @@
+# .NET Build
+[Bb]in/
+[Oo]bj/
+
+# Rider IDE (только личные настройки)
+.idea/workspace.xml
+.idea/caches/
+.idea/index/
+.rider/
+*.user
+*.DotSettings.user
+
+# Test outputs (xUnit)
+TestResults/
+*.trx
+*.coverage
+
+# Local configs & secrets
+appsettings.*.local.json
+*.env
+*.env.local
