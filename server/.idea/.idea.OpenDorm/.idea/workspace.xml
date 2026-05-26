@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f6a76ac5-5a96-4e65-bebe-a80ad6000de6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/OpenDorm.Domain/Common/AggregateRoot.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/OpenDorm.Domain/Common/Entity.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.OpenDorm/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.OpenDorm/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenDorm.Domain/Common/AggregateRoot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenDorm.Domain/Common/AggregateRoot.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/OpenDorm.Domain/OpenDorm.Domain.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/OpenDorm.Domain/OpenDorm.Domain.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -16,6 +17,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/OpenDorm.Domain/Common/Entity.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2,
@@ -64,7 +68,8 @@
     <MESSAGE value="chore: init empty backend solution (.slnx)" />
     <MESSAGE value="chore: init domain layer" />
     <MESSAGE value="chore: init project for domain tests" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: init project for domain tests" />
+    <MESSAGE value="chore: create abstract AggregateRoot class" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: create abstract AggregateRoot class" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
