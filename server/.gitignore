@@ -3,12 +3,13 @@
 [Oo]bj/
 
 # Rider IDE (только личные настройки)
-.idea/workspace.xml
-.idea/caches/
-.idea/index/
+.idea/
 .rider/
+*.suo
 *.user
+*.userosscache
 *.DotSettings.user
+*.sln.docstates
 
 # Test outputs (xUnit)
 TestResults/
