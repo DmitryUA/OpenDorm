@@ -3,7 +3,7 @@ using OpenDorm.Domain.Enums;
 using OpenDorm.Domain.Exceptions;
 using OpenDorm.Domain.ValueObjects;
 
-namespace OpenDorm.Domain.Tests.ValueObjectsTests;
+namespace OpenDorm.Domain.Tests.EntityTests;
 
 public class RoomTests
 {
