@@ -215,18 +215,99 @@ public class DormitoryTests
     }
 
     #endregion
+
+    #region CheckIn Tests
+
+    [Fact]
+    public void CheckIn_ByRoomName_ValidArguments_OccupantCheckedInEventWillBeCreated()
+    {
+        // Arrange
+        var dormitory = new DormitoryBuilder().Build();
+
+        var roomName = new RoomName("406");
+        var roomId = dormitory.AddRoom(roomName, Gender.Male);
+        var occupantId = Guid.NewGuid();
+
+        // Act
+        dormitory.CheckIn(roomName, occupantId);
+        
+        // Assert
+        Assert.Equal(2, dormitory.DomainEvents.Count);
+
+        var occupantCheckedIdEvent = Assert.IsType<OccupantCheckedInEvent>(dormitory.DomainEvents.Last());
+        
+        Assert.Equal(dormitory.Id, occupantCheckedIdEvent.DormitoryId);
+        Assert.Equal(roomId, occupantCheckedIdEvent.RoomId);
+        Assert.Equal(occupantId, occupantCheckedIdEvent.OccupantId);
+    }
+    
+    [Fact]
+    public void CheckIn_ByRoomId_ValidArguments_OccupantCheckedInEventWillBeCreated()
+    {
+        // Arrange
+        var dormitory = new DormitoryBuilder().Build();
+        
+        var roomId = dormitory.AddRoom(new RoomName("406"), Gender.Male);
+        var occupantId = Guid.NewGuid();
+
+        // Act
+        dormitory.CheckIn(roomId, occupantId);
+        
+        // Assert
+        Assert.Equal(2, dormitory.DomainEvents.Count);
+
+        var occupantCheckedIdEvent = Assert.IsType<OccupantCheckedInEvent>(dormitory.DomainEvents.Last());
+        
+        Assert.Equal(dormitory.Id, occupantCheckedIdEvent.DormitoryId);
+        Assert.Equal(roomId, occupantCheckedIdEvent.RoomId);
+        Assert.Equal(occupantId, occupantCheckedIdEvent.OccupantId);
+    }
+
+    #endregion
+
+    #region CheckOut Tests
+
+    [Fact]
+    public void CheckOut_IdentifierExistingOccupant()
+    {
+        // Arrange
+        var dormitory = new DormitoryBuilder().Build();
+        var roomId = dormitory.AddRoom(new RoomName("406"), Gender.Male);
+        var occupantId = Guid.NewGuid();
+        
+        dormitory.CheckIn(roomId, occupantId);
+        
+        // Act
+        dormitory.CheckOut(occupantId);
+        
+        // Assert
+        Assert.Equal(3, dormitory.DomainEvents.Count);
+
+        var occupantCheckedOutEvent = Assert.IsType<OccupantCheckedOutEvent>(dormitory.DomainEvents.Last());
+        
+        Assert.Equal(dormitory.Id, occupantCheckedOutEvent.DormitoryId);
+        Assert.Equal(roomId, occupantCheckedOutEvent.RoomId);
+        Assert.Equal(occupantId, occupantCheckedOutEvent.OccupantId);
+    }
+    
+    [Fact]
+    public void CheckOut_IdentifierNonExistentOccupant()
+    {
+        // Arrange
+        var dormitory = new DormitoryBuilder().Build();
+        var occupantId = Guid.NewGuid();
+        
+        // Act & Assert
+        Assert.Throws<DomainException>(() => dormitory.CheckOut(occupantId));
+    }
+
+    #endregion
     
     private class DormitoryBuilder
     {
-        private Guid _id = Guid.NewGuid();
+        private readonly Guid _id = Guid.NewGuid();
         private Address _address = new(new City("Москва"), new Street("Советская"));
         private int _floorCount = 9;
-
-        public DormitoryBuilder WithId(Guid id)
-        {
-            _id = id;
-            return this;
-        }
 
         public DormitoryBuilder WithAddress(Address address)
         {
