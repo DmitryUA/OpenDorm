@@ -90,7 +90,7 @@ public class Dormitory : AggregateRoot
             throw new DomainException($"{roomDescription} was not found in dormitory. Dormitory id: '{Id}'");
     
         room.CheckIn(occupantId);
-        AddDomainEvent(new OccupantCheckedInEvent(Id, room.Id, occupantId));
+        AddDomainEvent(new RoomOccupiedEvent(Id, room.Id, occupantId));
     }
 
     public void CheckOut(Guid occupantId)
@@ -103,7 +103,7 @@ public class Dormitory : AggregateRoot
         
         room.CheckOut(occupantId);
 
-        var occupantCheckedOutEvent = new OccupantCheckedOutEvent(Id, room.Id, occupantId);
+        var occupantCheckedOutEvent = new RoomVacatedEvent(Id, room.Id, occupantId);
         AddDomainEvent(occupantCheckedOutEvent);
     }
 }

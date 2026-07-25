@@ -234,7 +234,7 @@ public class DormitoryTests
         // Assert
         Assert.Equal(2, dormitory.DomainEvents.Count);
 
-        var occupantCheckedIdEvent = Assert.IsType<OccupantCheckedInEvent>(dormitory.DomainEvents.Last());
+        var occupantCheckedIdEvent = Assert.IsType<RoomOccupiedEvent>(dormitory.DomainEvents.Last());
         
         Assert.Equal(dormitory.Id, occupantCheckedIdEvent.DormitoryId);
         Assert.Equal(roomId, occupantCheckedIdEvent.RoomId);
@@ -256,7 +256,7 @@ public class DormitoryTests
         // Assert
         Assert.Equal(2, dormitory.DomainEvents.Count);
 
-        var occupantCheckedIdEvent = Assert.IsType<OccupantCheckedInEvent>(dormitory.DomainEvents.Last());
+        var occupantCheckedIdEvent = Assert.IsType<RoomOccupiedEvent>(dormitory.DomainEvents.Last());
         
         Assert.Equal(dormitory.Id, occupantCheckedIdEvent.DormitoryId);
         Assert.Equal(roomId, occupantCheckedIdEvent.RoomId);
@@ -283,7 +283,7 @@ public class DormitoryTests
         // Assert
         Assert.Equal(3, dormitory.DomainEvents.Count);
 
-        var occupantCheckedOutEvent = Assert.IsType<OccupantCheckedOutEvent>(dormitory.DomainEvents.Last());
+        var occupantCheckedOutEvent = Assert.IsType<RoomVacatedEvent>(dormitory.DomainEvents.Last());
         
         Assert.Equal(dormitory.Id, occupantCheckedOutEvent.DormitoryId);
         Assert.Equal(roomId, occupantCheckedOutEvent.RoomId);

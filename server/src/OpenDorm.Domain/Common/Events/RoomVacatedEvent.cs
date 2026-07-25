@@ -1,6 +1,6 @@
 namespace OpenDorm.Domain.Common.Events;
 
-public record OccupantCheckedInEvent(
+public record RoomVacatedEvent(
     Guid DormitoryId,
     Guid RoomId,
     Guid OccupantId
