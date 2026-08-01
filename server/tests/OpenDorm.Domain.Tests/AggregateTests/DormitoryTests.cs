@@ -15,7 +15,7 @@ public class DormitoryTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var address = new Address(new City("Москва"), new Street("Советская"));
+        var address = new Address(new City("Москва"), new Street("Советская"), new HouseNumber("41"));
         const int floorCount = 9;
         
         // Act
@@ -32,7 +32,7 @@ public class DormitoryTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var address = new Address(new City("Москва"), new Street("Советская"));
+        var address = new Address(new City("Москва"), new Street("Советская"), new HouseNumber("41"));
         
         // Act
         var dormitory = new Dormitory(id, address);
@@ -306,7 +306,7 @@ public class DormitoryTests
     private class DormitoryBuilder
     {
         private readonly Guid _id = Guid.NewGuid();
-        private Address _address = new(new City("Москва"), new Street("Советская"));
+        private Address _address = new(new City("Москва"), new Street("Советская"), new HouseNumber("41"));
         private int _floorCount = 9;
 
         public DormitoryBuilder WithAddress(Address address)
