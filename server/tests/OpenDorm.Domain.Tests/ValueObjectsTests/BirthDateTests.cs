@@ -21,23 +21,27 @@ public class BirthDateTests
     }
 
     [Fact]
-    public void Constructor_AgeExceedsTheMaximumLimit_ThrowsDomainException()
+    public void Constructor_AgeExceedsTheMaximumLimit_ThrowsInvalidBirthDateException()
     {
         // Arrange
         var date = new DateOnly(1800, 1, 1);
+        var expectedMessage = $"Age cannot exceed {BirthDate.MaxAgeYears} years.";
         
         // Act & Assert
-        Assert.Throws<DomainException>(() => new BirthDate(date));
+        var exception = Assert.Throws<InvalidBirthDateException>(() => new BirthDate(date));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Fact]
-    public void Constructor_DateThatHasNotYetArrived_ThrowsDomainException()
+    public void Constructor_DateThatHasNotYetArrived_ThrowsInvalidBirthDateException()
     {
         // Arrange
         var date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        const string expectedMessage = "Date of birth cannot be in the future.";
         
         // Act & Assert
-        Assert.Throws<DomainException>(() => new BirthDate(date));
+        var exception = Assert.Throws<InvalidBirthDateException>(() => new BirthDate(date));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     #endregion

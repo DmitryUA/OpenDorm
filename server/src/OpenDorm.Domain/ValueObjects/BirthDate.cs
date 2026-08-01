@@ -13,11 +13,11 @@ public record BirthDate
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
         if (date > today)
-            throw new DomainException("Date of birth cannot be in the future.");
+            throw new InvalidBirthDateException("Date of birth cannot be in the future.");
         
         var maxAllowedDate = today.AddYears(-MaxAgeYears);
         if (date < maxAllowedDate)
-            throw new DomainException($"Age cannot exceed {MaxAgeYears} years.");
+            throw new InvalidBirthDateException($"Age cannot exceed {MaxAgeYears} years.");
 
         Value = date;
     }
