@@ -1,3 +1,4 @@
+using OpenDorm.Domain.Exceptions;
 using OpenDorm.Domain.ValueObjects;
 
 namespace OpenDorm.Domain.Tests.ValueObjectsTests;
@@ -8,17 +9,17 @@ public class CityTests
     [InlineData("Уфа")]
     [InlineData("Москва")]
     [InlineData("Александровск-Сахалинский")]
-    public void Ctor_WithValidName_CreateInstanceAndPreservesName(string name)
+    public void Ctor_ValidValue_CreateInstanceAndPreservesValue(string name)
     { 
         // Arrange & Act
         var city = new City(name);
 
         // Assert
-        Assert.Equal(name, city.Name);
+        Assert.Equal(name, city.Value);
     }
 
     [Fact]
-    public void Ctor_WithLeadingAndTrailingWhitespace_TrimsName()
+    public void Ctor_LeadingAndTrailingWhitespace_TrimsValue()
     {
         // Arrange
         const string name = " Москва  ";
@@ -28,84 +29,82 @@ public class CityTests
         var city = new City(name);
         
         // Assert
-        Assert.Equal(expectedName, city.Name);
+        Assert.Equal(expectedName, city.Value);
+    }
+    
+    [Fact]
+    public void Ctor_MinValidLength_CreateInstanceSuccessfully()
+    {
+        // Arrange
+        var minValidName = new string('A', City.MinLength);
+        
+        // Act
+        var city = new City(minValidName);
+        
+        // Assert
+        Assert.Equal(minValidName, city.Value);
     }
 
     [Fact]
-    public void Ctor_withNull_ThrowsArgumentNullException()
+    public void Ctor_MaxValidLength_CreateInstanceSuccessfully()
     {
         // Arrange
-        const string? nullName = null;
-
+        var maxValidName = new string('A', City.MaxLength);
+        
         // Act
-        var act = () => new City(nullName!);
-
+        var city = new City(maxValidName);
+        
         // Assert
-        var exception = Assert.Throws<ArgumentNullException>(act);
-        Assert.Equal("name", exception.ParamName);
+        Assert.Equal(maxValidName, city.Value);
+    }
+
+    [Fact]
+    public void Ctor_Null_ThrowsInvalidCityException()
+    {
+        // Arrange
+        const string expectedMessage = "City name cannot be empty.";
+
+        // Act & Assert
+        var exception = Assert.Throws<InvalidCityException>(() => new City(null!));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
     [InlineData("\t")]
-    public void Ctor_WithEmptyOrWhitespace_ThrowArgumentException(string name)
+    public void Ctor_EmptyOrWhitespace_ThrowsInvalidCityException(string value)
     {
-        // Arrange & Act
-        var act = () => new City(name);
+        // Arrange
+        const string expectedMessage = "City name cannot be empty.";
         
-        // Assert
-        Assert.Throws<ArgumentException>(act);
+        // Act & Assert
+        var exception = Assert.Throws<InvalidCityException>(() => new City(value));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Theory]
     [InlineData("A")]
     [InlineData("AB")]
-    public void Ctor_WithLengthLessThanMin_ThrowsArgumentOutOfRangeException(string name)
+    public void Ctor_LengthLessThanMin_ThrowsInvalidCityException(string value)
     {
-        // Arrange & Act
-        var act = () => new City(name);
+        // Arrange
+        var expectedMessage = $"City name cannot be less than {City.MinLength} characters long.";
         
-        // Assert
-        Assert.Throws<ArgumentOutOfRangeException>(act);
+        // Act & Assert
+        var exception = Assert.Throws<InvalidCityException>(() => new City(value));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Fact]
-    public void Ctor_WithLengthGreaterThanMax_ThrowsArgumentOutOfRangeException()
+    public void Ctor_LengthGreaterThanMax_ThrowsInvalidCityException()
     {
         // Arrange
-        var longName = new string('A', City.MaxNameLength + 1);
-        
-        // Act
-        var act = () => new City(longName);
-        
-        // Assert
-        Assert.Throws<ArgumentOutOfRangeException>(act);
-    }
+        var longName = new string('A', City.MaxLength + 1);
+        var expectedMessage = $"City name cannot be exceed {City.MaxLength} characters.";
 
-    [Fact]
-    public void Ctor_WithMinValidLength_CreateInstanceSuccessfully()
-    {
-        // Arrange
-        var minValidName = new string('A', City.MinNameLength);
-        
-        // Act
-        var city = new City(minValidName);
-        
-        // Assert
-        Assert.Equal(minValidName, city.Name);
-    }
-
-    [Fact]
-    public void Ctor_WithMaxValidLength_CreateInstanceSuccessfully()
-    {
-        // Arrange
-        var maxValidName = new string('A', City.MaxNameLength);
-        
-        // Act
-        var city = new City(maxValidName);
-        
-        // Assert
-        Assert.Equal(maxValidName, city.Name);
+        // Act & Assert
+        var exception = Assert.Throws<InvalidCityException>(() => new City(longName));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 }
