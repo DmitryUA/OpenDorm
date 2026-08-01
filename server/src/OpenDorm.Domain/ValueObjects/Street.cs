@@ -1,19 +1,26 @@
+using OpenDorm.Domain.Exceptions;
+
 namespace OpenDorm.Domain.ValueObjects;
 
 public sealed record Street
 {
     public const byte MaxStreetNameLength = 255;
     public const byte MinStreetNameLength = 3;
-    public string Name { get; }
+    public string Value { get; }
 
-    public Street(string name)
+    public Street(string value)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        var trimmed = name.Trim();
-        
-        ArgumentOutOfRangeException.ThrowIfLessThan(trimmed.Length, MinStreetNameLength, nameof(name));
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(trimmed.Length, MaxStreetNameLength, nameof(name));
+        var trimmed = value?.Trim();
 
-        Name = trimmed;
+        if (string.IsNullOrEmpty(trimmed)) throw new InvalidStreetException("Street name cannot be empty.");
+        if (trimmed.Length < MinStreetNameLength)
+            throw new InvalidStreetException(
+                $"Street name cannot be less than {MinStreetNameLength} characters long.");
+        if (trimmed.Length > MaxStreetNameLength)
+            throw new InvalidStreetException($"Street name cannot exceed {MaxStreetNameLength} characters.");
+
+        Value = trimmed;
     }
+
+    public override string ToString() => Value;
 }
