@@ -17,4 +17,6 @@ public sealed record HouseNumber
 
         Value = trimmed;
     }
+
+    public override string ToString() => Value;
 }
