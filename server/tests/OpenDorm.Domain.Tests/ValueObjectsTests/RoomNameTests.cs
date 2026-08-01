@@ -1,3 +1,4 @@
+using OpenDorm.Domain.Exceptions;
 using OpenDorm.Domain.ValueObjects;
 
 namespace OpenDorm.Domain.Tests.ValueObjectsTests;
@@ -5,7 +6,7 @@ namespace OpenDorm.Domain.Tests.ValueObjectsTests;
 public class RoomNameTests
 {
     [Fact]
-    public void Ctor_WithValidName_CreateInstanceAndPreservesName()
+    public void Ctor_ValidValue_CreateInstanceAndPreservesValue()
     {
         // Arrange
         const string name = "406";
@@ -14,11 +15,11 @@ public class RoomNameTests
         var roomName = new RoomName(name);
         
         // Assert
-        Assert.Equal(name, roomName.Name);
+        Assert.Equal(name, roomName.Value);
     }
 
     [Fact]
-    public void Ctor_WithLeadingAndTrailingWhitespace_TrimsName()
+    public void Ctor_LeadingAndTrailingWhitespace_TrimsValue()
     {
         // Arrange
         const string name = "406  ";
@@ -28,73 +29,69 @@ public class RoomNameTests
         var roomName = new RoomName(name);
         
         // Assert
-        Assert.Equal(expectedName, roomName.Name);
+        Assert.Equal(expectedName, roomName.Value);
+    }
+    
+    [Fact]
+    public void Ctor_MaxValidLength_CreateInstanceSuccessfully()
+    {
+        // Arrange
+        var maxValidName = new string('A', RoomName.MaxLength);
+        
+        // Act
+        var roomName = new RoomName(maxValidName);
+        
+        // Assert
+        Assert.Equal(maxValidName, roomName.Value);
+    }
+    
+    [Fact]
+    public void Ctor_MinValidLength_CreateInstanceSuccessfully()
+    {
+        // Arrange
+        var minValidName = new string('A', RoomName.MinLength);
+        
+        // Act
+        var roomName = new RoomName(minValidName);
+        
+        // Assert
+        Assert.Equal(minValidName, roomName.Value);
     }
 
     [Fact]
-    public void Ctor_WithNull_ThrowsArgumentNullException()
+    public void Ctor_Null_ThrowsInvalidRoomNameException()
     {
         // Arrange
-        const string? nullName = null;
+        const string expectedMessage = "Room name cannot be empty.";
         
-        // Act
-        var act = () => new RoomName(nullName!);
-        
-        // Assert
-        var exception = Assert.Throws<ArgumentNullException>(act);
-        Assert.Equal("name", exception.ParamName);
+        // Act & Assert
+        var exception = Assert.Throws<InvalidRoomNameException>(() => new RoomName(null!));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
     [InlineData("\t")]
-    public void Ctor_WithEmptyOrWhitespace_ThrowsArgumentException(string name)
+    public void Ctor_EmptyOrWhitespace_ThrowsInvalidRoomNameException(string name)
     {
-        // Arrange & Act
-        var act = () => new RoomName(name);
+        // Arrange
+        const string expectedMessage = "Room name cannot be empty.";
         
-        // Assert
-        Assert.Throws<ArgumentException>(act);
+        // Act & Assert
+        var exception = Assert.Throws<InvalidRoomNameException>(() => new RoomName(name));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Fact]
-    public void Ctor_WithLengthGreaterThanMax_ThrowsArgumentOutOfRangeException()
+    public void Ctor_LengthGreaterThanMax_ThrowsInvalidRoomNameException()
     {
         // Arrange
-        var longName = new string('A', RoomName.MaxNameLength + 1);
+        var longName = new string('A', RoomName.MaxLength + 1);
+        var expectedMessage = $"Room name cannot be exceed {RoomName.MaxLength} characters.";
         
-        // Act
-        var act = () => new RoomName(longName);
-        
-        // Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(act);
-        Assert.Equal("name", exception.ParamName);
-    }
-
-    [Fact]
-    public void Ctor_WithMinValidLength_CreateInstanceSuccessfully()
-    {
-        // Arrange
-        var minValidName = new string('A', RoomName.MinNameLength);
-        
-        // Act
-        var roomName = new RoomName(minValidName);
-        
-        // Assert
-        Assert.Equal(minValidName, roomName.Name);
-    }
-
-    [Fact]
-    public void Ctor_WithMaxValidLength_CreateInstanceSuccessfully()
-    {
-        // Arrange
-        var maxValidName = new string('A', RoomName.MaxNameLength);
-        
-        // Act
-        var roomName = new RoomName(maxValidName);
-        
-        // Assert
-        Assert.Equal(maxValidName, roomName.Name);
+        // Act & Assert
+        var exception = Assert.Throws<InvalidRoomNameException>(() => new RoomName(longName));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 }
