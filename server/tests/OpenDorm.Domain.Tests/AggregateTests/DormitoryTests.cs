@@ -219,7 +219,7 @@ public class DormitoryTests
     #region CheckIn Tests
 
     [Fact]
-    public void CheckIn_ByRoomName_ValidArguments_OccupantCheckedInEventWillBeCreated()
+    public void CheckIn_ByRoomName_ValidArguments_RoomOccupiedEventWillBeCreated()
     {
         // Arrange
         var dormitory = new DormitoryBuilder().Build();
@@ -242,7 +242,7 @@ public class DormitoryTests
     }
     
     [Fact]
-    public void CheckIn_ByRoomId_ValidArguments_OccupantCheckedInEventWillBeCreated()
+    public void CheckIn_ByRoomId_ValidArguments_RoomOccupiedEventWillBeCreated()
     {
         // Arrange
         var dormitory = new DormitoryBuilder().Build();
@@ -268,7 +268,7 @@ public class DormitoryTests
     #region CheckOut Tests
 
     [Fact]
-    public void CheckOut_IdentifierExistingOccupant()
+    public void CheckOut_IdentifierExistingOccupant_RoomVacatedEventWillBeCreated()
     {
         // Arrange
         var dormitory = new DormitoryBuilder().Build();
