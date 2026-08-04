@@ -63,7 +63,7 @@ public class LastNameTests
         const string veryShortLastName = "А";
         
         // Act
-        var act = () => new FirstName(veryShortLastName);
+        var act = () => new LastName(veryShortLastName);
         
         // Assert
         Assert.Throws<ArgumentOutOfRangeException>(act);
@@ -76,7 +76,7 @@ public class LastNameTests
     public void Constructor_InvalidValue_ThrowsDomainException(string value)
     {
         // Act
-        var act = () => new FirstName(value);
+        var act = () => new LastName(value);
         
         // Assert
         Assert.Throws<DomainException>(act);
