@@ -12,22 +12,22 @@ public record LastName
     
     public const int MinLength = 2;
     public const int MaxLength = 30;
-    public string Value { get; init; }
+    public string Value { get; }
 
     public LastName(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentNullException(nameof(value), "Last name cannot be empty or white space");
+        var trimmed = value?.Trim();
 
-        var trimmedValue = value.Trim();
-        
-        ArgumentOutOfRangeException.ThrowIfLessThan(trimmedValue.Length, MinLength);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(trimmedValue.Length, MaxLength);
+        if (string.IsNullOrEmpty(trimmed)) throw new InvalidLastNameException("Last name cannot be empty.");
+        if (trimmed.Length < MinLength)
+            throw new InvalidLastNameException($"Last name cannot be less than {MinLength} characters long.");
+        if (trimmed.Length > MaxLength)
+            throw new InvalidLastNameException($"Last name cannot be exceed {MaxLength} characters.");
 
-        if (!LastNameRegex.IsMatch(trimmedValue))
-            throw new DomainException(
+        if (!LastNameRegex.IsMatch(trimmed))
+            throw new InvalidLastNameException(
                 "Last name must consist only of letters. First letter of each part must be uppercase, and the rest lowercase.");
         
-        Value = trimmedValue;
+        Value = trimmed;
     }
 }

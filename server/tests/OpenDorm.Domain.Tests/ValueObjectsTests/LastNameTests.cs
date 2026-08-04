@@ -22,63 +22,63 @@ public class LastNameTests
     }
 
     [Fact]
-    public void Constructor_Null_ThrowsArgumentNullException()
+    public void Constructor_Null_ThrowsInvalidLastNameException()
     {
-        // Act
-        var act = () => new LastName(null!);
+        // Arrange
+        const string expectedMessage = "Last name cannot be empty.";
         
-        // Assert
-        var exception = Assert.Throws<ArgumentNullException>(act);
-        Assert.Equal("value", exception.ParamName);
+        // Act & Assert
+        var exception = Assert.Throws<InvalidLastNameException>(() => new LastName(null!));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Fact]
-    public void Constructor_EmptyString_ThrowsArgumentNullException()
+    public void Constructor_EmptyString_ThrowsInvalidLastNameException()
     {
-        // Act
-        var act = () => new LastName(string.Empty);
+        // Arrange
+        const string expectedMessage = "Last name cannot be empty.";
         
-        // Assert
-        var exception = Assert.Throws<ArgumentNullException>(act);
-        Assert.Equal("value", exception.ParamName);
+        // Act & Assert
+        var exception = Assert.Throws<InvalidLastNameException>(() => new LastName(string.Empty));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Fact]
-    public void Constructor_ValueOfMaximumLength_ThrowsArgumentOutOfRangeException()
+    public void Constructor_ValueExceedsMaximumLength_ThrowsInvalidLastNameException()
     {
         // Arrange
         var veryLongLastName = new string('a', LastName.MaxLength + 1);
+        var expectedMessage = $"Last name cannot be exceed {LastName.MaxLength} characters.";
         
-        // Act
-        var act = () => new LastName(veryLongLastName);
-        
-        // Assert
-        Assert.Throws<ArgumentOutOfRangeException>(act);
+        // Act & Assert
+        var exception = Assert.Throws<InvalidLastNameException>(() => new LastName(veryLongLastName));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Fact]
-    public void Constructor_ValueShorterThanMinimum_ThrowsArgumentOutOfRangeException()
+    public void Constructor_ValueShorterThanMinimum_ThrowsInvalidLastNameException()
     {
         // Arrange
         const string veryShortLastName = "А";
+        var expectedMessage = $"Last name cannot be less than {LastName.MinLength} characters long.";
         
-        // Act
-        var act = () => new LastName(veryShortLastName);
-        
-        // Assert
-        Assert.Throws<ArgumentOutOfRangeException>(act);
+        // Act & Assert
+        var exception = Assert.Throws<InvalidLastNameException>(() => new LastName(veryShortLastName));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Theory]
     [InlineData("Дми3т1рий")]
     [InlineData("ВиКтоРиЯ")]
     [InlineData("18349527")]
-    public void Constructor_InvalidValue_ThrowsDomainException(string value)
+    public void Constructor_InvalidValue_ThrowsInvalidLastNameException(string value)
     {
-        // Act
-        var act = () => new LastName(value);
+        // Arrange
+        const string expectedMessage =
+            "Last name must consist only of letters. First letter of each part must be uppercase, and the rest lowercase.";
         
-        // Assert
-        Assert.Throws<DomainException>(act);
+        // Act & Assert
+        var exception = Assert.Throws<InvalidLastNameException>(()=>new LastName(value));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 }
