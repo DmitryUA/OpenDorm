@@ -22,63 +22,63 @@ public class PatronymicTests
     }
 
     [Fact]
-    public void Constructor_Null_ThrowsArgumentNullException()
+    public void Constructor_Null_ThrowsInvalidPatronymicException()
     {
-        // Act
-        var act = () => new Patronymic(null!);
+        // Arrange
+        const string expectedMessage = "Patronymic cannot be empty.";
         
-        // Assert
-        var exception = Assert.Throws<ArgumentNullException>(act);
-        Assert.Equal("value", exception.ParamName);
+        // Act & Assert
+        var exception = Assert.Throws<InvalidPatronymicException>(() => new Patronymic(null!));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Fact]
-    public void Constructor_EmptyString_ThrowsArgumentNullException()
+    public void Constructor_EmptyString_ThrowsInvalidPatronymicException()
     {
-        // Act
-        var act = () => new Patronymic(string.Empty);
+        // Arrange
+        const string expectedMessage = "Patronymic cannot be empty.";
         
-        // Assert
-        var exception = Assert.Throws<ArgumentNullException>(act);
-        Assert.Equal("value", exception.ParamName);
+        // Act & Assert
+        var exception = Assert.Throws<InvalidPatronymicException>(() => new Patronymic(string.Empty));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Fact]
-    public void Constructor_ValueOfMaximumLength_ThrowsArgumentOutOfRangeException()
+    public void Constructor_ValueExceedsMaximumLength_ThrowsInvalidPatronymicException()
     {
         // Arrange
         var veryLongPatronymic = new string('a', Patronymic.MaxLength + 1);
+        var expectedMessage = $"Patronymic cannot be exceed {Patronymic.MaxLength} characters.";
         
-        // Act
-        var act = () => new Patronymic(veryLongPatronymic);
-        
-        // Assert
-        Assert.Throws<ArgumentOutOfRangeException>(act);
+        // Act & Assert
+        var exception = Assert.Throws<InvalidPatronymicException>(() => new Patronymic(veryLongPatronymic));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Fact]
-    public void Constructor_ValueShorterThanMinimum_ThrowsArgumentOutOfRangeException()
+    public void Constructor_ValueShorterThanMinimum_ThrowsInvalidPatronymicException()
     {
         // Arrange
         const string veryShortPatronymic = "А";
+        var expectedMessage = $"Patronymic cannot be less than {Patronymic.MinLength} characters long.";
         
-        // Act
-        var act = () => new Patronymic(veryShortPatronymic);
-        
-        // Assert
-        Assert.Throws<ArgumentOutOfRangeException>(act);
+        // Act & Assert
+        var exception = Assert.Throws<InvalidPatronymicException>(() => new Patronymic(veryShortPatronymic));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Theory]
     [InlineData("Ив4нови4")]
     [InlineData("АлЕкСаНдРоВиЧ")]
     [InlineData("18349527")]
-    public void Constructor_InvalidValue_ThrowsDomainException(string value)
+    public void Constructor_InvalidValue_ThrowsInvalidPatronymicException(string value)
     {
-        // Act
-        var act = () => new Patronymic(value);
+        // Arrange
+        const string expectedMessage =
+            "Patronymic must consist only of letters. First letter of each part must be uppercase, and the rest lowercase.";
         
-        // Assert
-        Assert.Throws<DomainException>(act);
+        // Act & Assert
+        var exception = Assert.Throws<InvalidPatronymicException>(() => new Patronymic(value));
+        Assert.Equal(expectedMessage, exception.Message);
     }
 }

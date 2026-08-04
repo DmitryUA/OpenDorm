@@ -16,18 +16,19 @@ public class Patronymic
 
     public Patronymic(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentNullException(nameof(value), "Patronymic cannot be empty or white space");
+        var trimmed = value?.Trim();
 
-        var trimmedValue = value.Trim();
-        
-        ArgumentOutOfRangeException.ThrowIfLessThan(trimmedValue.Length, MinLength);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(trimmedValue.Length, MaxLength);
+        if (string.IsNullOrEmpty(trimmed))
+            throw new InvalidPatronymicException("Patronymic cannot be empty.");
+        if (trimmed.Length < MinLength)
+            throw new InvalidPatronymicException($"Patronymic cannot be less than {MinLength} characters long.");
+        if (trimmed.Length > MaxLength)
+            throw new InvalidPatronymicException($"Patronymic cannot be exceed {MaxLength} characters.");
 
-        if (!PatronymicRegex.IsMatch(trimmedValue))
-            throw new DomainException(
+        if (!PatronymicRegex.IsMatch(trimmed))
+            throw new InvalidPatronymicException(
                 "Patronymic must consist only of letters. First letter of each part must be uppercase, and the rest lowercase.");
         
-        Value = trimmedValue;
+        Value = trimmed;
     }
 }
