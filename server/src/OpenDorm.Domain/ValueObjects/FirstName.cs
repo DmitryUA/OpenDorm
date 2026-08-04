@@ -16,18 +16,18 @@ public record FirstName
 
     public FirstName(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentNullException(nameof(value), "First name cannot be empty or white space");
+        var trimmed = value?.Trim();
 
-        var trimmedValue = value.Trim();
+        if (string.IsNullOrEmpty(trimmed)) throw new InvalidFirstNameException("First name cannot be empty.");
+        if (trimmed.Length < MinLength)
+            throw new InvalidFirstNameException($"First name cannot be less than {MinLength} characters long.");
+        if (trimmed.Length > MaxLength)
+            throw new InvalidFirstNameException($"First name cannot be exceed {MaxLength} characters.");
         
-        ArgumentOutOfRangeException.ThrowIfLessThan(trimmedValue.Length, MinLength);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(trimmedValue.Length, MaxLength);
-
-        if (!FirstNameRegex.IsMatch(trimmedValue))
-            throw new DomainException(
-                "Name must consist only of letters. First letter of each part must be uppercase, and the rest lowercase.");
+        if (!FirstNameRegex.IsMatch(trimmed))
+            throw new InvalidFirstNameException(
+                "First name must consist only of letters. First letter of each part must be uppercase, and the rest lowercase.");
         
-        Value = trimmedValue;
+        Value = trimmed;
     }
 }
