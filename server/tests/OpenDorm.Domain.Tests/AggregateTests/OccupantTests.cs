@@ -33,6 +33,7 @@ public class OccupantTests
         Assert.Equal(fullName, occupant.FullName);
         Assert.Equal(gender, occupant.Gender);
         Assert.Equal(birthDate, occupant.BirthDate);
+        Assert.True(occupant.IsActive);
     }
 
     [Fact]
@@ -161,6 +162,82 @@ public class OccupantTests
         var checkOutEvent = Assert.IsType<OccupantCheckedOutEvent>(occupant.DomainEvents.Last());
         Assert.Equal(roomId, checkOutEvent.RoomId);
         Assert.Equal(occupant.Id, checkOutEvent.OccupantId);
+    }
+
+    #endregion
+
+    #region Activate Tests
+
+    [Fact]
+    public void Activate_Active_IsActiveIsTrue()
+    {
+        // Arrange
+        var occupant = new OccupantBuilder().Build();
+        
+        // Act
+        occupant.Activate();
+        
+        // Assert
+        Assert.True(occupant.IsActive);
+    }
+
+    [Fact]
+    public void Activate_Inactive_IsActiveIsTrue()
+    {
+        // Arrange
+        var occupant = new OccupantBuilder().Build();
+        occupant.Deactivate();
+        
+        // Act
+        occupant.Activate();
+        
+        // Assert
+        Assert.True(occupant.IsActive);
+    }
+
+    #endregion
+
+    #region Deactivate Tests
+
+    [Fact]
+    public void Deactivate_Active_IsActiveIsFalse()
+    {
+        // Arrange
+        var occupant = new OccupantBuilder().Build();
+        
+        // Act
+        occupant.Deactivate();
+        
+        // Assert
+        Assert.False(occupant.IsActive);
+    }
+
+    [Fact]
+    public void Deactivate_Inactive_IsActiveIsFalse()
+    {
+        // Arrange
+        var occupant = new OccupantBuilder().Build();
+        occupant.Deactivate();
+        
+        // Act
+        occupant.Deactivate();
+        
+        // Assert
+        Assert.False(occupant.IsActive);
+    }
+
+    [Fact]
+    public void Deactivate_ActiveAccommodation_ThrowsDomainException()
+    {
+        // Arrange
+        var occupant = new OccupantBuilder().Build();
+        occupant.CheckIn(Guid.NewGuid());
+        var expectedMessage =
+            $"Cannot deactivate occupant '{occupant.FullName}' with active accommodation. Occupant id: '{occupant.Id}'.";
+        
+        // Act & Assert
+        var exception = Assert.Throws<DomainException>(occupant.Deactivate);
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     #endregion

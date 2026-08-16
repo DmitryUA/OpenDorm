@@ -8,12 +8,13 @@ namespace OpenDorm.Domain.Aggregates.Occupant;
 
 public class Occupant : AggregateRoot
 {
-    public LastName LastName { get; init; }
-    public FirstName FirstName { get; init; }
-    public Patronymic? Patronymic { get; init; }
+    public LastName LastName { get; }
+    public FirstName FirstName { get; }
+    public Patronymic? Patronymic { get; }
     public string FullName => Patronymic == null ? $"{LastName} {FirstName}" : $"{LastName} {FirstName} {Patronymic}";
-    public Gender Gender { get; init; }
-    public BirthDate BirthDate { get; init; }
+    public Gender Gender { get; }
+    public BirthDate BirthDate { get; }
+    public bool IsActive { get; private set; } = true;
 
     private readonly List<Accommodation> _accommodations = [];
     
@@ -53,5 +54,22 @@ public class Occupant : AggregateRoot
         AddDomainEvent(checkedOutEvent);
         
         activeAccommodation.CheckOut(DateTime.UtcNow);
+    }
+    
+    public void Activate()
+    {
+        if (IsActive) return;
+
+        IsActive = true;
+    }
+
+    public void Deactivate()
+    {
+        if (!IsActive) return;
+
+        if (_accommodations.Any(a => a.IsActive))
+            throw new DomainException($"Cannot deactivate occupant '{FullName}' with active accommodation. Occupant id: '{Id}'.");
+
+        IsActive = false;
     }
 }
