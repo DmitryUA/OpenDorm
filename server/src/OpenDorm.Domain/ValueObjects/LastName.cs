@@ -30,4 +30,6 @@ public record LastName
         
         Value = trimmed;
     }
+
+    public override string ToString() => Value;
 }

@@ -31,4 +31,6 @@ public class Patronymic
         
         Value = trimmed;
     }
+
+    public override string ToString() => Value;
 }

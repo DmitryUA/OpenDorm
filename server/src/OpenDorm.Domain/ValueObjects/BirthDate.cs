@@ -39,4 +39,6 @@ public record BirthDate
     
     public static implicit operator DateOnly(BirthDate date) => date.Value;
     public static implicit operator BirthDate(DateOnly date) => new(date);
+
+    public override string ToString() => Value.ToString();
 }
