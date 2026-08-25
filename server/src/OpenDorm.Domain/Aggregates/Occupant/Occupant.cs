@@ -18,6 +18,7 @@ public class Occupant : AggregateRoot
 
     private readonly List<Accommodation> _accommodations = [];
     
+    private Occupant() {} // For EF Core only
     public Occupant(Guid id, LastName lastName, FirstName firstName, Patronymic? patronymic, Gender gender, BirthDate birthDate) : base(id)
     {
         ArgumentNullException.ThrowIfNull(lastName);
@@ -33,6 +34,8 @@ public class Occupant : AggregateRoot
 
     public void CheckIn(Guid roomId)
     {
+        if (!IsActive) throw new DomainException($"Inactive occupant cannot be moved in. Occupant id: '{Id}'.");
+            
         if (_accommodations.Any(a => a.IsActive))
             throw new DomainException($"'{FullName}' is already living in another room. Occupant id: '{Id}'");
 

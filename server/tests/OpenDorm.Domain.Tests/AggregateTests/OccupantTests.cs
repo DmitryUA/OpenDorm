@@ -143,6 +143,19 @@ public class OccupantTests
         Assert.Throws<DomainException>(() => occupant.CheckIn(Guid.NewGuid()));
     }
 
+    [Fact]
+    public void CheckIn_InactiveOccupant_ThrowsDomainException()
+    {
+        // Arrange
+        var occupant = new OccupantBuilder().Build();
+        occupant.Deactivate();
+        var expectedMessage = $"Inactive occupant cannot be moved in. Occupant id: '{occupant.Id}'.";
+        
+        // Act & Assert
+        var exception = Assert.Throws<DomainException>(() => occupant.CheckIn(Guid.NewGuid()));
+        Assert.Equal(expectedMessage, exception.Message);
+    }
+
     #endregion
 
     #region CheckOut Tests
