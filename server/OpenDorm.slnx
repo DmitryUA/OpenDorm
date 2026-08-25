@@ -1,9 +1,11 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/OpenDorm.API/OpenDorm.API.csproj" />
     <Project Path="src/OpenDorm.Domain/OpenDorm.Domain.csproj" />
     <Project Path="src/OpenDorm.Infrastructure/OpenDorm.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/OpenDorm.Domain.Tests/OpenDorm.Domain.Tests.csproj" />
+    <Project Path="tests/OpenDorm.Infrastructure.Tests/OpenDorm.Infrastructure.Tests.csproj" />
   </Folder>
 </Solution>

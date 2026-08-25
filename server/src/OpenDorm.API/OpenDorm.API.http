@@ -1,0 +1,6 @@
+@OpenDorm.API_HostAddress = http://localhost:5140
+
+GET {{OpenDorm.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
