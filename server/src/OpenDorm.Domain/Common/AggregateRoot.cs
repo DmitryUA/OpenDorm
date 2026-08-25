@@ -5,8 +5,8 @@ namespace OpenDorm.Domain.Common;
 public abstract class AggregateRoot : Entity
 {
     private readonly List<IDomainEvent> _domainEvents = [];
-    private AggregateRoot() : base() { } // For EF Core only
 
+    protected AggregateRoot() {} // For EF only
     protected AggregateRoot(Guid id) : base(id) { }
     
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();

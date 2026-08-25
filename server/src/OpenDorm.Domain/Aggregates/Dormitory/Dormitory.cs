@@ -8,11 +8,11 @@ namespace OpenDorm.Domain.Aggregates.Dormitory;
 
 public class Dormitory : AggregateRoot
 {
-    public Address Address { get; init; }
-    public int FloorCount { get; init; }
-
+    public Address Address { get; private set; }
+    public int FloorCount { get; private set; }
     private readonly List<Room> _rooms = [];
-
+    
+    private Dormitory() {}  // For EF Core only
     public Dormitory(Guid id, Address address, int floorCount = 1) : base(id)
     {
         ArgumentNullException.ThrowIfNull(address);
@@ -70,40 +70,5 @@ public class Dormitory : AggregateRoot
         AddDomainEvent(roomRemovedEvent);
         
         _rooms.RemoveAt(roomIndex);
-    }
-
-    public void CheckIn(RoomName roomName, Guid occupantId)
-    {
-        CheckIn(r => r.Name == roomName, $"Room '{roomName}'", occupantId);
-    }
-
-    public void CheckIn(Guid roomId, Guid occupantId)
-    {
-        CheckIn(r => r.Id == roomId, $"Room with id '{roomId}'", occupantId);
-    }
-
-    private void CheckIn(Func<Room, bool> predicate, string roomDescription, Guid occupantId)
-    {
-        var room = _rooms.FirstOrDefault(predicate);
-    
-        if (room is null)
-            throw new DomainException($"{roomDescription} was not found in dormitory. Dormitory id: '{Id}'");
-    
-        room.CheckIn(occupantId);
-        AddDomainEvent(new RoomOccupiedEvent(Id, room.Id, occupantId));
-    }
-
-    public void CheckOut(Guid occupantId)
-    {
-        var room = _rooms.FirstOrDefault(r => r.OccupantIds.Contains(occupantId));
-
-        if (room == null)
-            throw new DomainException(
-                $"Occupant with id: '{occupantId}' was not found in dormitory. Dormitory id: '{Id}'");
-        
-        room.CheckOut(occupantId);
-
-        var occupantCheckedOutEvent = new RoomVacatedEvent(Id, room.Id, occupantId);
-        AddDomainEvent(occupantCheckedOutEvent);
     }
 }
