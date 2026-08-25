@@ -7,30 +7,11 @@ namespace OpenDorm.Domain.Aggregates.Dormitory;
 
 public class Room : Entity
 {
-    public int Capacity { get; init; }
-    public RoomName Name { get; init; }
-    public Gender Gender { get; init; }
-    public int FloorNumber { get; init; }
-    public bool HasVacancy => _occupantIds.Count < Capacity;
-    private List<Guid> _occupantIds = [];
-    public IReadOnlyCollection<Guid> OccupantIds => _occupantIds.AsReadOnly();
-
-    public void CheckIn(Guid occupantId)
-    {
-        if (!HasVacancy)
-            throw new RoomFullyOccupiedException(Id, Name);
-
-        if (_occupantIds.Contains(occupantId))
-            throw new DuplicateOccupantException(occupantId, Id, Name);
-        
-        _occupantIds.Add(occupantId);
-    }
-
-    public void CheckOut(Guid occupantId)
-    {
-        if (!_occupantIds.Remove(occupantId))
-            throw new DomainException($"Occupant is not in this room. Room id: '{Id}', occupant id: '{occupantId}'");
-    }
+    public int Capacity { get; private set; }
+    public RoomName Name { get; private set; }
+    public Gender Gender { get; private set; }
+    public int FloorNumber { get; private set; }
+    public bool IsActive { get; private set; } = true;
 
     public Room(Guid id, RoomName name, Gender gender, int capacity = 1, int floorNumber = 1) : base(id)
     {
@@ -42,5 +23,19 @@ public class Room : Entity
         Gender = gender;
         Capacity = capacity;
         FloorNumber = floorNumber;
+    }
+    
+    public void Activate()
+    {
+        if (IsActive) return;
+
+        IsActive = true;
+    }
+
+    public void Deactivate()
+    {
+        if (!IsActive) return;
+
+        IsActive = false;
     }
 }

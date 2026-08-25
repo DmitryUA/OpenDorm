@@ -28,8 +28,7 @@ public class RoomTests
         Assert.Equal(gender, room.Gender);
         Assert.Equal(capacity, room.Capacity);
         Assert.Equal(floor, room.FloorNumber);
-        Assert.True(room.HasVacancy);
-        Assert.Empty(room.OccupantIds);
+        Assert.True(room.IsActive);
     }
     
     [Fact]
@@ -75,84 +74,70 @@ public class RoomTests
 
     #endregion
 
-    #region CheckIn Tests
+    #region Activate Tests
 
     [Fact]
-    public void CheckIn_ValidOccupantId_AddsToOccupantsAndUpdatesVacancy()
+    public void Activate_ActiveRoom_IsActiveTrue()
     {
         // Arrange
-        var room = new Room(Guid.NewGuid(), new RoomName("Room 101"), Gender.Male, capacity: 2);
-        var occupantId = Guid.NewGuid();
-
-        // Act
-        room.CheckIn(occupantId);
-
-        // Assert
-        Assert.Contains(occupantId, room.OccupantIds);
-        Assert.True(room.HasVacancy);
-    }
-
-    [Fact]
-    public void CheckIn_RoomIsFull_ThrowsRoomFullyOccupiedException()
-    {
-        // Arrange
-        var room = new Room(Guid.NewGuid(), new RoomName("Room 101"), Gender.Male, capacity: 1);
-        room.CheckIn(Guid.NewGuid()); // Заполняем комнату
-            
-        var newOccupantId = Guid.NewGuid();
-
-        // Act & Assert
-        var exception = Assert.Throws<RoomFullyOccupiedException>(() => room.CheckIn(newOccupantId));
+        var room = new RoomBuilder().Build();
         
-        Assert.Equal(room.Id, exception.RoomId); 
-        Assert.Equal(room.Name, exception.Name);
-    }
-    
-    [Fact]
-    public void CheckIn_DuplicateOccupantId_ThrowsDuplicateOccupantException()
-    {
-        // Arrange
-        var room = new Room(Guid.NewGuid(), new RoomName("Room 101"), Gender.Male, capacity: 2);
-        var occupantId = Guid.NewGuid();
-        room.CheckIn(occupantId);
-
-        // Act & Assert
-        var exception = Assert.Throws<DuplicateOccupantException>(() => room.CheckIn(occupantId));
-        
-        Assert.Equal(occupantId, exception.OccupantId);
-    }
-    
-    #endregion
-
-    #region CheckOutTests
-
-    [Fact]
-    public void CheckOut_ExistingOccupantId_RemovesFromOccupantsAndUpdatesVacancy()
-    {
-        // Arrange
-        var room = new Room(Guid.NewGuid(), new RoomName("Room 101"), Gender.Male, capacity: 1);
-        var occupantId = Guid.NewGuid();
-        room.CheckIn(occupantId);
-        Assert.False(room.HasVacancy); // Комната заполнена
-
         // Act
-        room.CheckOut(occupantId);
-
+        room.Activate();
+        
         // Assert
-        Assert.DoesNotContain(occupantId, room.OccupantIds);
+        Assert.True(room.IsActive);
     }
 
     [Fact]
-    public void CheckOut_NonExistingOccupantId_ThrowsDomainException()
+    public void Activate_InactiveRoom_IsActiveTrue()
     {
         // Arrange
-        var room = new Room(Guid.NewGuid(), new RoomName("Room 101"), Gender.Male);
-        var nonExistingOccupantId = Guid.NewGuid();
-
-        // Act & Assert
-        var exception = Assert.Throws<DomainException>(() => room.CheckOut(nonExistingOccupantId));
-        Assert.Contains("Occupant is not in this room", exception.Message);
+        var room = new RoomBuilder().Build();
+        room.Deactivate();
+        
+        // Act
+        room.Activate();
+        
+        // Assert
+        Assert.True(room.IsActive);
     }
 
     #endregion
+
+    #region Deactivate Tests
+
+    [Fact]
+    public void Deactivate_ActiveRoom_IsActiveFalse()
+    {
+        // Arrange
+        var room = new RoomBuilder().Build();
+        
+        // Act
+        room.Deactivate();
+        
+        // Assert
+        Assert.False(room.IsActive);
+    }
+
+    [Fact]
+    public void Deactivate_InactiveRoom_IsActiveFalse()
+    {
+        // Arrange
+        var room = new RoomBuilder().Build();
+        room.Deactivate();
+        
+        // Act
+        room.Deactivate();
+        
+        // Assert
+        Assert.False(room.IsActive);
+    }
+
+    #endregion
+    
+    private class RoomBuilder
+    {
+        public Room Build() => new(Guid.NewGuid(), new RoomName("Room 102"), Gender.Female);
+    }
 }
