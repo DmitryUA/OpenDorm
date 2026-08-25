@@ -37,7 +37,7 @@ public class StreetTests
     public void Ctor_MinValidLength_CreatesInstanceSuccessfully()
     {
         // Arrange
-        var minValidName = new string('X', Street.MinStreetNameLength);
+        var minValidName = new string('X', Street.MinLength);
         
         // Act
         var street = new Street(minValidName);
@@ -50,7 +50,7 @@ public class StreetTests
     public void Ctor_MaxValidLength_CreatesInstanceSuccessfully()
     {
         // Arrange
-        var maxValidName = new string('X', Street.MaxStreetNameLength);
+        var maxValidName = new string('X', Street.MaxLength);
 
         // Act
         var street = new Street(maxValidName);
@@ -90,7 +90,7 @@ public class StreetTests
     public void Ctor_LengthLessThanMin_ThrowsInvalidStreetException(string name)
     {
         // Arrange
-        var expectedMessage = $"Street name cannot be less than {Street.MinStreetNameLength} characters long.";
+        var expectedMessage = $"Street name cannot be less than {Street.MinLength} characters long.";
 
         // Act & Assert
         var exception = Assert.Throws<InvalidStreetException>(() => new Street(name));
@@ -101,8 +101,8 @@ public class StreetTests
     public void Ctor_LengthGreaterThanMax_ThrowsInvalidStreetException()
     {
         // Arrange
-        var longName = new string('A', Street.MaxStreetNameLength + 1);
-        var expectedMessage = $"Street name cannot exceed {Street.MaxStreetNameLength} characters.";
+        var longName = new string('A', Street.MaxLength + 1);
+        var expectedMessage = $"Street name cannot exceed {Street.MaxLength} characters.";
 
         // Act & Assert
         var exception = Assert.Throws<InvalidStreetException>(() => new Street(longName));
