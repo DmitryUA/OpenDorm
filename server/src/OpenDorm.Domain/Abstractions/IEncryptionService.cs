@@ -1,4 +1,4 @@
-namespace OpenDorm.Infrastructure.Abstractions;
+namespace OpenDorm.Domain.Abstractions;
 
 public interface IEncryptionService
 {

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using OpenDorm.Domain.Abstractions;
 using OpenDorm.Domain.Aggregates.Dormitory;
 using OpenDorm.Domain.Aggregates.Occupant;
-using OpenDorm.Infrastructure.Abstractions;
 using OpenDorm.Infrastructure.Configurations;
 
 namespace OpenDorm.Infrastructure;

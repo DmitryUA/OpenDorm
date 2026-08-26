@@ -1,5 +1,5 @@
 using System.Security.Cryptography;
-using OpenDorm.Infrastructure.Abstractions;
+using OpenDorm.Domain.Abstractions;
 
 namespace OpenDorm.Infrastructure.Services;
 

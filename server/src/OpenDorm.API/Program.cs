@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using OpenDorm.Domain.Abstractions;
 using OpenDorm.Infrastructure;
-using OpenDorm.Infrastructure.Abstractions;
 using OpenDorm.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);

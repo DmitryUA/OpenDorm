@@ -1,11 +1,11 @@
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using OpenDorm.Domain.Abstractions;
 using OpenDorm.Domain.Aggregates.Dormitory;
 using OpenDorm.Domain.Aggregates.Occupant;
 using OpenDorm.Domain.Enums;
 using OpenDorm.Domain.ValueObjects;
-using OpenDorm.Infrastructure.Abstractions;
 
 namespace OpenDorm.Infrastructure.Configurations;
 
