@@ -81,4 +81,21 @@ public class PatronymicTests
         var exception = Assert.Throws<InvalidPatronymicException>(() => new Patronymic(value));
         Assert.Equal(expectedMessage, exception.Message);
     }
+    
+    [Theory]
+    [InlineData("Иванович")]
+    [InlineData("Александровна")]
+    [InlineData("Петровна")]
+    public void Equality_SameValue_ReturnsTrue(string value)
+    {
+        // Arrange
+        var patronymic1 = new Patronymic(value);
+        var patronymic2 = new Patronymic(value);
+        
+        Assert.True(patronymic1.Equals(patronymic2));
+        
+        Assert.Equal(patronymic1.GetHashCode(), patronymic2.GetHashCode());
+        
+        Assert.Equal(patronymic1, patronymic2);
+    }
 }

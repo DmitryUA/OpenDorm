@@ -3,7 +3,7 @@ using OpenDorm.Domain.Exceptions;
 
 namespace OpenDorm.Domain.ValueObjects;
 
-public class Patronymic
+public record Patronymic
 {
     public const int MinLength = 2;
     public const int MaxLength = 30;
