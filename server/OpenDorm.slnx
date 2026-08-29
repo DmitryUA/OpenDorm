@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/OpenDorm.API/OpenDorm.API.csproj" />
+    <Project Path="src/OpenDorm.Application/OpenDorm.Application.csproj" />
     <Project Path="src/OpenDorm.Domain/OpenDorm.Domain.csproj" />
     <Project Path="src/OpenDorm.Infrastructure/OpenDorm.Infrastructure.csproj" />
   </Folder>
