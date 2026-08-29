@@ -11,6 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\OpenDorm.Application\OpenDorm.Application.csproj" />
       <ProjectReference Include="..\OpenDorm.Domain\OpenDorm.Domain.csproj" />
     </ItemGroup>
 
