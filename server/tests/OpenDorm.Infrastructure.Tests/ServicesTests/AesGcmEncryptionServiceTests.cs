@@ -15,7 +15,7 @@ public class AesGcmEncryptionServiceTests
     public void Constructor_ThrowsArgumentException_WhenKeyIsNull()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => new AesGcmEncryptionService(null));
+        Assert.Throws<ArgumentNullException>(() => new AesGcmEncryptionService(null!));
     }
 
     [Theory]
@@ -80,7 +80,7 @@ public class AesGcmEncryptionServiceTests
         var service = new AesGcmEncryptionService(_validKey);
 
         // Act
-        byte[] result = service.Encrypt(null);
+        byte[] result = service.Encrypt(null!);
 
         // Assert
         Assert.Empty(result);
@@ -106,7 +106,7 @@ public class AesGcmEncryptionServiceTests
         var service = new AesGcmEncryptionService(_validKey);
 
         // Act
-        byte[] result = service.Decrypt(null);
+        byte[] result = service.Decrypt(null!);
 
         // Assert
         Assert.Empty(result);
