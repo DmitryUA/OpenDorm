@@ -32,7 +32,7 @@ public class Occupant : AggregateRoot
         BirthDate = birthDate;
     }
 
-    public void CheckIn(Guid roomId)
+    public Guid CheckIn(Guid roomId)
     {
         if (!IsActive) throw new DomainException($"Inactive occupant cannot be moved in. Occupant id: '{Id}'.");
             
@@ -44,6 +44,8 @@ public class Occupant : AggregateRoot
 
         var checkedInEvent = new OccupantCheckedInEvent(roomId, Id);
         AddDomainEvent(checkedInEvent);
+
+        return accommodation.Id;
     }
     
     public void CheckOut()

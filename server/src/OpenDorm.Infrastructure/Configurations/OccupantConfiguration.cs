@@ -72,42 +72,9 @@ public class OccupantConfiguration(IEncryptionService encryptionService) : IEnti
             .HasComment("активен ли проживающий, true - да, false - нет")
             .IsRequired();
 
-        builder.OwnsMany<Accommodation>("_accommodations", accommodationBuilder =>
-        {
-            accommodationBuilder.ToTable("accommodations", t => t.HasComment("заселения"));
-
-            accommodationBuilder.HasKey(a => a.Id);
-
-            accommodationBuilder.Property(a => a.Id)
-                .HasColumnName("id")
-                .HasComment("идентификатор заселения");
-
-            accommodationBuilder.Property(a => a.CheckInDate)
-                .HasColumnName("check_in_date")
-                .HasComment("дата и время заселения")
-                .IsRequired();
-
-            accommodationBuilder.Property(a => a.CheckOutDate)
-                .HasColumnName("check_out_date")
-                .HasComment("дата и время выселения")
-                .IsRequired(false);
-
-            accommodationBuilder.Property<Guid>("OccupantId")
-                .HasColumnName("occupant_id")
-                .HasComment("идентификатор жильца");
-
-            accommodationBuilder.Property<Guid>("RoomId")
-                .HasColumnName("room_id")
-                .HasComment("идентификатор комнаты");
-            
-            accommodationBuilder.HasOne<Room>()
-                .WithMany()
-                .HasForeignKey("RoomId")
-                .OnDelete(DeleteBehavior.Restrict);
-
-            accommodationBuilder.HasIndex("OccupantId")
-                .HasFilter("check_out_date IS NULL")
-                .HasDatabaseName("UX_Accommodations_OccupantId_Active");
-        });
+        builder.HasMany<Accommodation>("_accommodations")
+            .WithOne()
+            .HasForeignKey("OccupantId")
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

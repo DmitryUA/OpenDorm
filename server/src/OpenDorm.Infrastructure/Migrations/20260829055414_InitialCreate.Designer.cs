@@ -12,7 +12,7 @@ using OpenDorm.Infrastructure;
 namespace OpenDorm.Infrastructure.Migrations
 {
     [DbContext(typeof(OpenDormDbContext))]
-    [Migration("20260825125604_InitialCreate")]
+    [Migration("20260829055414_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -97,6 +97,48 @@ namespace OpenDorm.Infrastructure.Migrations
                             t.HasComment("комнаты в общежитиях");
 
                             t.HasCheckConstraint("CK_Name_MinLength", "LENGTH(name) >= 1");
+                        });
+                });
+
+            modelBuilder.Entity("OpenDorm.Domain.Aggregates.Occupant.Accommodation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasComment("идентификатор заселения");
+
+                    b.Property<DateTime>("CheckInDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("check_in_date")
+                        .HasComment("дата и время заселения");
+
+                    b.Property<DateTime?>("CheckOutDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("check_out_date")
+                        .HasComment("дата и время выселения");
+
+                    b.Property<Guid>("OccupantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("occupant_id")
+                        .HasComment("идентификатор жильца");
+
+                    b.Property<Guid>("RoomId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("room_id")
+                        .HasComment("идентификатор комнаты");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OccupantId")
+                        .HasDatabaseName("UX_Accommodations_OccupantId_Active")
+                        .HasFilter("check_out_date IS NULL");
+
+                    b.HasIndex("RoomId");
+
+                    b.ToTable("accommodations", null, t =>
+                        {
+                            t.HasComment("заселения");
                         });
                 });
 
@@ -206,65 +248,29 @@ namespace OpenDorm.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("OpenDorm.Domain.Aggregates.Occupant.Occupant", b =>
+            modelBuilder.Entity("OpenDorm.Domain.Aggregates.Occupant.Accommodation", b =>
                 {
-                    b.OwnsMany("OpenDorm.Domain.Aggregates.Occupant.Accommodation", "_accommodations", b1 =>
-                        {
-                            b1.Property<Guid>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("uuid")
-                                .HasColumnName("id")
-                                .HasComment("идентификатор заселения");
+                    b.HasOne("OpenDorm.Domain.Aggregates.Occupant.Occupant", null)
+                        .WithMany("_accommodations")
+                        .HasForeignKey("OccupantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                            b1.Property<DateTime>("CheckInDate")
-                                .HasColumnType("timestamp with time zone")
-                                .HasColumnName("check_in_date")
-                                .HasComment("дата и время заселения");
-
-                            b1.Property<DateTime?>("CheckOutDate")
-                                .HasColumnType("timestamp with time zone")
-                                .HasColumnName("check_out_date")
-                                .HasComment("дата и время выселения");
-
-                            b1.Property<Guid>("OccupantId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("occupant_id")
-                                .HasComment("идентификатор жильца");
-
-                            b1.Property<Guid>("RoomId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("room_id")
-                                .HasComment("идентификатор комнаты");
-
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("OccupantId")
-                                .HasDatabaseName("UX_Accommodations_OccupantId_Active")
-                                .HasFilter("check_out_date IS NULL");
-
-                            b1.HasIndex("RoomId");
-
-                            b1.ToTable("accommodations", null, t =>
-                                {
-                                    t.HasComment("заселения");
-                                });
-
-                            b1.WithOwner()
-                                .HasForeignKey("OccupantId");
-
-                            b1.HasOne("OpenDorm.Domain.Aggregates.Dormitory.Room", null)
-                                .WithMany()
-                                .HasForeignKey("RoomId")
-                                .OnDelete(DeleteBehavior.Restrict)
-                                .IsRequired();
-                        });
-
-                    b.Navigation("_accommodations");
+                    b.HasOne("OpenDorm.Domain.Aggregates.Dormitory.Room", null)
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("OpenDorm.Domain.Aggregates.Dormitory.Dormitory", b =>
                 {
                     b.Navigation("_rooms");
+                });
+
+            modelBuilder.Entity("OpenDorm.Domain.Aggregates.Occupant.Occupant", b =>
+                {
+                    b.Navigation("_accommodations");
                 });
 #pragma warning restore 612, 618
         }

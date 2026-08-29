@@ -18,6 +18,7 @@ public class OpenDormDbContext(DbContextOptions<OpenDormDbContext> options, IEnc
 
         modelBuilder.ApplyConfiguration(new RoomConfiguration());
         modelBuilder.ApplyConfiguration(new DormitoryConfiguration());
+        modelBuilder.ApplyConfiguration(new AccommodationConfiguration());
         modelBuilder.ApplyConfiguration(new OccupantConfiguration(encryptionService));
     }
 }
