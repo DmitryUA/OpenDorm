@@ -8,16 +8,17 @@ namespace OpenDorm.Domain.Aggregates.Occupant;
 
 public class Occupant : AggregateRoot
 {
-    public LastName LastName { get; }
-    public FirstName FirstName { get; }
+    public LastName LastName { get; } = null!;
+    public FirstName FirstName { get; } = null!;
     public Patronymic? Patronymic { get; }
     public string FullName => Patronymic == null ? $"{LastName} {FirstName}" : $"{LastName} {FirstName} {Patronymic}";
     public Gender Gender { get; }
-    public BirthDate BirthDate { get; }
+    public BirthDate BirthDate { get; } = null!;
     public bool IsActive { get; private set; } = true;
 
     private readonly List<Accommodation> _accommodations = [];
     
+    // ReSharper disable once UnusedMember.Local
     private Occupant() {} // For EF Core only
     public Occupant(Guid id, LastName lastName, FirstName firstName, Patronymic? patronymic, Gender gender, BirthDate birthDate) : base(id)
     {

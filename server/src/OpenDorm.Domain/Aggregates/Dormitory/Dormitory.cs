@@ -8,10 +8,11 @@ namespace OpenDorm.Domain.Aggregates.Dormitory;
 
 public class Dormitory : AggregateRoot
 {
-    public Address Address { get; private set; }
+    public Address Address { get; private set; } = null!;
     public int FloorCount { get; private set; }
     private readonly List<Room> _rooms = [];
     
+    // ReSharper disable once UnusedMember.Local
     private Dormitory() {}  // For EF Core only
     public Dormitory(Guid id, Address address, int floorCount = 1) : base(id)
     {
