@@ -10,10 +10,15 @@ namespace OpenDorm.Infrastructure;
 public class OpenDormDbContext(DbContextOptions<OpenDormDbContext> options, IEncryptionService encryptionService)
     : DbContext(options), IApplicationDbContext
 {
-    public DbSet<Room> Rooms { get; set; }
-    public DbSet<Occupant> Occupants { get; set; }
-    public DbSet<Dormitory> Dormitories { get; set; }
-    public DbSet<Accommodation> Accommodations { get; set; }
+    public IQueryable<Room> Rooms => RoomsDbSet;
+    public IQueryable<Occupant> Occupants => OccupantsDbSet;
+    public IQueryable<Dormitory> Dormitories => DormitoriesDbSet;
+    public IQueryable<Accommodation> Accommodations => AccommodationsDbSet;
+    
+    public DbSet<Room> RoomsDbSet { get; set; }
+    public DbSet<Occupant> OccupantsDbSet { get; set; }
+    public DbSet<Dormitory> DormitoriesDbSet { get; set; }
+    public DbSet<Accommodation> AccommodationsDbSet { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

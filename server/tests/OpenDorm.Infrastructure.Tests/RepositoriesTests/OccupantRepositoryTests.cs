@@ -109,7 +109,7 @@ public class OccupantRepositoryTests : IAsyncLifetime
         await _context.SaveChangesAsync();
         _context.ChangeTracker.Clear();
 
-        var loadedOccupant = await _context.Occupants
+        var loadedOccupant = await _context.OccupantsDbSet
             .FirstOrDefaultAsync(o => o.Id == occupant.Id);
 
         var loadedAccommodation = await _context.Set<Accommodation>()

@@ -6,10 +6,10 @@ namespace OpenDorm.Application.Abstractions.Persistence;
 
 public interface IApplicationDbContext
 {
-    DbSet<Dormitory> Dormitories { get; }
-    DbSet<Room> Rooms { get; }
-    DbSet<Occupant> Occupants { get; }
-    DbSet<Accommodation> Accommodations { get; }
+    IQueryable<Dormitory> Dormitories { get; }
+    IQueryable<Room> Rooms { get; }
+    IQueryable<Occupant> Occupants { get; }
+    IQueryable<Accommodation> Accommodations { get; }
     
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

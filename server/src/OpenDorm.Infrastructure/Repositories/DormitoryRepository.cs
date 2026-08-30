@@ -8,11 +8,11 @@ public class DormitoryRepository(OpenDormDbContext dbContext) : IDormitoryReposi
 {
     public async Task AddAsync(Dormitory dormitory)
     {
-        await dbContext.Dormitories.AddAsync(dormitory);
+        await dbContext.DormitoriesDbSet.AddAsync(dormitory);
     }
 
     public async Task<Dormitory?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
-        return await dbContext.Dormitories.FirstOrDefaultAsync(d => d.Id == id, ct);
+        return await dbContext.DormitoriesDbSet.FirstOrDefaultAsync(d => d.Id == id, ct);
     }
 }

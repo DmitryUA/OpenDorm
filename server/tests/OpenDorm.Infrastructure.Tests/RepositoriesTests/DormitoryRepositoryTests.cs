@@ -87,7 +87,7 @@ public class DormitoryRepositoryTests : IAsyncLifetime
         await _context.SaveChangesAsync();
         _context.ChangeTracker.Clear();
         
-        var loadedDormitory = await _context.Dormitories
+        var loadedDormitory = await _context.DormitoriesDbSet
             .FirstOrDefaultAsync(d => d.Id == dormitory.Id);
     
         var loadedRoom = await _context.Set<Room>()

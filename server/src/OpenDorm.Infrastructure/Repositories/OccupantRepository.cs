@@ -6,8 +6,8 @@ namespace OpenDorm.Infrastructure.Repositories;
 
 public class OccupantRepository(OpenDormDbContext dbContext) : IOccupantRepository
 {
-    public async Task AddAsync(Occupant occupant) => await dbContext.Occupants.AddAsync(occupant);
+    public async Task AddAsync(Occupant occupant) => await dbContext.OccupantsDbSet.AddAsync(occupant);
 
     public async Task<Occupant?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
-        await dbContext.Occupants.FirstOrDefaultAsync(o => o.Id == id, ct);
+        await dbContext.OccupantsDbSet.FirstOrDefaultAsync(o => o.Id == id, ct);
 }
