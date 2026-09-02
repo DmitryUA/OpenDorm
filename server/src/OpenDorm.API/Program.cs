@@ -30,7 +30,10 @@ builder.Services.AddMediatR(cfg =>
 
 builder.Services.AddControllers();
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.EnableAnnotations();
+});
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 // builder.Services.AddOpenApi();
 
