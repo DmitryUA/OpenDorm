@@ -9,14 +9,14 @@ namespace OpenDorm.Application.Features.Dormitories.Commands.CreateDormitory;
 public class CreateDormitoryCommandHandler(IDormitoryRepository repository, IUnitOfWork unitOfWork)
     : IRequestHandler<CreateDormitoryCommand, Guid>
 {
-    public async Task<Guid> Handle(CreateDormitoryCommand request, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(CreateDormitoryCommand command, CancellationToken cancellationToken)
     {
-        var city = new City(request.City);
-        var street = new Street(request.Street);
-        var house = new HouseNumber(request.House);
+        var city = new City(command.City);
+        var street = new Street(command.Street);
+        var house = new HouseNumber(command.House);
         var address = new Address(city, street, house);
 
-        var dormitory = new Dormitory(Guid.NewGuid(), address, request.FloorCount);
+        var dormitory = new Dormitory(Guid.NewGuid(), address, command.FloorCount);
 
         await repository.AddAsync(dormitory);
 

@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using OpenDorm.API.Contracts;
 using OpenDorm.Application.Features.Dormitories.Commands.CreateDormitory;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryDetailsById;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryList;
@@ -49,9 +50,15 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create(
-        [FromBody] CreateDormitoryCommand command,
+        [FromBody] CreateDormitoryRequest request,
         CancellationToken cancellationToken)
     {
+        var command = new CreateDormitoryCommand(
+            request.City,
+            request.Street,
+            request.House,
+            request.FloorCount);
+        
         var dormitoryId = await mediator.Send(command, cancellationToken);
 
         return StatusCode(StatusCodes.Status201Created, dormitoryId);
