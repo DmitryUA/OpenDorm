@@ -26,12 +26,13 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
         return Ok(dormitories);
     }
     
-    // GET: api/dormitories
-    [HttpGet("{id:guid}")]
+    // GET: api/dormitories/{id}/details
+    [HttpGet("{id:guid}/details")]
     [SwaggerOperation(
         Summary = "Получить детальную информацию об общежитии по идентификатору.",
         Description = "Вовзращает детальную информацию об общежитии по его идентификатору.")]
     [ProducesResponseType(typeof(DormitoryDetailsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetDormitoryDetailsById(
         Guid id,
         CancellationToken cancellationToken)

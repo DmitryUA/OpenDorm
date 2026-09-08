@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using OpenDorm.API.Handlers;
 using OpenDorm.Application.Abstractions.Persistence;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryList;
 using OpenDorm.Domain.Abstractions;
@@ -30,6 +31,10 @@ builder.Services.AddMediatR(cfg =>
 
 builder.Services.AddControllers();
 
+builder.Services.AddProblemDetails();
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.EnableAnnotations();
@@ -46,6 +51,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 
