@@ -1,7 +1,8 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using OpenDorm.API.Handlers;
 using OpenDorm.Application.Abstractions.Persistence;
-using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryList;
+using OpenDorm.Application.Common;
 using OpenDorm.Domain.Abstractions;
 using OpenDorm.Infrastructure;
 using OpenDorm.Infrastructure.Persistence;
@@ -26,8 +27,13 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IDormitoryRepository, DormitoryRepository>();
 builder.Services.AddScoped<IOccupantRepository, OccupantRepository>();
 
-builder.Services.AddMediatR(cfg => 
-    cfg.RegisterServicesFromAssemblyContaining<GetDormitoryListQuery>()); 
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssemblyContaining<IApplicationMarker>();
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+});
+
+builder.Services.AddValidatorsFromAssemblyContaining<IApplicationMarker>();
 
 builder.Services.AddControllers();
 
