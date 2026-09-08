@@ -8,22 +8,21 @@ public class CreateDormitoryCommandValidator : AbstractValidator<CreateDormitory
     public CreateDormitoryCommandValidator()
     {
         RuleFor(x => x.City)
-            .NotEmpty().WithMessage("City is required.")
-            .MinimumLength(City.MinLength).WithMessage($"City must be at least {City.MinLength} characters long.")
-            .MaximumLength(City.MaxLength).WithMessage($"City must contain no more than {City.MaxLength} characters.");
+            .NotEmpty().WithMessage("Город обязателен.")
+            .MinimumLength(City.MinLength).WithMessage($"Название города не может быть короче {City.MinLength} символов.")
+            .MaximumLength(City.MaxLength).WithMessage($"Название города не может быть длинее {City.MaxLength} символов.");
 
         RuleFor(x => x.Street)
-            .NotEmpty().WithMessage("Street is required.")
-            .MinimumLength(Street.MinLength).WithMessage($"Street must be at least {Street.MinLength} characters long.")
-            .MaximumLength(Street.MaxLength)
-            .WithMessage($"Street must contain no more than {Street.MaxLength} characters.");
+            .NotEmpty().WithMessage("Улица обязательна.")
+            .MinimumLength(Street.MinLength).WithMessage($"Название улицы не может быть короче {Street.MinLength} символов.")
+            .MaximumLength(Street.MaxLength).WithMessage($"Название улицы не может быть длинее {Street.MaxLength} символов.");
 
         RuleFor(x => x.House)
-            .NotEmpty().WithMessage("House is required.")
+            .NotEmpty().WithMessage("Номер дома обязателен.")
             .MaximumLength(HouseNumber.MaxLength)
-            .WithMessage($"House must contain no more than {HouseNumber.MaxLength} characters");
+            .WithMessage($"Номер дома не может быть длинее {HouseNumber.MaxLength} символов");
 
         RuleFor(x => x.FloorCount)
-            .GreaterThanOrEqualTo(1).WithMessage("Floor count must be at least 1.");
+            .GreaterThanOrEqualTo(1).WithMessage("Количество этажей должно быть больше 0.");
     }
 }
