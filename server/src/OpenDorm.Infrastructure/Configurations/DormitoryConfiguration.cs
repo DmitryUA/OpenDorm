@@ -17,7 +17,8 @@ public class DormitoryConfiguration : IEntityTypeConfiguration<Dormitory>
         
         builder.Property(d => d.Id)
             .HasColumnName("id")
-            .HasComment("идентификатор общежития");
+            .HasComment("идентификатор общежития")
+            .ValueGeneratedNever();
 
         builder.Property(d => d.FloorCount)
             .HasColumnName("floor_count")

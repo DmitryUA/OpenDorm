@@ -17,7 +17,8 @@ public class AccommodationConfiguration : IEntityTypeConfiguration<Accommodation
 
         builder.Property(a => a.Id)
             .HasColumnName("id")
-            .HasComment("идентификатор заселения");
+            .HasComment("идентификатор заселения")
+            .ValueGeneratedNever();
         
         builder.Property(a => a.CheckInDate)
             .HasColumnName("check_in_date")

@@ -20,7 +20,8 @@ public class RoomConfiguration : IEntityTypeConfiguration<Room>
 
         builder.Property(r => r.Id)
             .HasColumnName("id")
-            .HasComment("идентификатор комнаты");
+            .HasComment("идентификатор комнаты")
+            .ValueGeneratedNever();
 
         builder.Property(r => r.Capacity)
             .HasColumnName("capacity")

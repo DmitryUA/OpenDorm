@@ -21,7 +21,8 @@ public class OccupantConfiguration(IEncryptionService encryptionService) : IEnti
 
         builder.Property(o => o.Id)
             .HasColumnName("id")
-            .HasComment("идентификатор жильца");
+            .HasComment("идентификатор жильца")
+            .ValueGeneratedNever();
 
         builder.Property(o => o.LastName)
             .HasColumnName("last_name_encrypted")
