@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using OpenDorm.API.Contracts;
 using OpenDorm.Application.Features.Dormitories.Commands.CreateDormitory;
+using OpenDorm.Application.Features.Dormitories.Commands.CreateRoom;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryDetailsById;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryList;
 using Swashbuckle.AspNetCore.Annotations;
@@ -63,4 +64,30 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
 
         return StatusCode(StatusCodes.Status201Created, dormitoryId);
     }
+    
+    // POST: api/dormitories/{dormitory-id}/rooms
+    [HttpPost("{dormitory-id:guid}/rooms")]
+    [SwaggerOperation(
+        Summary = "Добавить комнату в общежитие.",
+        Description = "Возвращает идентификатор созданной комнаты.")]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CreateRoom(
+        [FromRoute(Name = "dormitory-id")] Guid dormitoryId,
+        [FromBody] CreateRoomRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new CreateRoomCommand(
+            dormitoryId,
+            request.RoomName,
+            request.Gender,
+            request.Capacity,
+            request.FloorNumber);
+
+        var roomId = await mediator.Send(command, cancellationToken);
+
+        return StatusCode(StatusCodes.Status201Created, roomId);
+    }
+    
 }
