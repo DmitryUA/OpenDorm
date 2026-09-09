@@ -120,7 +120,7 @@ public class OccupantRepositoryTests : IAsyncLifetime
         Assert.NotNull(loadedAccommodation);
         Assert.Null(loadedAccommodation.CheckOutDate);
         Assert.Equal(roomId, loadedAccommodation.RoomId);
-        Assert.Equal(DateTime.Now.Date, loadedAccommodation.CheckInDate.Date);
+        Assert.Equal(DateTime.UtcNow.Date, loadedAccommodation.CheckInDate.Date);
     }
 
     [Fact]
