@@ -8,5 +8,6 @@
 
     <ItemGroup>
         <InternalsVisibleTo Include="OpenDorm.Infrastructure" />
+        <InternalsVisibleTo Include="OpenDorm.Application.Tests" />
     </ItemGroup>
 </Project>
