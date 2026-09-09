@@ -8,15 +8,18 @@ namespace OpenDorm.Domain.Aggregates.Occupant;
 
 public class Occupant : AggregateRoot
 {
-    public LastName LastName { get; } = null!;
-    public FirstName FirstName { get; } = null!;
-    public Patronymic? Patronymic { get; }
+    public LastName LastName { get; private set; } = null!;
+    public FirstName FirstName { get; private set; } = null!;
+    public Patronymic? Patronymic { get; private set; }
     public string FullName => Patronymic == null ? $"{LastName} {FirstName}" : $"{LastName} {FirstName} {Patronymic}";
-    public Gender Gender { get; }
-    public BirthDate BirthDate { get; } = null!;
+    public Gender Gender { get; private set; }
+    public BirthDate BirthDate { get; private set; } = null!;
     public bool IsActive { get; private set; } = true;
 
     private readonly List<Accommodation> _accommodations = [];
+    
+    // Доступно для сборки Infrastructure (Для EF Core)
+    internal IReadOnlyCollection<Accommodation> Accommodations => _accommodations.AsReadOnly();
     
     // ReSharper disable once UnusedMember.Local
     private Occupant() {} // For EF Core only
