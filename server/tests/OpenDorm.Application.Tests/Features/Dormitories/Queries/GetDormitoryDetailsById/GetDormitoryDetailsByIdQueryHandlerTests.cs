@@ -163,5 +163,9 @@ public class GetDormitoryDetailsByIdQueryHandlerTests : IAsyncLifetime
         Assert.Equal(2, result.TotalAvailablePlaceCount);
     }
 
-    public async Task DisposeAsync() => await _context.DisposeAsync();
+    public async Task DisposeAsync()
+    {
+        await _context.DisposeAsync();
+        await _postgres.DisposeAsync();
+    } 
 }
