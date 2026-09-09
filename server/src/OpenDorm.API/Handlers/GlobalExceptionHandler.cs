@@ -22,6 +22,13 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
             
             ValidationException validationException => CreateValidationProblemDetails(validationException),
 
+            DomainException domainException => new ProblemDetails
+            {
+                Status = StatusCodes.Status409Conflict,
+                Title = "Domain Rule Violation",
+                Detail = domainException.Message
+            },
+            
             _ => new ProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,
