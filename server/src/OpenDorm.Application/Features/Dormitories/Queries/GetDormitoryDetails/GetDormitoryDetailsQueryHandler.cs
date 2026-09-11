@@ -4,13 +4,13 @@ using OpenDorm.Application.Abstractions.Persistence;
 using OpenDorm.Domain.Aggregates.Dormitory;
 using OpenDorm.Domain.Exceptions;
 
-namespace OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryDetailsById;
+namespace OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryDetails;
 
-public class GetDormitoryDetailsByIdQueryHandler(IApplicationDbContext dbContext)
-    : IRequestHandler<GetDormitoryDetailsByIdQuery, DormitoryDetailsDto>
+public class GetDormitoryDetailsQueryHandler(IApplicationDbContext dbContext)
+    : IRequestHandler<GetDormitoryDetailsQuery, DormitoryDetailsDto>
 {
     public async Task<DormitoryDetailsDto> Handle(
-        GetDormitoryDetailsByIdQuery request,
+        GetDormitoryDetailsQuery request,
         CancellationToken cancellationToken)
     {
         var dto = await (

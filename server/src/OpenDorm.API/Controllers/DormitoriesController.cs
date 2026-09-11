@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenDorm.API.Contracts;
 using OpenDorm.Application.Features.Dormitories.Commands.CreateDormitory;
 using OpenDorm.Application.Features.Dormitories.Commands.CreateRoom;
-using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryDetailsById;
+using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryDetails;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryList;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -39,7 +39,7 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
         Guid id,
         CancellationToken cancellationToken)
     {
-        var query = new GetDormitoryDetailsByIdQuery(id);
+        var query = new GetDormitoryDetailsQuery(id);
         var dormitoryDetails = await mediator.Send(query, cancellationToken);
 
         return Ok(dormitoryDetails);

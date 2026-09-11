@@ -1,4 +1,4 @@
-namespace OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryDetailsById;
+namespace OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryDetails;
 
 public record DormitoryDetailsDto(
     Guid Id,

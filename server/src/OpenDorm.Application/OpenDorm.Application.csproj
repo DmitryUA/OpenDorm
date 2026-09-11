@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Features\Dormitories\Queries\GetDormitoryById\" />
       <Folder Include="Features\Occupants\Commands\" />
       <Folder Include="Features\Occupants\Queries\" />
     </ItemGroup>

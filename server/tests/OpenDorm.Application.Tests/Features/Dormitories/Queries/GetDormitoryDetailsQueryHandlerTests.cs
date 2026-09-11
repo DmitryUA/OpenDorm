@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryDetailsById;
+using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryDetails;
 using OpenDorm.Domain.Aggregates.Dormitory;
 using OpenDorm.Domain.Aggregates.Occupant;
 using OpenDorm.Domain.Enums;
@@ -8,9 +8,9 @@ using OpenDorm.Infrastructure;
 using OpenDorm.Infrastructure.Services;
 using Testcontainers.PostgreSql;
 
-namespace OpenDorm.Application.Tests.Features.Dormitories.Queries.GetDormitoryDetailsById;
+namespace OpenDorm.Application.Tests.Features.Dormitories.Queries.GetDormitoryDetails;
 
-public class GetDormitoryDetailsByIdQueryHandlerTests : IAsyncLifetime
+public class GetDormitoryDetailsQueryHandlerTests : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:16-alpine")
         .WithUsername("postgres")
@@ -19,7 +19,7 @@ public class GetDormitoryDetailsByIdQueryHandlerTests : IAsyncLifetime
         .Build();
     
     private OpenDormDbContext _context = null!;
-    private GetDormitoryDetailsByIdQueryHandler _handler = null!;
+    private GetDormitoryDetailsQueryHandler _handler = null!;
     
     public async Task InitializeAsync()
     {
@@ -37,7 +37,7 @@ public class GetDormitoryDetailsByIdQueryHandlerTests : IAsyncLifetime
         
         await _context.Database.MigrateAsync();
         
-        _handler = new GetDormitoryDetailsByIdQueryHandler(_context);
+        _handler = new GetDormitoryDetailsQueryHandler(_context);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class GetDormitoryDetailsByIdQueryHandlerTests : IAsyncLifetime
         
         // Act
         var result = await _handler.Handle(
-            new GetDormitoryDetailsByIdQuery(dormitoryId),
+            new GetDormitoryDetailsQuery(dormitoryId),
             CancellationToken.None);
         
         // Assert
@@ -92,7 +92,7 @@ public class GetDormitoryDetailsByIdQueryHandlerTests : IAsyncLifetime
         
         // Act
         var result = await _handler.Handle(
-            new GetDormitoryDetailsByIdQuery(dormitoryId),
+            new GetDormitoryDetailsQuery(dormitoryId),
             CancellationToken.None);
         
         // Assert
@@ -148,7 +148,7 @@ public class GetDormitoryDetailsByIdQueryHandlerTests : IAsyncLifetime
         
         // Act
         var result = await _handler.Handle(
-            new GetDormitoryDetailsByIdQuery(dormitoryId),
+            new GetDormitoryDetailsQuery(dormitoryId),
             CancellationToken.None);
         
         // Assert
