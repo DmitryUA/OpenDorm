@@ -1,0 +1,49 @@
+namespace OpenDorm.Application.Tests.Factories;
+
+using Domain.Aggregates.Dormitory;
+using Domain.Enums;
+using Domain.ValueObjects;
+
+public static class DormitoryFactory
+{
+    private static int _counter = 1;
+
+    /// <summary>
+    /// Создаёт общежитие без комнат.
+    /// </summary>
+    public static Dormitory Create(Address? address = null, int floorCount = 1)
+    {
+        var addr = address ?? new Address(
+            new City("Тестовый город"),
+            new Street("Тестовая улица"),
+            new HouseNumber("Тестовый номер дома"));
+        
+        return new Dormitory(Guid.NewGuid(), addr, floorCount);
+    }
+
+    /// <summary>
+    /// Создаёт общежитие с указанным количеством комнат.
+    /// Возвращает кортеж (общежитие, список Id созданных комнат).
+    /// </summary>
+    public static (Dormitory Dormitory, IReadOnlyList<Guid> RoomIds) CreateWithRooms(
+        Address? address = null,
+        int floorCount = 2,
+        int roomsCount = 2,
+        int capacity = 2,
+        Gender gender = Gender.Male)
+    {
+        var dormitory = Create(address, floorCount);
+        var roomIds = new List<Guid>(roomsCount);
+
+        for (var i = 1; i <= roomsCount; i++)
+        {
+            var floorNumber = (i - 1) % floorCount + 1;
+            
+            var roomName = new RoomName($"{floorNumber}0{i:D2}");
+            var roomId = dormitory.AddRoom(roomName, gender, capacity, floorNumber);
+            roomIds.Add(roomId);
+        }
+
+        return (dormitory, roomIds);
+    }
+}
