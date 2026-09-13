@@ -5,6 +5,7 @@ using OpenDorm.Application.Abstractions;
 using OpenDorm.Application.Common;
 using OpenDorm.Application.Features.Dormitories.Commands.CreateDormitory;
 using OpenDorm.Application.Features.Dormitories.Commands.CreateRoom;
+using OpenDorm.Application.Features.Dormitories.Commands.DeactivateRoom;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryDetails;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryList;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryRoomsList;
@@ -114,5 +115,23 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
         var response = await mediator.Send(command, cancellationToken);
 
         return StatusCode(StatusCodes.Status201Created, response);
+    }
+    
+    // POST /api/dormitories/{dormitoryId}/rooms/{roomId}/deactivate
+    [HttpPost("{dormitory-id:guid}/rooms/{room-id}/deactivate")]
+    [SwaggerOperation(Summary = "Сделать комнату неактивной")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> DeactivateRoom(
+        [FromRoute(Name = "dormitory-id")] Guid dormitoryId,
+        [FromRoute(Name = "room-id")] Guid roomId,
+        CancellationToken cancellationToken)
+    {
+        var command = new DeactivateRoomCommand(dormitoryId, roomId);
+        await mediator.Send(command, cancellationToken);
+
+        return Ok();
     }
 }
