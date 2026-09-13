@@ -167,51 +167,15 @@ public class DormitoryTests
         Assert.Equal(dormitory.Id, roomRemovedEvent.DormitoryId);
         Assert.Equal(newRoomId, roomRemovedEvent.RoomId);
     }
-
-    [Fact]
-    public void RemoveRoom_NameExistingRoom_RoomRemovedEventWillBeCreated()
-    {
-        // Arrange
-        var dormitory = new DormitoryBuilder().Build();
-        
-        var roomName = new RoomName("406");
-        const Gender gender = Gender.Male;
-        const int floorNumber = 4;
-        const int capacity = 2;
-        
-        var newRoomId = dormitory.AddRoom(roomName, gender, capacity, floorNumber);
-        
-        // Act
-        dormitory.RemoveRoom(roomName);
-        
-        // Assert
-        Assert.Equal(2, dormitory.DomainEvents.Count);
-        
-        var roomRemovedEvent = Assert.IsType<RoomRemovedEvent>(dormitory.DomainEvents.Last());
-        
-        Assert.Equal(dormitory.Id, roomRemovedEvent.DormitoryId);
-        Assert.Equal(newRoomId, roomRemovedEvent.RoomId);
-    }
     
     [Fact]
-    public void RemoveRoom_IdentifierNonExistentRoom_ThrowsDomainException()
+    public void RemoveRoom_IdentifierNonExistentRoom_ThrowsNotFoundException()
     {
         // Arrange
         var dormitory = new DormitoryBuilder().Build();
         
         // Act & Assert
-        Assert.Throws<DomainException>(() => dormitory.RemoveRoom(Guid.NewGuid()));
-    }
-    
-    [Fact]
-    public void RemoveRoom_NameNonExistentRoom_ThrowsDomainException()
-    {
-        // Arrange
-        var dormitory = new DormitoryBuilder().Build();
-        var nameNonExistentRoom = new RoomName("406");
-        
-        // Act & Assert
-        Assert.Throws<DomainException>(() => dormitory.RemoveRoom(nameNonExistentRoom));
+        Assert.Throws<NotFoundException>(() => dormitory.RemoveRoom(Guid.NewGuid()));
     }
 
     #endregion

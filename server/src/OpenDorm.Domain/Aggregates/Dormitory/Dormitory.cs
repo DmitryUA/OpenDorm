@@ -49,30 +49,25 @@ public class Dormitory : AggregateRoot
         return room.Id;
     }
 
-    public void RemoveRoom(Guid roomId)
+    public void RemoveRoom(Guid id)
     {
-        var roomIndex = _rooms.FindIndex(r => r.Id == roomId);
+        var roomIndex = _rooms.FindIndex(r => r.Id == id);
 
         if (roomIndex == -1)
-            throw new DomainException($"Room with id '{roomId}' not found in dormitory '{Id}");
+            throw new NotFoundException(nameof(Room), id);
 
-        var roomRemovedEvent = new RoomRemovedEvent(Id, roomId);
+        var roomRemovedEvent = new RoomRemovedEvent(Id, id);
         AddDomainEvent(roomRemovedEvent);
                 
         _rooms.RemoveAt(roomIndex);
     }
 
-    public void RemoveRoom(RoomName name)
+    public void DeactivateRoom(Guid id)
     {
-        var roomIndex = _rooms.FindIndex(r => r.Name == name);
+        var room = _rooms.FirstOrDefault(r => r.Id == id);
 
-        if (roomIndex == -1)
-            throw new DomainException($"Room with name '{name}' not found in dormitory '{Id}");
-
-        var roomId = _rooms[roomIndex].Id;
-        var roomRemovedEvent = new RoomRemovedEvent(Id, roomId);
-        AddDomainEvent(roomRemovedEvent);
+        if (room == null) throw new NotFoundException(nameof(Room), id);
         
-        _rooms.RemoveAt(roomIndex);
+        room.Deactivate();
     }
 }
