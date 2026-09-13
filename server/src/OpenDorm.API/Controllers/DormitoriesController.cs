@@ -1,10 +1,13 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using OpenDorm.API.Contracts;
+using OpenDorm.Application.Abstractions;
+using OpenDorm.Application.Common;
 using OpenDorm.Application.Features.Dormitories.Commands.CreateDormitory;
 using OpenDorm.Application.Features.Dormitories.Commands.CreateRoom;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryDetails;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryList;
+using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryRoomsList;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace OpenDorm.API.Controllers;
@@ -22,10 +25,9 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var query = new GetDormitoryListQuery();
+        var response = await mediator.Send(query, cancellationToken);
 
-        var dormitories = await mediator.Send(query, cancellationToken);
-
-        return Ok(dormitories);
+        return Ok(response);
     }
     
     // GET: api/dormitories/{id}/details
@@ -44,6 +46,30 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
 
         return Ok(dormitoryDetails);
     }
+    
+    // GET: api/dormitories/{id}/rooms
+    [HttpGet("{id:guid}/rooms")]
+    [SwaggerOperation(
+        Summary = "Получить краткую информацию о комнатах общежития",
+        Description = "Возвращает краткую информацию о комнатах общежития." +
+                      "\nПоддерживает пагинацию." +
+                      "\nПоддерживает фильтры по: номеру комнаты и её статусу. ")]
+    [ProducesResponseType(typeof(PagedResult<RoomListDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetDormitoryRooms(
+        Guid id,
+        CancellationToken cancellationToken,
+        [FromQuery] string? name = null,
+        [FromQuery] bool? isActive = null,
+        [FromQuery] int page = PagedQuery.DefaultPage,
+        [FromQuery] int pageSize = PagedQuery.DefaultPageSize)
+    {
+        var query = new GetDormitoryRoomsListQuery(id, name, isActive, page, pageSize);
+        var response = await mediator.Send(query, cancellationToken);
+
+        return Ok(response);
+    }
+    
     
     // POST: api/dormitories
     [HttpPost]
@@ -85,9 +111,8 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
             request.Capacity,
             request.FloorNumber);
 
-        var roomId = await mediator.Send(command, cancellationToken);
+        var response = await mediator.Send(command, cancellationToken);
 
-        return StatusCode(StatusCodes.Status201Created, roomId);
+        return StatusCode(StatusCodes.Status201Created, response);
     }
-    
 }
