@@ -28,14 +28,14 @@ public class RoomConfiguration : IEntityTypeConfiguration<Room>
             .HasComment("вместимость")
             .IsRequired();
 
-        builder.Property(r => r.Name)
-            .HasColumnName("name")
-            .HasConversion(
-                name => name.Value,
-                value => new RoomName(value))
-            .HasComment("номер комнаты")
-            .HasMaxLength(RoomName.MaxLength)
-            .IsRequired();
+        builder.ComplexProperty(r => r.Name, b =>
+        {
+            b.Property(n => n.Value)
+                .HasColumnName("name")
+                .HasComment("номер комнаты")
+                .HasMaxLength(RoomName.MaxLength)
+                .IsRequired();
+        });
 
         builder.Property(r => r.Gender)
             .HasColumnName("gender")

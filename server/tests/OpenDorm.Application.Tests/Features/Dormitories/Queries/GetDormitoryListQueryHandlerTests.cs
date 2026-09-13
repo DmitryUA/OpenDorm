@@ -27,8 +27,7 @@ public class GetDormitoryListQueryHandlerTests
             CreateDormitory("Казань", "Баумана", "5", 3),
             CreateDormitory("Москва", "Арбат", "20", 4),
         };
-
-        // Используем наш TestAsyncEnumerable
+        
         _dbContext.Dormitories.Returns(new TestAsyncEnumerable<Dormitory>(dormitories));
 
         // Act
