@@ -30,9 +30,9 @@ public class GetDormitoryDetailsQueryHandler(IApplicationDbContext dbContext)
                 d.Address.City.Value,
                 d.Address.Street.Value,
                 d.Address.House.Value,
-                d.FloorCount,
                 roomCount,
                 totalSeats,
+                d.FloorCount,
                 totalSeats - occupiedSeats
             )
         ).FirstOrDefaultAsync(cancellationToken);

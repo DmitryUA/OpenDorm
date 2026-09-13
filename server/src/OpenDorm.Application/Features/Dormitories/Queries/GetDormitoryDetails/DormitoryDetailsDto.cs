@@ -5,7 +5,7 @@ public record DormitoryDetailsDto(
     string City,
     string Street,
     string House,
-    int TotalFloorCount,
     int TotalRoomCount,
     int TotalSeatCount,
+    int TotalFloorCount,
     int TotalAvailablePlaceCount);
