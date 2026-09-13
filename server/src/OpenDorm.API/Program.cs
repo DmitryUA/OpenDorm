@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using OpenDorm.API.Handlers;
+using OpenDorm.Application.Abstractions;
 using OpenDorm.Application.Abstractions.Persistence;
 using OpenDorm.Application.Common;
 using OpenDorm.Domain.Abstractions;
