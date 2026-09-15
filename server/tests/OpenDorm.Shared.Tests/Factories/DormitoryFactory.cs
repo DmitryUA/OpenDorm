@@ -1,8 +1,8 @@
-namespace OpenDorm.Application.Tests.Factories;
+using OpenDorm.Domain.Aggregates.Dormitory;
+using OpenDorm.Domain.Enums;
+using OpenDorm.Domain.ValueObjects;
 
-using Domain.Aggregates.Dormitory;
-using Domain.Enums;
-using Domain.ValueObjects;
+namespace OpenDorm.Shared.Tests.Factories;
 
 public static class DormitoryFactory
 {

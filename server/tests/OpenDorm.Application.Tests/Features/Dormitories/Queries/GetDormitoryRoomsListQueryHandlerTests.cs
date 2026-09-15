@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryRoomsList;
-using OpenDorm.Application.Tests.Factories;
 using OpenDorm.Infrastructure;
 using OpenDorm.Infrastructure.Services;
+using OpenDorm.Shared.Tests.Factories;
 using Testcontainers.PostgreSql;
 
 namespace OpenDorm.Application.Tests.Features.Dormitories.Queries;

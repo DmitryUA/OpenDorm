@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using OpenDorm.Application.Abstractions.Persistence;
 using OpenDorm.Application.Features.Dormitories.Commands.DeactivateRoom;
-using OpenDorm.Application.Tests.Factories;
 using OpenDorm.Domain.Abstractions;
 using OpenDorm.Domain.Exceptions;
 using OpenDorm.Infrastructure;
 using OpenDorm.Infrastructure.Persistence;
 using OpenDorm.Infrastructure.Repositories;
 using OpenDorm.Infrastructure.Services;
+using OpenDorm.Shared.Tests.Factories;
 using Testcontainers.PostgreSql;
 
 namespace OpenDorm.Application.Tests.Features.Dormitories.Commands;

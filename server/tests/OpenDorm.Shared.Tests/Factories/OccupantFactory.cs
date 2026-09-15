@@ -1,8 +1,8 @@
-namespace OpenDorm.Application.Tests.Factories;
+using OpenDorm.Domain.Aggregates.Occupant;
+using OpenDorm.Domain.Enums;
+using OpenDorm.Domain.ValueObjects;
 
-using Domain.Aggregates.Occupant;
-using Domain.Enums;
-using Domain.ValueObjects;
+namespace OpenDorm.Shared.Tests.Factories;
 
 public static class OccupantFactory
 {

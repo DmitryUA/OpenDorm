@@ -23,6 +23,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\src\OpenDorm.Application\OpenDorm.Application.csproj" />
       <ProjectReference Include="..\..\src\OpenDorm.Infrastructure\OpenDorm.Infrastructure.csproj" />
+      <ProjectReference Include="..\OpenDorm.Shared.Tests\OpenDorm.Shared.Tests.csproj" />
     </ItemGroup>
 
 </Project>
