@@ -20,6 +20,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\OpenDorm.Domain\OpenDorm.Domain.csproj" />
+      <ProjectReference Include="..\OpenDorm.Shared.Tests\OpenDorm.Shared.Tests.csproj" />
     </ItemGroup>
 
 </Project>

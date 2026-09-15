@@ -12,7 +12,6 @@ public class Dormitory : AggregateRoot
     public int FloorCount { get; private set; }
     private readonly List<Room> _rooms = [];
     
-    // Доступно для сборки Infrastructure (Для EF Core)
     internal IReadOnlyCollection<Room> Rooms => _rooms.AsReadOnly();
     
     // ReSharper disable once UnusedMember.Local
@@ -69,5 +68,14 @@ public class Dormitory : AggregateRoot
         if (room == null) throw new NotFoundException(nameof(Room), id);
         
         room.Deactivate();
+    }
+
+    public void ActivateRoom(Guid id)
+    {
+        var room = _rooms.FirstOrDefault(r => r.Id == id);
+
+        if (room == null) throw new NotFoundException(nameof(Room), id);
+        
+        room.Activate();
     }
 }

@@ -6,8 +6,6 @@ namespace OpenDorm.Shared.Tests.Factories;
 
 public static class DormitoryFactory
 {
-    private static int _counter = 1;
-
     /// <summary>
     /// Создаёт общежитие без комнат.
     /// </summary>
