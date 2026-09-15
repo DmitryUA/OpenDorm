@@ -13,3 +13,9 @@
 
 [![xUnit](https://img.shields.io/badge/Tests-xUnit-239120?logo=dotnet&logoColor=white)](https://xunit.net/)
 [![Testcontainers](https://img.shields.io/badge/Testcontainers-PostgreSQL-239120)](https://testcontainers.com/)
+
+Проект находится в активной разработке.
+
+## Контакты
+
+- **Email:** dreamysnail0921@gmail.com
