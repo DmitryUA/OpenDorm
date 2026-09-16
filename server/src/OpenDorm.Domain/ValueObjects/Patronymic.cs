@@ -3,15 +3,12 @@ using OpenDorm.Domain.Exceptions;
 
 namespace OpenDorm.Domain.ValueObjects;
 
-public record Patronymic
+public partial record Patronymic
 {
     public const int MinLength = 2;
     public const int MaxLength = 30;
+    private static readonly Regex PatronymicRegex = MyRegex();
     
-    private static readonly Regex PatronymicRegex = new(
-        @"^[А-ЯA-ZЁ][а-яa-zё]+$", 
-        RegexOptions.Compiled
-    );
     public string Value { get; }
 
     public Patronymic(string value)
@@ -33,4 +30,7 @@ public record Patronymic
     }
 
     public override string ToString() => Value;
+    
+    [GeneratedRegex(@"^[А-ЯA-ZЁ][а-яa-zё]+$", RegexOptions.Compiled)]
+    private static partial Regex MyRegex();
 }
