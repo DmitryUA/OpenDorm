@@ -7,7 +7,7 @@ public partial record Patronymic
 {
     public const int MinLength = 2;
     public const int MaxLength = 30;
-    private static readonly Regex PatronymicRegex = MyRegex();
+    public static readonly Regex PatronymicRegex = MyRegex();
     
     public string Value { get; }
 
