@@ -54,7 +54,7 @@ public class BirthDateTests
         var birthDate = new BirthDate(new DateOnly(1990, 1, 15));
         var currentDate = new DateOnly(2026, 7, 12);
 
-        var age = birthDate.CalculateAge(currentDate);
+        var age = birthDate.CalculateAgeByCurrentDate(currentDate);
 
         Assert.Equal(36, age);
     }
@@ -65,7 +65,7 @@ public class BirthDateTests
         var birthDate = new BirthDate(new DateOnly(1990, 12, 25));
         var currentDate = new DateOnly(2026, 7, 12);
 
-        var age = birthDate.CalculateAge(currentDate);
+        var age = birthDate.CalculateAgeByCurrentDate(currentDate);
 
         Assert.Equal(35, age);
     }
@@ -76,7 +76,7 @@ public class BirthDateTests
         var birthDate = new BirthDate(new DateOnly(1990, 7, 12));
         var currentDate = new DateOnly(2026, 7, 12);
 
-        var age = birthDate.CalculateAge(currentDate);
+        var age = birthDate.CalculateAgeByCurrentDate(currentDate);
 
         Assert.Equal(36, age);
     }
@@ -87,7 +87,7 @@ public class BirthDateTests
         var birthDate = new BirthDate(new DateOnly(1990, 7, 13));
         var currentDate = new DateOnly(2026, 7, 12);
 
-        var age = birthDate.CalculateAge(currentDate);
+        var age = birthDate.CalculateAgeByCurrentDate(currentDate);
 
         Assert.Equal(35, age);
     }
@@ -98,7 +98,7 @@ public class BirthDateTests
         var birthDate = new BirthDate(new DateOnly(1988, 2, 29));
         var currentDate = new DateOnly(2026, 3, 1);
 
-        var age = birthDate.CalculateAge(currentDate);
+        var age = birthDate.CalculateAgeByCurrentDate(currentDate);
 
         Assert.Equal(38, age);
     }
@@ -109,7 +109,7 @@ public class BirthDateTests
         var birthDate = new BirthDate(new DateOnly(1988, 2, 29));
         var currentDate = new DateOnly(2026, 2, 27);
 
-        var age = birthDate.CalculateAge(currentDate);
+        var age = birthDate.CalculateAgeByCurrentDate(currentDate);
     }
     
     [Fact]
@@ -118,7 +118,7 @@ public class BirthDateTests
         var birthDate = new BirthDate(new DateOnly(2000, 12, 31));
         var currentDate = new DateOnly(2025, 12, 31);
 
-        var age = birthDate.CalculateAge(currentDate);
+        var age = birthDate.CalculateAgeByCurrentDate(currentDate);
 
         Assert.Equal(25, age);
     }
@@ -129,7 +129,7 @@ public class BirthDateTests
         var birthDate = new BirthDate(new DateOnly(2000, 12, 31));
         var currentDate = new DateOnly(2026, 1, 1);
 
-        var age = birthDate.CalculateAge(currentDate);
+        var age = birthDate.CalculateAgeByCurrentDate(currentDate);
 
         Assert.Equal(25, age);
     }
@@ -140,7 +140,7 @@ public class BirthDateTests
         var today = new DateOnly(2026, 7, 12);
         var birthDate = new BirthDate(today);
 
-        var age = birthDate.CalculateAge(today);
+        var age = birthDate.CalculateAgeByCurrentDate(today);
 
         Assert.Equal(0, age);
     }

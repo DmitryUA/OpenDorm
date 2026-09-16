@@ -22,18 +22,20 @@ public record BirthDate
         Value = date;
     }
 
-    public int CalculateAge()
-    {
-        return CalculateAge(DateOnly.FromDateTime(DateTime.UtcNow));
-    }
+    public int CalculateAge() => CalculateAgeByCurrentDate(DateOnly.FromDateTime(DateTime.UtcNow));
 
-    public int CalculateAge(DateOnly currentDate)
+    public int CalculateAgeByCurrentDate(DateOnly currentDate) => CalculateAgeByRange(Value, currentDate);
+
+    public static int CalculateAgeByBirthDate(DateOnly birthDate) =>
+        CalculateAgeByRange(birthDate, DateOnly.FromDateTime(DateTime.UtcNow));
+
+    private static int CalculateAgeByRange(DateOnly birthDate, DateOnly currentDate)
     {
-        int age = currentDate.Year - Value.Year;
-    
-        if (currentDate < Value.AddYears(age)) 
+        var age = currentDate.Year - birthDate.Year;
+
+        if (currentDate < birthDate.AddYears(age))
             age--;
-        
+
         return age;
     }
     
