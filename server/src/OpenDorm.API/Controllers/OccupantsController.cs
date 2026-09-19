@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using OpenDorm.API.Contracts;
+using OpenDorm.Application.Features.Occupants.Commands.CreateAccommodation;
 using OpenDorm.Application.Features.Occupants.Commands.CreateOccupant;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -29,5 +30,21 @@ public class OccupantsController(IMediator mediator) : ControllerBase
         var occupantId = await mediator.Send(command, cancellationToken);
 
         return StatusCode(StatusCodes.Status201Created, occupantId);
+    }
+    
+    // POST: api/occupants/{occupant-id}/rooms/{room-id}/check-in
+    [HttpPost("{occupant-id:guid}/rooms/{room-id:guid}/check-in")]
+    [SwaggerOperation("Создать новое заселение.")]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> CheckIn(
+        [FromRoute(Name = "occupant-id")] Guid occupantId,
+        [FromRoute(Name = "room-id")] Guid roomId,
+        CancellationToken cancellationToken)
+    {
+        var command = new CreateAccommodationCommand(roomId, occupantId);
+        var response = await mediator.Send(command, cancellationToken);
+
+        return StatusCode(StatusCodes.Status201Created, response);
     }
 }
