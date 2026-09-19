@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using OpenDorm.Application.Abstractions.Persistence;
 using OpenDorm.Application.Features.Occupants.Commands.CreateOccupant;
 using OpenDorm.Domain.Abstractions;
 using OpenDorm.Domain.Enums;
