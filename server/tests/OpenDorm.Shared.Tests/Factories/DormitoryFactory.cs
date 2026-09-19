@@ -44,4 +44,14 @@ public static class DormitoryFactory
 
         return (dormitory, roomIds);
     }
+    
+    /// <summary>
+    /// Создаёт общежитие с одной комнатой.
+    /// </summary>
+    /// <returns>Вернёт кортеж (общежитие, id комнаты)</returns>
+    public static (Dormitory Dormitory, Guid RoomId) CreateWithOneRoom()
+    {
+        var (dormitory, roomsIds) = CreateWithRooms(roomsCount: 1);
+        return (dormitory, roomsIds[0]);
+    }
 }
