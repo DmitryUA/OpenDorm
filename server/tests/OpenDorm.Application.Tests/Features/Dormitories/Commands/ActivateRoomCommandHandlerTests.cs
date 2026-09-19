@@ -51,8 +51,7 @@ public class ActivateRoomCommandHandlerTests : IAsyncLifetime
     public async Task Handle_InactiveRoom_MakeRoomInactive()
     {
         // Arrange
-        var (dormitory, roomsIds) = DormitoryFactory.CreateWithRooms(roomsCount: 1);
-        var roomId = roomsIds[0];
+        var (dormitory, roomId) = DormitoryFactory.CreateWithOneRoom();
         
         dormitory.DeactivateRoom(roomId);
 

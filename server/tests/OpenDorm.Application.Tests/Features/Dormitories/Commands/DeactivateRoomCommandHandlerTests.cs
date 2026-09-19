@@ -50,19 +50,19 @@ public class DeactivateRoomCommandHandlerTests : IAsyncLifetime
     public async Task Handle_UnoccupiedRoom_MakeRoomInactive()
     {
         // Arrange
-        var (dormitory, roomsIds) = DormitoryFactory.CreateWithRooms(roomsCount: 1);
+        var (dormitory, roomId) = DormitoryFactory.CreateWithOneRoom();
 
         await _repository.AddAsync(dormitory);
         await _context.SaveChangesAsync(CancellationToken.None);
         _context.ChangeTracker.Clear();
 
-        var command = new DeactivateRoomCommand(dormitory.Id, roomsIds[0]);
+        var command = new DeactivateRoomCommand(dormitory.Id, roomId);
         
         // Act
         await _handler.Handle(command, CancellationToken.None);
         
         // Assert
-        var roomStatus = _context.Rooms.First(r => r.Id == roomsIds[0]).IsActive;
+        var roomStatus = _context.Rooms.First(r => r.Id == roomId).IsActive;
         Assert.False(roomStatus);
     }
 
@@ -70,12 +70,12 @@ public class DeactivateRoomCommandHandlerTests : IAsyncLifetime
     public async Task Handle_OccupiedRoom_ThrowsDomainException()
     {
         // Arrange
-        var (dormitory, roomsIds) = DormitoryFactory.CreateWithRooms(roomsCount: 1);
+        var (dormitory, roomId) = DormitoryFactory.CreateWithOneRoom();
         
         await _repository.AddAsync(dormitory);
         await _context.SaveChangesAsync(CancellationToken.None);
 
-        var (occupant, accommodationId) = OccupantFactory.CreateCheckedIn(roomsIds[0]);
+        var (occupant, accommodationId) = OccupantFactory.CreateCheckedIn(roomId);
         await _context.OccupantsDbSet.AddAsync(occupant);
         await _context.SaveChangesAsync(CancellationToken.None);
         
@@ -83,7 +83,7 @@ public class DeactivateRoomCommandHandlerTests : IAsyncLifetime
 
         var expectedMessage =
             $"It is impossible to deactivate a room that is currently occupied. Accommodation id: '{accommodationId}'";
-        var command = new DeactivateRoomCommand(dormitory.Id, roomsIds[0]);
+        var command = new DeactivateRoomCommand(dormitory.Id, roomId);
         
         // Act & Assert
         var exception = await Assert.ThrowsAsync<DomainException>(

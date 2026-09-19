@@ -176,9 +176,7 @@ public class DormitoryTests
     public void ActivateRoom_InactiveRoom_MakeRoomActive()
     {
         // Arrange
-        var (dormitory, roomsIds) = DormitoryFactory.CreateWithRooms(roomsCount: 1);
-        var roomId = roomsIds[0];
-        
+        var (dormitory, roomId) = DormitoryFactory.CreateWithOneRoom();
         dormitory.DeactivateRoom(roomId);
         
         // Act
@@ -212,9 +210,8 @@ public class DormitoryTests
     public void DeactivateRoom_ActiveRoom_MakeRoomInactive()
     {
         // Arrange
-        var (dormitory, roomsIds) = DormitoryFactory.CreateWithRooms(roomsCount: 1);
-        var roomId = roomsIds[0];
-
+        var (dormitory, roomId) = DormitoryFactory.CreateWithOneRoom();
+        
         // Act
         dormitory.DeactivateRoom(roomId);
         
