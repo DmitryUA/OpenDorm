@@ -18,8 +18,7 @@ public class CreateOccupantCommandHandlerTests : IAsyncLifetime
         .WithPassword("postgres")
         .WithDatabase("opendorm_test")
         .Build();
-
-    private IUnitOfWork _unitOfWork = null!;
+    
     private OpenDormDbContext _context = null!;
     private IOccupantRepository _repository = null!;
     private CreateOccupantCommandHandler _handler = null!;
@@ -40,9 +39,9 @@ public class CreateOccupantCommandHandlerTests : IAsyncLifetime
 
         await _context.Database.MigrateAsync();
 
-        _unitOfWork = new UnitOfWork(_context);
+        var unitOfWork = new UnitOfWork(_context);
         _repository = new OccupantRepository(_context);
-        _handler = new CreateOccupantCommandHandler(_repository, _unitOfWork);
+        _handler = new CreateOccupantCommandHandler(_repository, unitOfWork);
     }
 
     [Theory]
