@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using OpenDorm.API.Contracts;
+using OpenDorm.Application.Features.Occupants.Commands.CheckOutOccupant;
 using OpenDorm.Application.Features.Occupants.Commands.CreateAccommodation;
 using OpenDorm.Application.Features.Occupants.Commands.CreateOccupant;
 using Swashbuckle.AspNetCore.Annotations;
@@ -36,6 +37,7 @@ public class OccupantsController(IMediator mediator) : ControllerBase
     [HttpPost("{occupant-id:guid}/rooms/{room-id:guid}/check-in")]
     [SwaggerOperation("Создать новое заселение.")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CheckIn(
         [FromRoute(Name = "occupant-id")] Guid occupantId,
@@ -46,5 +48,21 @@ public class OccupantsController(IMediator mediator) : ControllerBase
         var response = await mediator.Send(command, cancellationToken);
 
         return StatusCode(StatusCodes.Status201Created, response);
+    }
+    
+    // POST: api/occupants/{id}/check-out
+    [HttpPost("{id:guid}/check-out")]
+    [SwaggerOperation("Выселить жильца.")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> CheckOut(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var command = new CheckOutOccupantCommand(id);
+        await mediator.Send(command, cancellationToken);
+
+        return Ok();
     }
 }
