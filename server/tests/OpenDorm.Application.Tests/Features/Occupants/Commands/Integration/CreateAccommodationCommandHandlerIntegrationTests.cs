@@ -11,9 +11,9 @@ using OpenDorm.Infrastructure.Services;
 using OpenDorm.Shared.Tests.Factories;
 using Testcontainers.PostgreSql;
 
-namespace OpenDorm.Application.Tests.Features.Occupants.Commands;
+namespace OpenDorm.Application.Tests.Features.Occupants.Commands.Integration;
 
-public class CreateAccommodationCommandHandlerTests : IAsyncLifetime
+public class CreateAccommodationCommandHandlerIntegrationTests : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:16-alpine")
         .WithUsername("postgres")

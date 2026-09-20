@@ -16,7 +16,6 @@ public class CheckOutOccupantCommandHandlerUnitTests
         var repository = Substitute.For<IOccupantRepository>();
         var nonExistId = Guid.NewGuid();
         
-        // Настраиваем NSubstitute: при вызове GetByIdAsync вернуть null
         repository.GetByIdAsync(nonExistId, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<Occupant?>(null));
 

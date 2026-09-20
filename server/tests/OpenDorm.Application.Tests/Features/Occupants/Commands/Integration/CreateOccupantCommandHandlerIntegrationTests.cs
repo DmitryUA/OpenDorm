@@ -8,9 +8,9 @@ using OpenDorm.Infrastructure.Repositories;
 using OpenDorm.Infrastructure.Services;
 using Testcontainers.PostgreSql;
 
-namespace OpenDorm.Application.Tests.Features.Occupants.Commands;
+namespace OpenDorm.Application.Tests.Features.Occupants.Commands.Integration;
 
-public class CreateOccupantCommandHandlerTests : IAsyncLifetime
+public class CreateOccupantCommandHandlerIntegrationTests : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:16-alpine")
         .WithUsername("postgres")
