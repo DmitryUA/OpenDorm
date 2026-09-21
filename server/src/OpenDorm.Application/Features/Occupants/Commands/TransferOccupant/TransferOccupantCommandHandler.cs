@@ -34,8 +34,7 @@ public class TransferOccupantCommandHandler(
         if (!roomInfo.HasFreePlaces)
             throw new DomainException($"There are no empty seats in the room. Room id: '{command.RoomId}'.");
         
-        occupant.CheckOut();
-        var accommodationId = occupant.CheckIn(command.RoomId);
+        var accommodationId = occupant.Transfer(command.RoomId);
         await uow.SaveChangesAsync(cancellationToken);
 
         return accommodationId;
