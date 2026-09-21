@@ -3,6 +3,7 @@ using OpenDorm.Domain.Common.Events;
 using OpenDorm.Domain.Enums;
 using OpenDorm.Domain.Exceptions;
 using OpenDorm.Domain.ValueObjects;
+using OpenDorm.Shared.Tests.Factories;
 
 namespace OpenDorm.Domain.Tests.AggregateTests;
 
@@ -250,6 +251,45 @@ public class OccupantTests
         
         // Act & Assert
         var exception = Assert.Throws<DomainException>(occupant.Deactivate);
+        Assert.Equal(expectedMessage, exception.Message);
+    }
+
+    #endregion
+
+    #region Transfer Tests
+
+    [Fact]
+    public void Transfer_UnoccupiedRoom_TransferOccupant()
+    {
+        // Arrange
+        var roomToId = Guid.NewGuid();
+        var roomFromId = Guid.NewGuid();
+        var (occupant, firsAccommodationId) = OccupantFactory.CreateCheckedIn(roomFromId);
+        
+        // Act
+        var lastAccommodationId = occupant.Transfer(roomToId);
+        
+        // Assert
+        var firstAccommodation = occupant.Accommodations.First(a => a.Id == firsAccommodationId);
+        var lastAccommodation = occupant.Accommodations.FirstOrDefault(a => a.Id == lastAccommodationId);
+        
+        Assert.NotNull(firstAccommodation.CheckOutDate);
+        Assert.NotNull(lastAccommodation);
+        Assert.Null(lastAccommodation.CheckOutDate);
+        Assert.Equal(roomToId ,lastAccommodation.RoomId);
+    }
+
+    [Fact]
+    public void Transfer_RoomWhereThisOccupantIsAlreadyLiving_ThrowsDomainException()
+    {
+        // Arrange
+        var roomId = Guid.NewGuid();
+        var (occupant, accommodationId) = OccupantFactory.CreateCheckedIn(roomId);
+        var expectedMessage = $"Occupant is already living in this room. Accommodation id: '{accommodationId}'.";
+        
+        // Act & Assert
+        var exception = Assert.Throws<DomainException>(() => occupant.Transfer(roomId));
+        
         Assert.Equal(expectedMessage, exception.Message);
     }
 

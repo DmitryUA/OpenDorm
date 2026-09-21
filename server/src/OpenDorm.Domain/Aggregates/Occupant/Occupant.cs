@@ -64,6 +64,21 @@ public class Occupant : AggregateRoot
         
         activeAccommodation.CheckOut(DateTime.UtcNow);
     }
+
+    public Guid Transfer(Guid roomId)
+    {
+        var isCurrentRoomIdEqualsTargetRoomId = _accommodations.Any(a => a.IsActive && a.RoomId == roomId);
+
+        if (isCurrentRoomIdEqualsTargetRoomId)
+        {
+            var activeAccommodationId = _accommodations.First(a => a.IsActive).Id;
+            throw new DomainException(
+                $"Occupant is already living in this room. Accommodation id: '{activeAccommodationId}'.");
+        }
+        
+        CheckOut();
+        return CheckIn(roomId);
+    }
     
     public void Activate()
     {
