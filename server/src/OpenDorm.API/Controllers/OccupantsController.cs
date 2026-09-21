@@ -4,6 +4,7 @@ using OpenDorm.API.Contracts;
 using OpenDorm.Application.Features.Occupants.Commands.CheckOutOccupant;
 using OpenDorm.Application.Features.Occupants.Commands.CreateAccommodation;
 using OpenDorm.Application.Features.Occupants.Commands.CreateOccupant;
+using OpenDorm.Application.Features.Occupants.Commands.TransferOccupant;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace OpenDorm.API.Controllers;
@@ -33,18 +34,18 @@ public class OccupantsController(IMediator mediator) : ControllerBase
         return StatusCode(StatusCodes.Status201Created, occupantId);
     }
     
-    // POST: api/occupants/{occupant-id}/rooms/{room-id}/check-in
-    [HttpPost("{occupant-id:guid}/rooms/{room-id:guid}/check-in")]
+    // POST: api/occupants/{occupant-id}/check-in
+    [HttpPost("{id:guid}/check-in")]
     [SwaggerOperation("Создать новое заселение.")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CheckIn(
-        [FromRoute(Name = "occupant-id")] Guid occupantId,
-        [FromRoute(Name = "room-id")] Guid roomId,
+        Guid id,
+        [FromBody] CheckInOccupantRequest request,
         CancellationToken cancellationToken)
     {
-        var command = new CreateAccommodationCommand(roomId, occupantId);
+        var command = new CreateAccommodationCommand(request.RoomId, id);
         var response = await mediator.Send(command, cancellationToken);
 
         return StatusCode(StatusCodes.Status201Created, response);
@@ -64,5 +65,27 @@ public class OccupantsController(IMediator mediator) : ControllerBase
         await mediator.Send(command, cancellationToken);
 
         return Ok();
+    }
+    
+    // POST: api/occupants/{id}/transfer
+    [HttpPost("{id:guid}/transfer")]
+    [SwaggerOperation(
+        Summary = "Переселить жильца в другую комнату.",
+        Description = "Принимает в теле запроса id комнаты в которую нужно переселить жильца. " +
+                      "Вернёт идентификатор новго заселения.")
+    ]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Transfer(
+        Guid id,
+        [FromBody] TransferOccupantRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new TransferOccupantCommand(id, request.TargetRoomId);
+        var response = await mediator.Send(command, cancellationToken);
+
+        return StatusCode(StatusCodes.Status201Created, response);
     }
 }
