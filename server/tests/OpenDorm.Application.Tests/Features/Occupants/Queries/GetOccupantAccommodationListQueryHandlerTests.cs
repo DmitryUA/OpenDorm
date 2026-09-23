@@ -81,6 +81,10 @@ public class GetOccupantAccommodationListQueryHandlerTests : IAsyncLifetime
         }
         else
             Assert.Equal(firstAccommodation.CheckOutDate, loadedFirstAccommodation.CheckOutDate);
+        
+        Assert.True(
+            result.First().CheckInDate > result.Last().CheckInDate,
+            $"Нарушен порядок сортировки. Ожидалась сортировка по убывания для '{nameof(Accommodation.CheckInDate)}'.");
     }
 
     [Fact]

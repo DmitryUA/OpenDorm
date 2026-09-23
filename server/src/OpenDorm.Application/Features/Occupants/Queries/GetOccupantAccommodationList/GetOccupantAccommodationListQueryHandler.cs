@@ -33,6 +33,7 @@ public class GetOccupantAccommodationListQueryHandler(IApplicationDbContext dbCo
 
             let accommodationAddressDto = new AccommodationAddressDto(dormitory.Address.ToString(), room.Name.Value)
 
+            orderby accommodation.CheckInDate descending
             select new AccommodationDto(
                 accommodation.Id,
                 accommodation.CheckInDate,
