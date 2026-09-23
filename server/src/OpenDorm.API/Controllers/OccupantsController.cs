@@ -7,6 +7,7 @@ using OpenDorm.Application.Features.Occupants.Commands.CheckOutOccupant;
 using OpenDorm.Application.Features.Occupants.Commands.CreateAccommodation;
 using OpenDorm.Application.Features.Occupants.Commands.CreateOccupant;
 using OpenDorm.Application.Features.Occupants.Commands.TransferOccupant;
+using OpenDorm.Application.Features.Occupants.Queries.GetOccupantAccommodationList;
 using OpenDorm.Application.Features.Occupants.Queries.GetOccupantList;
 using OpenDorm.Domain.Enums;
 using Swashbuckle.AspNetCore.Annotations;
@@ -34,6 +35,26 @@ public class OccupantsController(IMediator mediator) : ControllerBase
         [FromQuery] int pageSize = PagedQuery.DefaultPageSize)
     {
         var query = new GetOccupantListQuery(gender, status, page, pageSize);
+        var response = await mediator.Send(query, cancellationToken);
+
+        return Ok(response);
+    }
+    
+    // GET: api/occupants/{id}/accommodations
+    [HttpGet("{id:guid}/accommodations")]
+    [SwaggerOperation(
+        Summary = "Получить историю заселений жильца.",
+        Description = "Вернёт историю заселений жильца отсортированную по новых заселений к старым. " +
+                      "Если дата выселения null значит комната используется жильцом в данный момент")
+    ]
+    [ProducesResponseType(typeof(IReadOnlyCollection<AccommodationDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAccommodationListByOccupantId(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetOccupantAccommodationListQuery(id);
         var response = await mediator.Send(query, cancellationToken);
 
         return Ok(response);
