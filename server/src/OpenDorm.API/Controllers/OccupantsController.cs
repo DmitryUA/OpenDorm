@@ -1,10 +1,14 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using OpenDorm.API.Contracts;
+using OpenDorm.Application.Abstractions;
+using OpenDorm.Application.Common;
 using OpenDorm.Application.Features.Occupants.Commands.CheckOutOccupant;
 using OpenDorm.Application.Features.Occupants.Commands.CreateAccommodation;
 using OpenDorm.Application.Features.Occupants.Commands.CreateOccupant;
 using OpenDorm.Application.Features.Occupants.Commands.TransferOccupant;
+using OpenDorm.Application.Features.Occupants.Queries.GetOccupantList;
+using OpenDorm.Domain.Enums;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace OpenDorm.API.Controllers;
@@ -13,6 +17,28 @@ namespace OpenDorm.API.Controllers;
 [Route("api/[controller]")]
 public class OccupantsController(IMediator mediator) : ControllerBase
 {
+    // GET: api/occupants
+    [HttpGet]
+    [SwaggerOperation(
+        Summary = "Получить краткую информацию о жильцах.",
+        Description = "Возвращает краткую информацию о жильцах. " +
+                      "Поддерживает пагинацию. " +
+                      "Поддерживает фильтры по: гендеру и статусу.")
+    ]
+    [ProducesResponseType(typeof(PagedResult<OccupantListDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Get(
+        CancellationToken cancellationToken,
+        [FromQuery] bool? status = null,
+        [FromQuery] Gender? gender = null,
+        [FromQuery] int page = PagedQuery.DefaultPage,
+        [FromQuery] int pageSize = PagedQuery.DefaultPageSize)
+    {
+        var query = new GetOccupantListQuery(gender, status, page, pageSize);
+        var response = await mediator.Send(query, cancellationToken);
+
+        return Ok(response);
+    }
+
     // POST: api/occupants
     [HttpPost]
     [SwaggerOperation("Создать новго жильца.")]

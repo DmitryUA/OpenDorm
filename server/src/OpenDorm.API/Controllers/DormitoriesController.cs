@@ -55,7 +55,7 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
         Summary = "Получить краткую информацию о комнатах общежития",
         Description = "Возвращает краткую информацию о комнатах общежития." +
                       "\nПоддерживает пагинацию." +
-                      "\nПоддерживает фильтры по: номеру комнаты и её статусу. ")]
+                      "\nПоддерживает фильтры по: номеру комнаты и её статусу.")]
     [ProducesResponseType(typeof(PagedResult<RoomListDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetDormitoryRooms(
