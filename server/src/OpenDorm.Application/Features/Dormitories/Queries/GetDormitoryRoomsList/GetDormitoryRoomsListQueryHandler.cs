@@ -12,7 +12,7 @@ public class GetDormitoryRoomsListQueryHandler(IApplicationDbContext dbContext)
         GetDormitoryRoomsListQuery request,
         CancellationToken cancellationToken)
     {
-        var query = from room in dbContext.Rooms
+        var query = from room in dbContext.Rooms.AsNoTracking()
             where EF.Property<Guid>(room, "DormitoryId") == request.DormitoryId
             where !request.IsActive.HasValue || room.IsActive == request.IsActive.Value
             where string.IsNullOrEmpty(request.Name) || room.Name.Value.Contains(request.Name)
@@ -21,7 +21,7 @@ public class GetDormitoryRoomsListQueryHandler(IApplicationDbContext dbContext)
         var totalCount = await query.CountAsync(cancellationToken);
 
         var items = await (
-                from room in query
+                from room in query.AsNoTracking()
                 let occupantsCount = dbContext.Accommodations
                     .Count(a => a.RoomId == room.Id && a.CheckOutDate == null)
                 orderby room.Name.Value

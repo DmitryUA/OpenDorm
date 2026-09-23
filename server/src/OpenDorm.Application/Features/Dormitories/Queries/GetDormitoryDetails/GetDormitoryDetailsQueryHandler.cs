@@ -14,7 +14,7 @@ public class GetDormitoryDetailsQueryHandler(IApplicationDbContext dbContext)
         CancellationToken cancellationToken)
     {
         var dto = await (
-            from d in dbContext.Dormitories
+            from d in dbContext.Dormitories.AsNoTracking()
             where d.Id == request.Id
             let roomCount = dbContext.Rooms
                 .Count(r => EF.Property<Guid>(r, "DormitoryId") == d.Id)
