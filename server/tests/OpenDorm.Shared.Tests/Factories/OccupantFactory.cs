@@ -58,15 +58,7 @@ public static class OccupantFactory
 
         var occupant = Create();
         var allIds = new List<Guid>(roomIds.Count);
-
-        for (var i = 0; i < roomIds.Count; i++)
-        {
-            var accId = occupant.CheckIn(roomIds[i]);
-            allIds.Add(accId);
-
-            // Все заселения, кроме последнего, нужно выселить
-            if (i < roomIds.Count - 1) occupant.CheckOut();
-        }
+        allIds.AddRange(roomIds.Select((t, i) => i == 0 ? occupant.CheckIn(t) : occupant.Transfer(t)));
 
         return (occupant, allIds, allIds[^1]);
     }
