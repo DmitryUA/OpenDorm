@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using OpenDorm.Application.Abstractions.Persistence;
 using OpenDorm.Application.Common;
+using OpenDorm.Application.Features.Occupants.Queries.Common;
 
 namespace OpenDorm.Application.Features.Occupants.Queries.GetOccupantList;
 

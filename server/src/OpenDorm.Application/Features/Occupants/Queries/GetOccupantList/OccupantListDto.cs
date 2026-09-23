@@ -1,3 +1,4 @@
+using OpenDorm.Application.Features.Occupants.Queries.Common;
 using OpenDorm.Domain.Enums;
 
 namespace OpenDorm.Application.Features.Occupants.Queries.GetOccupantList;
