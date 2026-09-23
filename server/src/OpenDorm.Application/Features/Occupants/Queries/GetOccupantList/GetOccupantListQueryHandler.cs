@@ -30,7 +30,7 @@ public class GetOccupantListQueryHandler(IApplicationDbContext dbContext)
                             .FirstOrDefault(d => d.Id == EF.Property<Guid>(room, "DormitoryId"))
 
                         select room != null && dormitory != null
-                            ? new CurrentAccommodationDto(
+                            ? new AccommodationAddressDto(
                                 dormitory.Address.ToString(),
                                 room.Name.Value)
                             : null)
