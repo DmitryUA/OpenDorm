@@ -6,6 +6,7 @@ using OpenDorm.Application.Common;
 using OpenDorm.Application.Features.Occupants.Commands.CheckOutOccupant;
 using OpenDorm.Application.Features.Occupants.Commands.CreateAccommodation;
 using OpenDorm.Application.Features.Occupants.Commands.CreateOccupant;
+using OpenDorm.Application.Features.Occupants.Commands.DeactivateOccupant;
 using OpenDorm.Application.Features.Occupants.Commands.TransferOccupant;
 using OpenDorm.Application.Features.Occupants.Queries.GetOccupantAccommodationList;
 using OpenDorm.Application.Features.Occupants.Queries.GetOccupantList;
@@ -134,5 +135,22 @@ public class OccupantsController(IMediator mediator) : ControllerBase
         var response = await mediator.Send(command, cancellationToken);
 
         return StatusCode(StatusCodes.Status201Created, response);
+    }
+    
+    // POST: api/occupants/{id}/deactivate
+    [HttpPost("{id:guid}/deactivate")]
+    [SwaggerOperation("Сделать жильца неактивным.")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Deactivate(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var command = new DeactivateOccupantCommand(id);
+        await mediator.Send(command, cancellationToken);
+
+        return Ok();
     }
 }
