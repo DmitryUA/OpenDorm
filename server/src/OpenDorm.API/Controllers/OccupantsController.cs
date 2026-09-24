@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenDorm.API.Contracts;
 using OpenDorm.Application.Abstractions;
 using OpenDorm.Application.Common;
+using OpenDorm.Application.Features.Occupants.Commands.ActivateOccupant;
 using OpenDorm.Application.Features.Occupants.Commands.CheckOutOccupant;
 using OpenDorm.Application.Features.Occupants.Commands.CreateAccommodation;
 using OpenDorm.Application.Features.Occupants.Commands.CreateOccupant;
@@ -149,6 +150,22 @@ public class OccupantsController(IMediator mediator) : ControllerBase
         CancellationToken cancellationToken)
     {
         var command = new DeactivateOccupantCommand(id);
+        await mediator.Send(command, cancellationToken);
+
+        return Ok();
+    }
+    
+    // POST: api/occupants/{id}/activate
+    [HttpPost("{id:guid}/activate")]
+    [SwaggerOperation("Сделать жильца неактивным.")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Activate(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var command = new ActivateOccupantCommand(id);
         await mediator.Send(command, cancellationToken);
 
         return Ok();
