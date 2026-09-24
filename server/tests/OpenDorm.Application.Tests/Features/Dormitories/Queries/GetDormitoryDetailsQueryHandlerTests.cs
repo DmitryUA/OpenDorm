@@ -8,7 +8,7 @@ using OpenDorm.Infrastructure;
 using OpenDorm.Infrastructure.Services;
 using Testcontainers.PostgreSql;
 
-namespace OpenDorm.Application.Tests.Features.Dormitories.Queries.GetDormitoryDetails;
+namespace OpenDorm.Application.Tests.Features.Dormitories.Queries;
 
 public class GetDormitoryDetailsQueryHandlerTests : IAsyncLifetime
 {

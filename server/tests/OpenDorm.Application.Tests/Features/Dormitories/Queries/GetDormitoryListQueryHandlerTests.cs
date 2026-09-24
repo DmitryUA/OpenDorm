@@ -4,7 +4,7 @@ using OpenDorm.Application.Tests.Helpers;
 using OpenDorm.Domain.Aggregates.Dormitory;
 using OpenDorm.Domain.ValueObjects;
 
-namespace OpenDorm.Application.Tests.Features.Dormitories.Queries.GetDormitoryList;
+namespace OpenDorm.Application.Tests.Features.Dormitories.Queries;
 
 public class GetDormitoryListQueryHandlerTests
 {
