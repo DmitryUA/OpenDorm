@@ -1,0 +1,33 @@
+using MockQueryable.NSubstitute;
+using OpenDorm.Application.Abstractions.Persistence;
+using OpenDorm.Application.Features.Dormitories.Queries.GetRoomOccupancyHistory;
+using OpenDorm.Domain.Aggregates.Dormitory;
+using OpenDorm.Domain.Exceptions;
+
+namespace OpenDorm.Application.Tests.Features.Dormitories.Queries.Unit;
+
+public class GetRoomOccupancyHistoryQueryHandlerUnitTests
+{
+    [Fact]
+    public async Task Handle_NonExistRoom_ThrowsNotFoundException()
+    {
+        // Arrange
+        var nonExistRoomId = Guid.NewGuid();
+        var query = new GetRoomOccupancyHistoryQuery(nonExistRoomId);
+        
+        var context = Substitute.For<IApplicationDbContext>();
+        var emptyRoomsList = new List<Room>(); 
+        var mockRoomsDbSet = emptyRoomsList.BuildMockDbSet();
+        
+        context.Rooms.Returns(mockRoomsDbSet);
+
+        var handler = new GetRoomOccupancyHistoryQueryHandler(context);
+        
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<NotFoundException>(
+            () => handler.Handle(query, CancellationToken.None));
+        
+        Assert.Equal(nameof(Room), exception.EntityName);
+        Assert.Equal(nonExistRoomId, exception.EntityId);
+    }
+}
