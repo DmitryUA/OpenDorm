@@ -1,7 +1,7 @@
 namespace OpenDorm.Application.Common;
 
 public record PagedResult<T>(
-    IReadOnlyCollection<T> Items,
+    IReadOnlyList<T> Items,
     int TotalCount,
     int Page,
     int PageSize);
