@@ -16,6 +16,10 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
             .HasColumnName("name")
             .IsRequired();
 
+        builder.Property(r => r.NormalizedName)
+            .HasColumnName("normalized_name")
+            .IsRequired();
+
         builder.HasIndex(r => r.Name)
             .IsUnique()
             .HasDatabaseName("IX_roles_name");
