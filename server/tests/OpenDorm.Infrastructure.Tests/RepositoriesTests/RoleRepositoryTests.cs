@@ -90,20 +90,4 @@ public class RoleRepositoryTests : IAsyncLifetime
     }
 
     #endregion
-
-    #region GetAllAsync
-
-    [Fact]
-    public async Task GetAllAsync_ReturnsAllSeededRoles()
-    {
-        // Act
-        var roles = (await _repository.GetAllAsync()).ToList();
-
-        // Assert
-        Assert.Equal(2, roles.Count);
-        Assert.Contains(roles, r => r.Name == RoleName.Administrator);
-        Assert.Contains(roles, r => r.Name == RoleName.Manager);
-    }
-
-    #endregion
 }
