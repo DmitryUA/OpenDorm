@@ -30,7 +30,6 @@ public class OccupantConfiguration(IEncryptionService encryptionService) : IEnti
                 lastName => encryptionService.Encrypt(Encoding.UTF8.GetBytes(lastName.Value)),
                 value => new LastName(Encoding.UTF8.GetString(encryptionService.Decrypt(value))))
             .HasComment("зашифрованная фамилия")
-            .HasMaxLength(LastName.MaxLength)
             .IsRequired();
 
         builder.Property(o => o.FirstName)
@@ -39,7 +38,6 @@ public class OccupantConfiguration(IEncryptionService encryptionService) : IEnti
                 firstName => encryptionService.Encrypt(Encoding.UTF8.GetBytes(firstName.Value)),
                 value => new FirstName(Encoding.UTF8.GetString(encryptionService.Decrypt(value))))
             .HasComment("зашифрованное имя")
-            .HasMaxLength(FirstName.MaxLength)
             .IsRequired();
 
         builder.Property(o => o.Patronymic)
@@ -49,7 +47,6 @@ public class OccupantConfiguration(IEncryptionService encryptionService) : IEnti
                 value => value != null ? new Patronymic(Encoding.UTF8.GetString(encryptionService.Decrypt(value))) : null
             )
             .HasComment("зашифрованное отчество")
-            .HasMaxLength(Patronymic.MaxLength)
             .IsRequired(false);
 
         builder.Property(o => o.Gender)
