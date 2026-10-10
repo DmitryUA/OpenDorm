@@ -13,7 +13,7 @@ using OpenDorm.Infrastructure;
 namespace OpenDorm.Infrastructure.Migrations
 {
     [DbContext(typeof(OpenDormDbContext))]
-    [Migration("20260911100108_InitialCreate")]
+    [Migration("20261010050500_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -160,7 +160,6 @@ namespace OpenDorm.Infrastructure.Migrations
 
                     b.Property<byte[]>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(30)
                         .HasColumnType("bytea")
                         .HasColumnName("first_name_encrypted")
                         .HasComment("зашифрованное имя");
@@ -177,13 +176,11 @@ namespace OpenDorm.Infrastructure.Migrations
 
                     b.Property<byte[]>("LastName")
                         .IsRequired()
-                        .HasMaxLength(30)
                         .HasColumnType("bytea")
                         .HasColumnName("last_name_encrypted")
                         .HasComment("зашифрованная фамилия");
 
                     b.Property<byte[]>("Patronymic")
-                        .HasMaxLength(30)
                         .HasColumnType("bytea")
                         .HasColumnName("patronymic_encrypted")
                         .HasComment("зашифрованное отчество");
@@ -193,6 +190,212 @@ namespace OpenDorm.Infrastructure.Migrations
                     b.ToTable("occupants", null, t =>
                         {
                             t.HasComment("жильцы");
+                        });
+                });
+
+            modelBuilder.Entity("OpenDorm.Domain.Aggregates.System.SystemFlag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)")
+                        .HasColumnName("value");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_system_flags_name");
+
+                    b.ToTable("system_flags", (string)null);
+                });
+
+            modelBuilder.Entity("OpenDorm.Domain.Aggregates.User.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_at");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_revoked");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("token");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique()
+                        .HasDatabaseName("IX_refresh_tokens_token");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_refresh_tokens_user_id");
+
+                    b.ToTable("refresh_tokens", null, t =>
+                        {
+                            t.HasComment("токены обновления");
+                        });
+                });
+
+            modelBuilder.Entity("OpenDorm.Domain.Aggregates.User.Role", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Name")
+                        .HasColumnType("integer")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("normalized_name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_roles_name");
+
+                    b.ToTable("roles", null, t =>
+                        {
+                            t.HasComment("роли");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000001"),
+                            Name = 1,
+                            NormalizedName = "ADMINISTRATOR"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000002"),
+                            Name = 2,
+                            NormalizedName = "MANAGER"
+                        });
+                });
+
+            modelBuilder.Entity("OpenDorm.Domain.Aggregates.User.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<byte[]>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("first_name_encrypted")
+                        .HasComment("зашифрованное имя");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<byte[]>("LastName")
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("last_name_encrypted")
+                        .HasComment("зашифрованная фамилия");
+
+                    b.Property<byte[]>("Patronymic")
+                        .HasColumnType("bytea")
+                        .HasColumnName("patronymic_encrypted")
+                        .HasComment("зашифрованное отчество");
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Login", "OpenDorm.Domain.Aggregates.User.User.Login#Login", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("character varying(20)")
+                                .HasColumnName("login");
+                        });
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "PasswordHash", "OpenDorm.Domain.Aggregates.User.User.PasswordHash#PasswordHash", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(255)
+                                .HasColumnType("character varying(255)")
+                                .HasColumnName("password_hash");
+                        });
+
+                    b.HasKey("Id");
+
+                    b.ToTable("users", null, t =>
+                        {
+                            t.HasComment("пользователи");
+
+                            t.HasCheckConstraint("CK_Login_MinLength", "LENGTH(login) >= 4");
+                        });
+                });
+
+            modelBuilder.Entity("OpenDorm.Domain.Aggregates.User.UserRole", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("role_id");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("UserId", "RoleId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_user_roles_user_id_role_id");
+
+                    b.ToTable("user_roles", null, t =>
+                        {
+                            t.HasComment("роли пользователя");
                         });
                 });
 
@@ -265,6 +468,33 @@ namespace OpenDorm.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("OpenDorm.Domain.Aggregates.User.RefreshToken", b =>
+                {
+                    b.HasOne("OpenDorm.Domain.Aggregates.User.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_refresh_tokens_users");
+                });
+
+            modelBuilder.Entity("OpenDorm.Domain.Aggregates.User.UserRole", b =>
+                {
+                    b.HasOne("OpenDorm.Domain.Aggregates.User.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_user_roles_roles");
+
+                    b.HasOne("OpenDorm.Domain.Aggregates.User.User", null)
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_user_roles_users");
+                });
+
             modelBuilder.Entity("OpenDorm.Domain.Aggregates.Dormitory.Dormitory", b =>
                 {
                     b.Navigation("_rooms");
@@ -273,6 +503,11 @@ namespace OpenDorm.Infrastructure.Migrations
             modelBuilder.Entity("OpenDorm.Domain.Aggregates.Occupant.Occupant", b =>
                 {
                     b.Navigation("_accommodations");
+                });
+
+            modelBuilder.Entity("OpenDorm.Domain.Aggregates.User.User", b =>
+                {
+                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }
