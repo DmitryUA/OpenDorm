@@ -4,7 +4,6 @@ using OpenDorm.Application.Abstractions;
 using OpenDorm.Application.Abstractions.Persistence;
 using OpenDorm.Domain.Abstractions;
 using OpenDorm.Domain.Aggregates.User;
-using OpenDorm.Domain.Enums;
 using OpenDorm.Domain.Exceptions;
 using OpenDorm.Domain.ValueObjects;
 
@@ -23,11 +22,13 @@ public class CreateUserCommandHandler(
         if (await userRepository.ExistsByLoginAsync(login, cancellationToken))
             throw new DomainException($"User with login '{command.Login}' already exists.");
 
-        var roleName = Enum.Parse<RoleName>(command.RoleName, ignoreCase: true);
+        var normalizedName = command.RoleName.ToUpperInvariant();
         
-        var role = await context.Roles
+        var roleId = await context.Roles
                        .AsNoTracking()
-                       .FirstOrDefaultAsync(r => r.Name == roleName, cancellationToken)
+                       .Where(r => r.NormalizedName == normalizedName)
+                       .Select(r=>(Guid?)r.Id)
+                       .FirstOrDefaultAsync(cancellationToken)
                    ?? throw new NotFoundException(nameof(Role), command.RoleName);
 
         var passwordHash = passwordHasher.Hash(command.Password);
@@ -40,7 +41,7 @@ public class CreateUserCommandHandler(
             new FirstName(command.FirstName),
             command.Patronymic is null ? null : new Patronymic(command.Patronymic));
 
-        user.AssignRole(role.Id);
+        user.AssignRole(roleId);
 
         await userRepository.AddAsync(user, cancellationToken);
         await uow.SaveChangesAsync(cancellationToken);
