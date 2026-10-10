@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenDorm.API.Contracts;
 using OpenDorm.Application.Abstractions;
@@ -12,23 +13,34 @@ using OpenDorm.Application.Features.Occupants.Commands.TransferOccupant;
 using OpenDorm.Application.Features.Occupants.Queries.GetOccupantAccommodationList;
 using OpenDorm.Application.Features.Occupants.Queries.GetOccupantList;
 using OpenDorm.Domain.Enums;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace OpenDorm.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class OccupantsController(IMediator mediator) : ControllerBase
 {
     // GET: api/occupants
+    /// <summary>Получить краткую информацию о жильцах.</summary>
+    /// <remarks>
+    /// Возвращает краткую информацию о жильцах.
+    /// Поддерживает пагинацию.
+    /// Поддерживает фильтры по: гендеру и статусу.
+    /// </remarks>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <param name="status">Фильтр по статусу.</param>
+    /// <param name="gender">Фильтр по полу.</param>
+    /// <param name="page">Номер страницы (пагинация).</param>
+    /// <param name="pageSize">Размер страницы (пагинация).</param>
+    /// <response code="200">Список жильцов получен</response>
+    /// <response code="401">Пользователь не аутентифицирован</response>
+    /// <response code="403">Недостаточно прав</response>
     [HttpGet]
-    [SwaggerOperation(
-        Summary = "Получить краткую информацию о жильцах.",
-        Description = "Возвращает краткую информацию о жильцах. " +
-                      "Поддерживает пагинацию. " +
-                      "Поддерживает фильтры по: гендеру и статусу.")
-    ]
+    [Authorize(Policy = Permissions.Occupants.Read)]
     [ProducesResponseType(typeof(PagedResult<OccupantListDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> Get(
         CancellationToken cancellationToken,
         [FromQuery] bool? status = null,
@@ -43,14 +55,23 @@ public class OccupantsController(IMediator mediator) : ControllerBase
     }
     
     // GET: api/occupants/{id}/accommodations
+    /// <summary>Получить историю заселений жильца.</summary>
+    /// <remarks>
+    /// Вернёт историю заселений жильца отсортированную по новых заселений к старым.
+    /// Если дата выселения null значит комната используется жильцом в данный момент.
+    /// </remarks>
+    /// <param name="id">Идентификатор жильца.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <response code="200">История заселений жильца получена</response>
+    /// <response code="401">Пользователь не аутентифицирован</response>
+    /// <response code="403">Недостаточно прав</response>
+    /// <response code="404">Жилец не найден</response>
     [HttpGet("{id:guid}/accommodations")]
-    [SwaggerOperation(
-        Summary = "Получить историю заселений жильца.",
-        Description = "Вернёт историю заселений жильца отсортированную по новых заселений к старым. " +
-                      "Если дата выселения null значит комната используется жильцом в данный момент")
-    ]
+    [Authorize(Policy = Permissions.Accommodations.Read)]
     [ProducesResponseType(typeof(IReadOnlyCollection<AccommodationDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAccommodationListByOccupantId(
         Guid id,
@@ -63,10 +84,18 @@ public class OccupantsController(IMediator mediator) : ControllerBase
     }
 
     // POST: api/occupants
+    /// <summary>Создать нового жильца.</summary>
+    /// <param name="request">Параметры для создания нового жильца.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <response code="201">Жилец создан</response>
+    /// <response code="401">Пользователь не аутентифицирован</response>
+    /// <response code="403">Недостаточно прав</response>
     [HttpPost]
-    [SwaggerOperation("Создать новго жильца.")]
+    [Authorize(Policy = Permissions.Occupants.Create)]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> Create(
         [FromBody] CreateOccupantRequest request,
         CancellationToken cancellationToken)
@@ -84,9 +113,19 @@ public class OccupantsController(IMediator mediator) : ControllerBase
     }
     
     // POST: api/occupants/{occupant-id}/check-in
+    /// <summary>Создать новое заселение.</summary>
+    /// <param name="id">Идентификатор жильца.</param>
+    /// <param name="request">Параметры для создания заселения.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <response code="201">Заселение создано</response>
+    /// <response code="401">Пользователь не аутентифицирован</response>
+    /// <response code="403">Недостаточно прав</response>
+    /// <response code="404">Жилец не найден</response>
     [HttpPost("{id:guid}/check-in")]
-    [SwaggerOperation("Создать новое заселение.")]
+    [Authorize(Policy = Permissions.Accommodations.CheckIn)]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CheckIn(
@@ -101,9 +140,18 @@ public class OccupantsController(IMediator mediator) : ControllerBase
     }
     
     // POST: api/occupants/{id}/check-out
+    /// <summary>Выселить жильца.</summary>
+    /// <param name="id">Идентификатор жильца.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <response code="200">Жилец выселен</response>
+    /// <response code="401">Пользователь не аутентифицирован</response>
+    /// <response code="403">Недостаточно прав</response>
+    /// <response code="404">Жилец не найден</response>
     [HttpPost("{id:guid}/check-out")]
-    [SwaggerOperation("Выселить жильца.")]
+    [Authorize(Policy = Permissions.Accommodations.CheckOut)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CheckOut(
@@ -117,14 +165,24 @@ public class OccupantsController(IMediator mediator) : ControllerBase
     }
     
     // POST: api/occupants/{id}/transfer
+    /// <summary>Переселить жильца в другую комнату.</summary>
+    /// <remarks>
+    /// Принимает в теле запроса id комнаты в которую нужно переселить жильца.
+    /// Вернёт идентификатор новго заселения.
+    /// </remarks>
+    /// <param name="id">Идентификатор жильца.</param>
+    /// <param name="request">Параметры для переселения.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <response code="201">Жилец переселён</response>
+    /// <response code="401">Пользователь не аутентифицирован</response>
+    /// <response code="403">Недостаточно прав</response>
+    /// <response code="404">Жилец не найден</response>
     [HttpPost("{id:guid}/transfer")]
-    [SwaggerOperation(
-        Summary = "Переселить жильца в другую комнату.",
-        Description = "Принимает в теле запроса id комнаты в которую нужно переселить жильца. " +
-                      "Вернёт идентификатор новго заселения.")
-    ]
+    [Authorize(Policy = Permissions.Accommodations.Transfer)]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Transfer(
@@ -139,10 +197,19 @@ public class OccupantsController(IMediator mediator) : ControllerBase
     }
     
     // POST: api/occupants/{id}/deactivate
+    /// <summary>Сделать жильца неактивным.</summary>
+    /// <param name="id">Идентификатор жильца.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <response code="200">Жилец деактивирован</response>
+    /// <response code="401">Пользователь не аутентифицирован</response>
+    /// <response code="403">Недостаточно прав</response>
+    /// <response code="404">Жилец не найден</response>
     [HttpPost("{id:guid}/deactivate")]
-    [SwaggerOperation("Сделать жильца неактивным.")]
+    [Authorize(Policy = Permissions.Occupants.Deactivate)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Deactivate(
@@ -156,10 +223,19 @@ public class OccupantsController(IMediator mediator) : ControllerBase
     }
     
     // POST: api/occupants/{id}/activate
+    /// <summary>Сделать жильца неактивным.</summary>
+    /// <param name="id">Идентификатор жильца.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <response code="200">Жилец активирован</response>
+    /// <response code="401">Пользователь не аутентифицирован</response>
+    /// <response code="403">Недостаточно прав</response>
+    /// <response code="404">Жилец не найден</response>
     [HttpPost("{id:guid}/activate")]
-    [SwaggerOperation("Сделать жильца неактивным.")]
+    [Authorize(Policy = Permissions.Occupants.Activate)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Activate(
         Guid id,
