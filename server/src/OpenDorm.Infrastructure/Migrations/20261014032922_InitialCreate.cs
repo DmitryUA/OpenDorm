@@ -55,7 +55,7 @@ namespace OpenDorm.Infrastructure.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, comment: "идентификатор роли"),
                     name = table.Column<int>(type: "integer", nullable: false),
-                    normalized_name = table.Column<string>(type: "text", nullable: false)
+                    normalized_name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {

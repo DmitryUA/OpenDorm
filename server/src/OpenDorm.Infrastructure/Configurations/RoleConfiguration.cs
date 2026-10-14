@@ -23,6 +23,7 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
 
         builder.Property(r => r.NormalizedName)
             .HasColumnName("normalized_name")
+            .HasMaxLength(Role.MaxLength)
             .IsRequired();
 
         builder.HasIndex(r => r.Name)

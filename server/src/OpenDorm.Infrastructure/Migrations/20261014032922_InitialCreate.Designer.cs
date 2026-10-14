@@ -13,7 +13,7 @@ using OpenDorm.Infrastructure;
 namespace OpenDorm.Infrastructure.Migrations
 {
     [DbContext(typeof(OpenDormDbContext))]
-    [Migration("20261014012136_InitialCreate")]
+    [Migration("20261014032922_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -282,7 +282,8 @@ namespace OpenDorm.Infrastructure.Migrations
 
                     b.Property<string>("NormalizedName")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
                         .HasColumnName("normalized_name");
 
                     b.HasKey("Id");

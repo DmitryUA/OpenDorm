@@ -279,7 +279,8 @@ namespace OpenDorm.Infrastructure.Migrations
 
                     b.Property<string>("NormalizedName")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
                         .HasColumnName("normalized_name");
 
                     b.HasKey("Id");
