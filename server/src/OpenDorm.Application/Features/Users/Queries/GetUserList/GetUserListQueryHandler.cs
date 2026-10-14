@@ -31,13 +31,16 @@ public class GetUserListQueryHandler(IApplicationDbContext context)
                     )
                     .ToList()
             })
+            .ToListAsync(cancellationToken);
+        
+        var sortedData = rawData
             .OrderBy(u => u.LastName)
             .ThenBy(u => u.FirstName)
-            .ToListAsync(cancellationToken);
+            .ToList();
         
         return
         [
-            .. rawData.Select(u => new UserDto(
+            .. sortedData.Select(u => new UserDto(
                 u.Id,
                 u.Login,
                 u.LastName,
