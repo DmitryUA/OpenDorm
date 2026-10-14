@@ -99,5 +99,18 @@ public class OpenDormDbContext(DbContextOptions<OpenDormDbContext> options, IEnc
                     accommodationEntry.State = EntityState.Added;
             }
         }
+        
+        foreach (var entry in ChangeTracker.Entries<User>())
+        {
+            if (entry.State is EntityState.Deleted) continue;
+            
+            foreach (var userRole in entry.Entity.UserRoles)
+            {
+                var userRoleEntry = Entry(userRole);
+                
+                if (userRoleEntry.State is EntityState.Detached)
+                    userRoleEntry.State = EntityState.Added;
+            }
+        }
     }
 }

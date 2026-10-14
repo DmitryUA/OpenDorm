@@ -53,13 +53,13 @@ namespace OpenDorm.Infrastructure.Migrations
                 name: "roles",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false, comment: "идентификатор роли"),
                     name = table.Column<int>(type: "integer", nullable: false),
                     normalized_name = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_roles", x => x.Id);
+                    table.PrimaryKey("PK_roles", x => x.id);
                 },
                 comment: "роли");
 
@@ -67,21 +67,21 @@ namespace OpenDorm.Infrastructure.Migrations
                 name: "system_flags",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false, comment: "идентификатор флага"),
                     name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     value = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_system_flags", x => x.Id);
+                    table.PrimaryKey("PK_system_flags", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "users",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false, comment: "идентификатор пользователя"),
                     last_name_encrypted = table.Column<byte[]>(type: "bytea", nullable: false, comment: "зашифрованная фамилия"),
                     first_name_encrypted = table.Column<byte[]>(type: "bytea", nullable: false, comment: "зашифрованное имя"),
                     patronymic_encrypted = table.Column<byte[]>(type: "bytea", nullable: true, comment: "зашифрованное отчество"),
@@ -92,7 +92,7 @@ namespace OpenDorm.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_users", x => x.Id);
+                    table.PrimaryKey("PK_users", x => x.id);
                     table.CheckConstraint("CK_Login_MinLength", "LENGTH(login) >= 4");
                 },
                 comment: "пользователи");
@@ -126,7 +126,7 @@ namespace OpenDorm.Infrastructure.Migrations
                 name: "refresh_tokens",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false, comment: "идентификатор токена"),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     token = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -135,12 +135,12 @@ namespace OpenDorm.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_refresh_tokens", x => x.Id);
+                    table.PrimaryKey("PK_refresh_tokens", x => x.id);
                     table.ForeignKey(
                         name: "FK_refresh_tokens_users",
                         column: x => x.user_id,
                         principalTable: "users",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 },
                 comment: "токены обновления");
@@ -149,24 +149,24 @@ namespace OpenDorm.Infrastructure.Migrations
                 name: "user_roles",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false, comment: "идентификатор роли пользователя"),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     role_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_user_roles", x => x.Id);
+                    table.PrimaryKey("PK_user_roles", x => x.id);
                     table.ForeignKey(
                         name: "FK_user_roles_roles",
                         column: x => x.role_id,
                         principalTable: "roles",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_user_roles_users",
                         column: x => x.user_id,
                         principalTable: "users",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 },
                 comment: "роли пользователя");
@@ -201,7 +201,7 @@ namespace OpenDorm.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "roles",
-                columns: new[] { "Id", "name", "normalized_name" },
+                columns: new[] { "id", "name", "normalized_name" },
                 values: new object[,]
                 {
                     { new Guid("00000000-0000-0000-0000-000000000001"), 1, "ADMINISTRATOR" },

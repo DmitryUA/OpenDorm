@@ -193,8 +193,9 @@ namespace OpenDorm.Infrastructure.Migrations
             modelBuilder.Entity("OpenDorm.Domain.Aggregates.System.SystemFlag", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasComment("идентификатор флага");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -224,8 +225,9 @@ namespace OpenDorm.Infrastructure.Migrations
             modelBuilder.Entity("OpenDorm.Domain.Aggregates.User.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasComment("идентификатор токена");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -267,8 +269,9 @@ namespace OpenDorm.Infrastructure.Migrations
             modelBuilder.Entity("OpenDorm.Domain.Aggregates.User.Role", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasComment("идентификатор роли");
 
                     b.Property<int>("Name")
                         .HasColumnType("integer")
@@ -308,8 +311,9 @@ namespace OpenDorm.Infrastructure.Migrations
             modelBuilder.Entity("OpenDorm.Domain.Aggregates.User.User", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasComment("идентификатор пользователя");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -371,8 +375,9 @@ namespace OpenDorm.Infrastructure.Migrations
             modelBuilder.Entity("OpenDorm.Domain.Aggregates.User.UserRole", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasComment("идентификатор роли пользователя");
 
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uuid")

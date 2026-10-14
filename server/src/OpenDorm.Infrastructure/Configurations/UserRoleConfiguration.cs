@@ -11,6 +11,11 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
         builder.ToTable("user_roles", t => t.HasComment("роли пользователя"));
 
         builder.HasKey(ur => ur.Id);
+        
+        builder.Property(ur => ur.Id)
+            .HasColumnName("id")
+            .HasComment("идентификатор роли пользователя")
+            .ValueGeneratedNever();
 
         builder.Property(ur => ur.UserId)
             .HasColumnName("user_id")

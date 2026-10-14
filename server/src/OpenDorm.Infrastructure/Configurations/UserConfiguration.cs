@@ -18,6 +18,11 @@ public class UserConfiguration(IEncryptionService encryptionService) : IEntityTy
         });
 
         builder.HasKey(u => u.Id);
+        
+        builder.Property(u=>u.Id)
+            .HasColumnName("id")
+            .HasComment("идентификатор пользователя")
+            .ValueGeneratedNever();
 
         builder.ComplexProperty(u => u.Login, b =>
         {

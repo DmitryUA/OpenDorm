@@ -12,6 +12,11 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
 
         builder.HasKey(rt => rt.Id);
 
+        builder.Property(rt => rt.Id)
+            .HasColumnName("id")
+            .HasComment("идентификатор токена")
+            .ValueGeneratedNever();
+
         builder.Property(rt => rt.UserId)
             .HasColumnName("user_id")
             .IsRequired();

@@ -11,6 +11,11 @@ public class SystemFlagConfiguration : IEntityTypeConfiguration<SystemFlag>
         builder.ToTable("system_flags");
 
         builder.HasKey(f => f.Id);
+        
+        builder.Property(f=>f.Id)
+            .HasColumnName("id")
+            .HasComment("идентификатор флага")
+            .ValueGeneratedNever();
 
         builder.Property(f => f.Name)
             .HasColumnName("name")

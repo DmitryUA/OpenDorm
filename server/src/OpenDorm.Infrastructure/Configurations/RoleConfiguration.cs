@@ -12,6 +12,11 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
 
         builder.HasKey(r => r.Id);
 
+        builder.Property(r => r.Id)
+            .HasColumnName("id")
+            .HasComment("идентификатор роли")
+            .ValueGeneratedNever();
+
         builder.Property(r => r.Name)
             .HasColumnName("name")
             .IsRequired();
