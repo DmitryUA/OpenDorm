@@ -16,9 +16,10 @@ public class RevokeRoleCommandHandler(
     public async Task Handle(RevokeRoleCommand command, CancellationToken cancellationToken)
     {
         var user = await userRepository.GetByIdAsync(command.UserId, cancellationToken)
-                   ?? throw new NotFoundException(nameof(Domain.Aggregates.User.User), command.UserId);
+                   ?? throw new NotFoundException(nameof(User), command.UserId);
 
-        var roleName = Enum.Parse<RoleName>(command.RoleName, ignoreCase: true);
+        if (!Enum.TryParse<RoleName>(command.RoleName, ignoreCase: true, out var roleName))
+            throw new NotFoundException(nameof(Role), command.RoleName);
         
         var roleId = await context.Roles
                          .AsNoTracking()
