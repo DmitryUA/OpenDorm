@@ -16,8 +16,8 @@ public class RoomTests
         var id = Guid.NewGuid();
         var name = new RoomName("Room 101");
         var gender = Gender.Male;
-        const int capacity = 4;
-        const int floor = 2;
+        var capacity = new RoomCapacity(4);
+        var floor = new FloorNumber(2);
 
         // Act
         var room = new Room(id, name, gender, capacity, floor);
@@ -32,44 +32,27 @@ public class RoomTests
     }
     
     [Fact]
-    public void Constructor_DefaultCapacityAndFloor_SetsToOne()
+    public void Constructor_NullName_ThrowsInvalidRoomException()
     {
-        // Act
-        var room = new Room(Guid.NewGuid(), new RoomName("Room 102"), Gender.Female);
-
-        // Assert
-        Assert.Equal(1, room.Capacity);
-        Assert.Equal(1, room.FloorNumber);
+        // Act & Assert
+        Assert.Throws<InvalidRoomException>(() => 
+            new Room(Guid.NewGuid(), null!, Gender.Male, new RoomCapacity(1), new FloorNumber(1)));
     }
     
     [Fact]
-    public void Constructor_NullName_ThrowsArgumentNullException()
+    public void Constructor_NullCapacity_ThrowsInvalidRoomException()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => 
-            new Room(Guid.NewGuid(), null!, Gender.Male));
+        Assert.Throws<InvalidRoomException>(() => 
+            new Room(Guid.NewGuid(), new RoomName("406"), Gender.Male, null!, new FloorNumber(1)));
     }
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    [InlineData(-100)]
-    public void Constructor_InvalidCapacity_ThrowsArgumentOutOfRangeException(int invalidCapacity)
+    
+    [Fact]
+    public void Constructor_NullFloorNumber_ThrowsInvalidRoomException()
     {
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            new Room(Guid.NewGuid(), new RoomName("Room"), Gender.Male, invalidCapacity));
-    }
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    [InlineData(-5)]
-    public void Constructor_InvalidFloorNumber_ThrowsArgumentOutOfRangeException(int invalidFloor)
-    {
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => 
-            new Room(Guid.NewGuid(), new RoomName("Room"), Gender.Male, 1, invalidFloor));
+        Assert.Throws<InvalidRoomException>(() => 
+            new Room(Guid.NewGuid(), new RoomName("406"), Gender.Male, new RoomCapacity(1), null!));
     }
 
     #endregion
@@ -80,7 +63,7 @@ public class RoomTests
     public void Activate_ActiveRoom_IsActiveTrue()
     {
         // Arrange
-        var room = new RoomBuilder().Build();
+        var room = RoomBuilder.Build();
         
         // Act
         room.Activate();
@@ -93,7 +76,7 @@ public class RoomTests
     public void Activate_InactiveRoom_IsActiveTrue()
     {
         // Arrange
-        var room = new RoomBuilder().Build();
+        var room = RoomBuilder.Build();
         room.Deactivate();
         
         // Act
@@ -111,7 +94,7 @@ public class RoomTests
     public void Deactivate_ActiveRoom_IsActiveFalse()
     {
         // Arrange
-        var room = new RoomBuilder().Build();
+        var room = RoomBuilder.Build();
         
         // Act
         room.Deactivate();
@@ -124,7 +107,7 @@ public class RoomTests
     public void Deactivate_InactiveRoom_IsActiveFalse()
     {
         // Arrange
-        var room = new RoomBuilder().Build();
+        var room = RoomBuilder.Build();
         room.Deactivate();
         
         // Act
@@ -136,8 +119,12 @@ public class RoomTests
 
     #endregion
     
-    private class RoomBuilder
+    private static class RoomBuilder
     {
-        public Room Build() => new(Guid.NewGuid(), new RoomName("Room 102"), Gender.Female);
+        public static Room Build() => new(
+            Guid.NewGuid(),
+            new RoomName("Room 102"),
+            Gender.Female, new RoomCapacity(1),
+            new FloorNumber(1));
     }
 }

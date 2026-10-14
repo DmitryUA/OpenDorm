@@ -71,6 +71,9 @@ public class DormitoryRepositoryTests : IAsyncLifetime
     public async Task AddAsync_ShouldPersistDormitoryWithRooms()
     {
         // Arrange
+        const int capacity = 2;
+        const int floorNumber = 5;
+        
         var dormitory = new Dormitory(
             Guid.NewGuid(),
             new Address(new City("Москва"), new Street("Строителей"), new HouseNumber("12")),
@@ -79,8 +82,8 @@ public class DormitoryRepositoryTests : IAsyncLifetime
         var roomId = dormitory.AddRoom(
             new RoomName("101"),
             Gender.Male,
-            capacity: 2,
-            floorNumber: 1);
+            new RoomCapacity(capacity),
+            new FloorNumber(floorNumber));
 
         // Act
         await _repository.AddAsync(dormitory);
@@ -98,8 +101,8 @@ public class DormitoryRepositoryTests : IAsyncLifetime
         Assert.NotNull(loadedRoom);
         Assert.Equal("101", loadedRoom.Name.Value);
         Assert.Equal(Gender.Male, loadedRoom.Gender);
-        Assert.Equal(2, loadedRoom.Capacity);
-        Assert.Equal(1, loadedRoom.FloorNumber);
+        Assert.Equal(capacity, loadedRoom.Capacity.Value);
+        Assert.Equal(floorNumber, loadedRoom.FloorNumber.Value);
     }
     
     [Fact]

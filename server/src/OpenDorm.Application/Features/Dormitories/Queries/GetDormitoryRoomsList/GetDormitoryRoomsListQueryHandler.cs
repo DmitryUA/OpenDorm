@@ -28,10 +28,10 @@ public class GetDormitoryRoomsListQueryHandler(IApplicationDbContext dbContext)
                 select new RoomListDto(
                     room.Id,
                     room.Name.Value,
-                    room.Capacity,
+                    room.Capacity.Value,
                     room.Gender,
                     room.IsActive,
-                    room.FloorNumber,
+                    room.FloorNumber.Value,
                     occupantsCount))
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)

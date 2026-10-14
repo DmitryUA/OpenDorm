@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OpenDorm.Application.Common;
 using OpenDorm.Application.Features.Dormitories.Queries.GetRoomOccupancyHistory;
+using OpenDorm.Domain.ValueObjects;
 using OpenDorm.Infrastructure;
 using OpenDorm.Infrastructure.Services;
 using OpenDorm.Shared.Tests.Factories;
@@ -42,7 +43,7 @@ public class GetRoomOccupancyHistoryQueryHandlerIntegrationTests : IAsyncLifetim
     public async Task Handle_NoFilters_ReturnsRoomHistorySortedInDescendingOrder()
     {
         // Arrange
-        var (dormitory, roomId) = DormitoryFactory.CreateWithOneRoom(capacity: 2);
+        var (dormitory, roomId) = DormitoryFactory.CreateWithOneRoom(new RoomCapacity(2));
         var firstOccupant = OccupantFactory.CreateCheckedIn(roomId).Occupant;
         var (lastOccupant, lastAccommodationId) = OccupantFactory.CreateCheckedIn(roomId);
         
@@ -94,7 +95,7 @@ public class GetRoomOccupancyHistoryQueryHandlerIntegrationTests : IAsyncLifetim
     public async Task Handle_Sort_ReturnsSortedResult(SortOrder sortOrder)
     {
         // Arrange
-        var (dormitory, roomId) = DormitoryFactory.CreateWithOneRoom(capacity: 2);
+        var (dormitory, roomId) = DormitoryFactory.CreateWithOneRoom(new RoomCapacity(2));
         var firstOccupant = OccupantFactory.CreateCheckedIn(roomId).Occupant;
         var lastOccupant = OccupantFactory.CreateCheckedIn(roomId).Occupant;
 

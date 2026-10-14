@@ -5,6 +5,7 @@ using OpenDorm.Domain.Abstractions;
 using OpenDorm.Domain.Aggregates.Dormitory;
 using OpenDorm.Domain.Aggregates.Occupant;
 using OpenDorm.Domain.Exceptions;
+using OpenDorm.Domain.ValueObjects;
 using OpenDorm.Infrastructure;
 using OpenDorm.Infrastructure.Persistence;
 using OpenDorm.Infrastructure.Repositories;
@@ -127,7 +128,7 @@ public class TransferOccupantCommandHandlerIntegrationTests : IAsyncLifetime
     public async Task Handle_FullyOccupiedTargetRoom_ThrowsDomainException()
     {
         // Assert
-        var (dormitory, roomIds) = DormitoryFactory.CreateWithRooms(roomsCount: 2, capacity: 1);
+        var (dormitory, roomIds) = DormitoryFactory.CreateWithRooms(roomsCount: 2, capacity: new RoomCapacity(1));
         var roomFromId = roomIds[0];
         var roomToId = roomIds[1];
         var occupantForTransfer = OccupantFactory.CreateCheckedIn(roomFromId).Occupant;
@@ -153,7 +154,7 @@ public class TransferOccupantCommandHandlerIntegrationTests : IAsyncLifetime
     public async Task Handle_InactiveTargetRoom_ThrowsDomainException()
     {
         // Arrange
-        var (dormitory, roomIds) = DormitoryFactory.CreateWithRooms(roomsCount: 2, capacity: 1);
+        var (dormitory, roomIds) = DormitoryFactory.CreateWithRooms(roomsCount: 2, capacity: new RoomCapacity(1));
         var roomFromId = roomIds[0];
         var roomToId = roomIds[1];
         var occupant = OccupantFactory.CreateCheckedIn(roomFromId).Occupant;

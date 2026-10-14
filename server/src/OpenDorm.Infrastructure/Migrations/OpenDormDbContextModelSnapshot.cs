@@ -50,20 +50,10 @@ namespace OpenDorm.Infrastructure.Migrations
                         .HasColumnName("id")
                         .HasComment("идентификатор комнаты");
 
-                    b.Property<int>("Capacity")
-                        .HasColumnType("integer")
-                        .HasColumnName("capacity")
-                        .HasComment("вместимость");
-
                     b.Property<Guid>("DormitoryId")
                         .HasColumnType("uuid")
                         .HasColumnName("dormitory_id")
                         .HasComment("идентификатор общежития");
-
-                    b.Property<int>("FloorNumber")
-                        .HasColumnType("integer")
-                        .HasColumnName("floor_number")
-                        .HasComment("номер этажа");
 
                     b.Property<char>("Gender")
                         .HasColumnType("character(1)")
@@ -76,6 +66,26 @@ namespace OpenDorm.Infrastructure.Migrations
                         .HasDefaultValue(true)
                         .HasColumnName("is_active")
                         .HasComment("активна ли комната");
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Capacity", "OpenDorm.Domain.Aggregates.Dormitory.Room.Capacity#RoomCapacity", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<int>("Value")
+                                .HasColumnType("integer")
+                                .HasColumnName("capacity")
+                                .HasComment("вместимость");
+                        });
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "FloorNumber", "OpenDorm.Domain.Aggregates.Dormitory.Room.FloorNumber#FloorNumber", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<int>("Value")
+                                .HasColumnType("integer")
+                                .HasColumnName("floor_number")
+                                .HasComment("номер этажа");
+                        });
 
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Name", "OpenDorm.Domain.Aggregates.Dormitory.Room.Name#RoomName", b1 =>
                         {

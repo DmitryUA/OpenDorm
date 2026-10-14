@@ -84,8 +84,8 @@ public class GetDormitoryDetailsQueryHandlerTests : IAsyncLifetime
 
         var dormitory = new Dormitory(dormitoryId, address, 2);
 
-        dormitory.AddRoom(new RoomName("109"), Gender.Female, 2);
-        dormitory.AddRoom(new RoomName("206"), Gender.Male, 2, 2);
+        dormitory.AddRoom(new RoomName("109"), Gender.Female, new RoomCapacity(2), new FloorNumber(1));
+        dormitory.AddRoom(new RoomName("206"), Gender.Male, new RoomCapacity(2), new FloorNumber(2));
 
         _context.DormitoriesDbSet.Add(dormitory);
         await _context.SaveChangesAsync();
@@ -119,8 +119,8 @@ public class GetDormitoryDetailsQueryHandlerTests : IAsyncLifetime
 
         var dormitory = new Dormitory(dormitoryId, address, 2);
 
-        var firstRoomId = dormitory.AddRoom(new RoomName("109"), Gender.Male, 2);
-        var secondRoomId = dormitory.AddRoom(new RoomName("206"), Gender.Female, 2, 2);
+        var firstRoomId = dormitory.AddRoom(new RoomName("109"), Gender.Male, new RoomCapacity(2), new FloorNumber(1));
+        var secondRoomId = dormitory.AddRoom(new RoomName("206"), Gender.Female, new RoomCapacity(2), new FloorNumber(2));
 
         var firstOccupant = new Occupant(Guid.NewGuid(),
             new LastName("Иванов"),

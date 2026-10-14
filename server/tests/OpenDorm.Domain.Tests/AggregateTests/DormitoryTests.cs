@@ -74,8 +74,8 @@ public class DormitoryTests
         
         var roomName = new RoomName("406");
         const Gender gender = Gender.Male;
-        const int floorNumber = 4;
-        const int capacity = 2;
+        var floorNumber = new FloorNumber(4);
+        var capacity = new RoomCapacity(2);
 
         // Act
         var newRoomId = dormitory.AddRoom(roomName, gender, capacity, floorNumber);
@@ -89,8 +89,8 @@ public class DormitoryTests
         Assert.Equal(newRoomId, roomAddedEvent.RoomId);
         Assert.Equal(roomName, roomAddedEvent.RoomName);
         Assert.Equal(gender, roomAddedEvent.Gender);
-        Assert.Equal(capacity, roomAddedEvent.Capacity);
-        Assert.Equal(floorNumber, roomAddedEvent.FloorNumber);
+        Assert.Equal(capacity.Value, roomAddedEvent.Capacity);
+        Assert.Equal(floorNumber.Value, roomAddedEvent.FloorNumber);
     }
 
     [Fact]
@@ -101,11 +101,15 @@ public class DormitoryTests
         
         var roomName = new RoomName("406");
         const Gender gender = Gender.Male;
-        const int floorNumber = 999;
-        const int capacity = 2;
+        var floorNumber = new FloorNumber(999);
         
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => dormitory.AddRoom(roomName, gender, capacity, floorNumber));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => dormitory.AddRoom(
+            roomName,
+            gender,
+            new RoomCapacity(2),
+            floorNumber));
+        
         Assert.Equal("floorNumber", exception.ParamName);
     }
 
@@ -120,11 +124,15 @@ public class DormitoryTests
         var roomName = new RoomName(duplicateName);
         var duplicateRoomName = new RoomName(duplicateName);
 
-        dormitory.AddRoom(roomName, Gender.Male, 2);
+        dormitory.AddRoom(
+            roomName,
+            Gender.Male,
+            new RoomCapacity(2),
+            new FloorNumber(1));
         
         // Act & Assert
         var exception = Assert.Throws<RoomAlreadyExistsException>(
-            () => dormitory.AddRoom(duplicateRoomName, Gender.Male, 2));
+            () => dormitory.AddRoom(duplicateRoomName, Gender.Male, new RoomCapacity(2), new FloorNumber(1)));
         
         Assert.Equal(dormitory.Id, exception.DormitoryId);
         Assert.Equal(duplicateRoomName, exception.Name);
@@ -142,9 +150,12 @@ public class DormitoryTests
         
         var roomName = new RoomName("106");
         const Gender gender = Gender.Male;
-        const int capacity = 2;
         
-        var newRoomId = dormitory.AddRoom(roomName, gender, capacity);
+        var newRoomId = dormitory.AddRoom(
+            roomName,
+            gender,
+            new RoomCapacity(2),
+            new FloorNumber(1));
         
         // Act
         dormitory.RemoveRoom(newRoomId);

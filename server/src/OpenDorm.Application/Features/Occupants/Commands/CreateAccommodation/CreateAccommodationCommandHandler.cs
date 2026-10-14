@@ -21,7 +21,7 @@ public class CreateAccommodationCommandHandler(
             {
                 r.IsActive,
                 HasFreePlaces = dbContext.Accommodations
-                    .Count(a => a.RoomId == r.Id && a.CheckOutDate == null) < r.Capacity
+                    .Count(a => a.RoomId == r.Id && a.CheckOutDate == null) < r.Capacity.Value
             })
             .FirstOrDefaultAsync(cancellationToken);
 

@@ -20,7 +20,7 @@ public class GetDormitoryDetailsQueryHandler(IApplicationDbContext dbContext)
                 .Count(r => EF.Property<Guid>(r, "DormitoryId") == d.Id)
             let totalSeats = dbContext.Rooms
                 .Where(r => EF.Property<Guid>(r, "DormitoryId") == d.Id)
-                .Sum(r => (int?)r.Capacity) ?? 0
+                .Sum(r => (int?)r.Capacity.Value) ?? 0
             let occupiedSeats = dbContext.Accommodations
                 .Count(a => a.CheckOutDate == null
                             && dbContext.Rooms.Any(r => r.Id == a.RoomId

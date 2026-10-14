@@ -87,8 +87,8 @@ public class OccupantRepositoryTests : IAsyncLifetime
         var roomId = dormitory.AddRoom(
             new RoomName("101"),
             Gender.Male,
-            capacity: 2,
-            floorNumber: 1);
+            new RoomCapacity(2),
+            new FloorNumber(4));
         
         await _dormitoryRepository.AddAsync(dormitory);
         await _context.SaveChangesAsync();

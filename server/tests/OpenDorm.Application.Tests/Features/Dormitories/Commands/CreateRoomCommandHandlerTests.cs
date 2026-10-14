@@ -82,7 +82,7 @@ public class CreateRoomCommandHandlerTests : IAsyncLifetime
         Assert.NotNull(room);
         Assert.Equal(command.RoomName, room.Name.Value);
         Assert.Equal(command.Gender, room.Gender);
-        Assert.Equal(command.Capacity, room.Capacity);
+        Assert.Equal(command.Capacity, room.Capacity.Value);
         Assert.Equal(command.FloorNumber, command.FloorNumber);
     }
 

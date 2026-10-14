@@ -102,11 +102,11 @@ namespace OpenDorm.Infrastructure.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, comment: "идентификатор комнаты"),
-                    capacity = table.Column<int>(type: "integer", nullable: false, comment: "вместимость"),
                     gender = table.Column<char>(type: "character(1)", nullable: false, comment: "гендер, m - мужская, f - женская"),
-                    floor_number = table.Column<int>(type: "integer", nullable: false, comment: "номер этажа"),
                     is_active = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true, comment: "активна ли комната"),
                     dormitory_id = table.Column<Guid>(type: "uuid", nullable: false, comment: "идентификатор общежития"),
+                    capacity = table.Column<int>(type: "integer", nullable: false, comment: "вместимость"),
+                    floor_number = table.Column<int>(type: "integer", nullable: false, comment: "номер этажа"),
                     name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false, comment: "номер комнаты")
                 },
                 constraints: table =>

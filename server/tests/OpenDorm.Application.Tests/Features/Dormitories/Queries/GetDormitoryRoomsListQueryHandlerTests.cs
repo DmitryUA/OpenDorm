@@ -71,8 +71,8 @@ public class GetDormitoryRoomsListQueryHandlerTests : IAsyncLifetime
         Assert.Equal(1, activeRoomInfo.OccupantCount);
         Assert.Equal(activeRoom.Gender, activeRoomInfo.Gender);
         Assert.Equal(activeRoom.Name.Value, activeRoomInfo.Name);
-        Assert.Equal(activeRoom.Capacity, activeRoomInfo.Capacity);
-        Assert.Equal(activeRoom.FloorNumber, activeRoomInfo.FloorNumber);
+        Assert.Equal(activeRoom.Capacity.Value, activeRoomInfo.Capacity);
+        Assert.Equal(activeRoom.FloorNumber.Value, activeRoomInfo.FloorNumber);
     }
 
     [Fact]

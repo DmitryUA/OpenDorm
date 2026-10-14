@@ -27,18 +27,23 @@ public static class DormitoryFactory
         Address? address = null,
         int floorCount = 2,
         int roomsCount = 2,
-        int capacity = 2,
+        RoomCapacity? capacity = null,
         Gender gender = Gender.Male)
     {
         var dormitory = Create(address, floorCount);
         var roomIds = new List<Guid>(roomsCount);
-
+        
         for (var i = 1; i <= roomsCount; i++)
         {
-            var floorNumber = (i - 1) % floorCount + 1;
+            var floorNumber = new FloorNumber((i - 1) % floorCount + 1);
             
             var roomName = new RoomName($"{floorNumber}0{i:D2}");
-            var roomId = dormitory.AddRoom(roomName, gender, capacity, floorNumber);
+            var roomId = dormitory.AddRoom(
+                roomName,
+                gender,
+                capacity ?? new RoomCapacity(1),
+                floorNumber);
+            
             roomIds.Add(roomId);
         }
 
@@ -49,7 +54,7 @@ public static class DormitoryFactory
     /// Создаёт общежитие с одной комнатой.
     /// </summary>
     /// <returns>Вернёт кортеж (общежитие, id комнаты)</returns>
-    public static (Dormitory Dormitory, Guid RoomId) CreateWithOneRoom(int capacity = 2)
+    public static (Dormitory Dormitory, Guid RoomId) CreateWithOneRoom(RoomCapacity? capacity = null)
     {
         var (dormitory, roomsIds) = CreateWithRooms(roomsCount: 1, capacity: capacity);
         return (dormitory, roomsIds[0]);

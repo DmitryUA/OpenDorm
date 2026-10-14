@@ -23,10 +23,13 @@ public class RoomConfiguration : IEntityTypeConfiguration<Room>
             .HasComment("идентификатор комнаты")
             .ValueGeneratedNever();
 
-        builder.Property(r => r.Capacity)
-            .HasColumnName("capacity")
-            .HasComment("вместимость")
-            .IsRequired();
+        builder.ComplexProperty(r => r.Capacity, capacityBuilder =>
+        {
+            capacityBuilder.Property(c => c.Value)
+                .HasColumnName("capacity")
+                .HasComment("вместимость")
+                .IsRequired();
+        });
 
         builder.ComplexProperty(r => r.Name, b =>
         {
@@ -45,10 +48,13 @@ public class RoomConfiguration : IEntityTypeConfiguration<Room>
             .HasComment("гендер, m - мужская, f - женская")
             .IsRequired();
 
-        builder.Property(r => r.FloorNumber)
-            .HasColumnName("floor_number")
-            .HasComment("номер этажа")
-            .IsRequired();
+        builder.ComplexProperty(r => r.FloorNumber, floorNumberBuilder =>
+        {
+            floorNumberBuilder.Property(fn => fn.Value)
+                .HasColumnName("floor_number")
+                .HasComment("номер этажа")
+                .IsRequired();
+        });
 
         builder.Property(r => r.IsActive)
             .HasColumnName("is_active")

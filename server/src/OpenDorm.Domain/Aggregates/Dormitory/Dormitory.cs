@@ -25,9 +25,9 @@ public class Dormitory : AggregateRoot
         FloorCount = floorCount;
     }
 
-    public Guid AddRoom(RoomName name, Gender gender, int capacity = 1, int floorNumber = 1)
+    public Guid AddRoom(RoomName name, Gender gender, RoomCapacity capacity, FloorNumber floorNumber)
     {
-        if (floorNumber > FloorCount)
+        if (floorNumber.Value > FloorCount)
             throw new ArgumentOutOfRangeException(nameof(floorNumber), $"There is no floor number {floorNumber} in the dormitory.");
 
         if (_rooms.Any(r => r.Name == name)) throw new RoomAlreadyExistsException(Id ,name);
@@ -40,8 +40,8 @@ public class Dormitory : AggregateRoot
             room.Id,
             room.Name,
             room.Gender,
-            room.Capacity,
-            room.FloorNumber);
+            room.Capacity.Value,
+            room.FloorNumber.Value);
         
         AddDomainEvent(roomAddedEvent);
 

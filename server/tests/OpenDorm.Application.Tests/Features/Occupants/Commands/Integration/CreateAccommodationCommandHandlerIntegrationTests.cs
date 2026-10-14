@@ -4,6 +4,7 @@ using OpenDorm.Domain.Abstractions;
 using OpenDorm.Domain.Aggregates.Dormitory;
 using OpenDorm.Domain.Aggregates.Occupant;
 using OpenDorm.Domain.Exceptions;
+using OpenDorm.Domain.ValueObjects;
 using OpenDorm.Infrastructure;
 using OpenDorm.Infrastructure.Persistence;
 using OpenDorm.Infrastructure.Repositories;
@@ -148,7 +149,7 @@ public class CreateAccommodationCommandHandlerIntegrationTests : IAsyncLifetime
     public async Task Handle_FullyOccupiedRoom_ThrowsDomainException()
     {
         // Arrange
-        var (dormitory, roomId) = DormitoryFactory.CreateWithOneRoom(capacity: 1);
+        var (dormitory, roomId) = DormitoryFactory.CreateWithOneRoom(new RoomCapacity(1));
         var firstOccupant = OccupantFactory.Create();
         var secondOccupant = OccupantFactory.CreateCheckedIn(roomId).Occupant;
         
