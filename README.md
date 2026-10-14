@@ -5,6 +5,7 @@
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![EF Core](https://img.shields.io/badge/EF_Core-10-512BD4?logo=dotnet&logoColor=white)](https://learn.microsoft.com/ef/core/)
+[![Scalar](https://img.shields.io/badge/Scalar-API_Reference-1a1a1a?logo=scalar&logoColor=white)](https://scalar.com)
 
 [![Architecture](https://img.shields.io/badge/Architecture-DDD%20%7C%20Clean%20%7C%20Vertical%20Slice-007ACC)]()
 [![Pattern](https://img.shields.io/badge/Pattern-CQRS-007ACC)]()
