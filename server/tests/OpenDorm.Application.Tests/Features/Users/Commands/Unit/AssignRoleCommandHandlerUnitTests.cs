@@ -39,7 +39,7 @@ public class AssignRoleCommandHandlerUnitTests
     }
 
     [Fact]
-    public async Task Handle_InvalidRoleName_ThrowsArgumentException()
+    public async Task Handle_InvalidRoleName_ThrowsNotFoundException()
     {
         // Arrange
         var user = UserFactory.Create();
@@ -50,7 +50,7 @@ public class AssignRoleCommandHandlerUnitTests
             .Returns(user);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(
+        await Assert.ThrowsAsync<NotFoundException>(
             () => _handler.Handle(command, CancellationToken.None));
     }
 }
