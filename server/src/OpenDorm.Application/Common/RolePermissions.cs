@@ -12,6 +12,7 @@ public static class RolePermissions
             Permissions.Users.Create,
             Permissions.Users.Read,
             Permissions.Users.Update,
+            Permissions.Users.Activate,
             Permissions.Users.Deactivate,
 
             // Dormitories

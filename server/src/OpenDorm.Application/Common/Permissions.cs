@@ -7,6 +7,7 @@ public static class Permissions
         public const string Create = "users.create";
         public const string Read = "users.read";
         public const string Update = "users.update";
+        public const string Activate = "users.activate";
         public const string Deactivate = "users.deactivate";
     }
 

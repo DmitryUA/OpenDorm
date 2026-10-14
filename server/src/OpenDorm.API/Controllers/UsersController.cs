@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenDorm.API.Contracts;
 using OpenDorm.Application.Common;
-using OpenDorm.Application.Features.Users;
+using OpenDorm.Application.Features.Users.Commands.ActivateUser;
 using OpenDorm.Application.Features.Users.Commands.AssignRole;
 using OpenDorm.Application.Features.Users.Commands.CreateUser;
 using OpenDorm.Application.Features.Users.Commands.DeactivateUser;
@@ -166,23 +166,45 @@ public class UsersController(ISender sender) : ControllerBase
         return NoContent();
     }
 
-    // POST: api/users/{id}
+    // POST: api/users/{id}/deactivate
     /// <summary>Деактивировать пользователя.</summary>
     /// <response code="204">Пользователь успешно деактивирован</response>
     /// <response code="401">Пользователь не аутентифицирован</response>
     /// <response code="403">Недостаточно прав</response>
     /// <response code="404">Пользователь не найден</response>
-    [HttpPost("{id:guid}")]
+    [HttpPost("{id:guid}/deactivate")]
     [Authorize(Policy = Permissions.Users.Deactivate)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
     {
         var command = new DeactivateUserCommand(id);
         await sender.Send(command, cancellationToken);
         
+        return NoContent();
+    }
+    
+    // POST: api/users/{id}/activate
+    /// <summary>Активировать пользователя.</summary>
+    /// <response code="204">Пользователь успешно активирован</response>
+    /// <response code="401">Пользователь не аутентифицирован</response>
+    /// <response code="403">Недостаточно прав</response>
+    /// <response code="404">Пользователь не найден</response>
+    [HttpPost("{id:guid}/activate")]
+    [Authorize(Policy = Permissions.Users.Activate)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Activate(Guid id, CancellationToken cancellationToken)
+    {
+        var command = new ActivateUserCommand(id);
+        await sender.Send(command, cancellationToken);
+
         return NoContent();
     }
 }
