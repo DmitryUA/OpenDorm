@@ -24,6 +24,9 @@ public class Dormitory : AggregateRoot
         FloorCount = floorCount;
     }
 
+    public void ChangeAddress(Address address) =>
+        Address = address ?? throw new InvalidDormitoryException("Dormitory address cannot be null.");
+
     public Guid AddRoom(RoomName name, Gender gender, RoomCapacity capacity, FloorNumber floorNumber)
     {
         if (floorNumber.Value > FloorCount)
@@ -46,34 +49,40 @@ public class Dormitory : AggregateRoot
 
         return room.Id;
     }
+
     public void RemoveRoom(Guid id)
     {
-        var roomIndex = _rooms.FindIndex(r => r.Id == id);
-
-        if (roomIndex == -1)
-            throw new NotFoundException(nameof(Room), id);
-
+        var room = FindRoomOrThrow(id);
+        _rooms.Remove(room);
         var roomRemovedEvent = new RoomRemovedEvent(Id, id);
         AddDomainEvent(roomRemovedEvent);
-                
-        _rooms.RemoveAt(roomIndex);
     }
+
     public void DeactivateRoom(Guid id)
     {
-        var room = _rooms.FirstOrDefault(r => r.Id == id);
-
-        if (room == null) throw new NotFoundException(nameof(Room), id);
-        
+        var room = FindRoomOrThrow(id);
         room.Deactivate();
     }
+
     public void ActivateRoom(Guid id)
     {
-        var room = _rooms.FirstOrDefault(r => r.Id == id);
-
-        if (room == null) throw new NotFoundException(nameof(Room), id);
-        
+        var room = FindRoomOrThrow(id);
         room.Activate();
     }
-    public void ChangeAddress(Address address) =>
-        Address = address ?? throw new InvalidDormitoryException("Dormitory address cannot be null.");
+
+    public void UpdateRoom(Guid roomId, Action<Room> updateAction)
+    {
+        ArgumentNullException.ThrowIfNull(updateAction);
+
+        var room = FindRoomOrThrow(roomId);
+
+        updateAction(room);
+        
+        if (_rooms.Any(r => r.Id != room.Id && r.Name == room.Name))
+            throw new RoomAlreadyExistsException(Id, room.Name);
+    }
+    
+    private Room FindRoomOrThrow(Guid roomId) =>
+        _rooms.FirstOrDefault(r => r.Id == roomId)
+        ?? throw new NotFoundException(nameof(Room), roomId);
 }

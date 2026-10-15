@@ -8,10 +8,10 @@ namespace OpenDorm.Domain.Aggregates.Dormitory;
 public class Room : Entity
 {
     public RoomName Name { get; private set; } = null!;
-    public Gender Gender { get; private set; }
-    public bool IsActive { get; private set; } = true;
     public RoomCapacity Capacity { get; private set; } = null!;
-    public FloorNumber FloorNumber { get; private set; } = null!;
+    public Gender Gender { get; private set; }
+    public FloorNumber FloorNumber { get; } = null!;
+    public bool IsActive { get; private set; } = true;
 
     // ReSharper disable once UnusedMember.Local
     private Room(){} // For EF Core only
@@ -37,8 +37,9 @@ public class Room : Entity
         IsActive = false;
     }
 
-    public void ChangeName(RoomName name) => Name = name;
+    public void ChangeName(RoomName name) =>
+        Name = name ?? throw new InvalidRoomException("Room name cannot be null.");
     public void ChangeGender(Gender gender) => Gender = gender;
-    public void ChangeCapacity(RoomCapacity capacity) => Capacity = capacity;
-    public void ChangeFloorNumber(FloorNumber floorNumber) => FloorNumber = floorNumber;
+    public void ChangeCapacity(RoomCapacity capacity) =>
+        Capacity = capacity ?? throw new InvalidRoomException("Room capacity cannot be null.");
 }

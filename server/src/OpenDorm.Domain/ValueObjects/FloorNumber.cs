@@ -12,4 +12,6 @@ public record FloorNumber
 
         Value = value;
     }
+
+    public override string ToString() => Value.ToString();
 }

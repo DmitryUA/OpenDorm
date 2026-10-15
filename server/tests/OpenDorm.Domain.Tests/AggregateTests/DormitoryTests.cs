@@ -255,6 +255,61 @@ public class DormitoryTests
 
     #endregion
 
+    #region UpdateRoom Tests
+
+    [Fact]
+    public void UpdateRoom_WhenRoomExists_AndUpdateIsValid_ShouldUpdateRoomProperties()
+    {
+        // Arrange
+        var dormitory = new Dormitory(Guid.NewGuid(), AddressFactory.Create(), floorCount: 5);
+        var roomId = dormitory.AddRoom(new RoomName("406"), Gender.Male, new RoomCapacity(2), new FloorNumber(4));
+        var newRoomName = new RoomName("407");
+        var newCapacity = new RoomCapacity(4);
+        const Gender newRoomGender = Gender.Female;
+
+        // Act
+        dormitory.UpdateRoom(roomId, room =>
+        {
+            room.ChangeName(newRoomName);
+            room.ChangeGender(newRoomGender);
+            room.ChangeCapacity(newCapacity);
+        });
+
+        // Assert
+        var updatedRoom = dormitory.Rooms.First(r => r.Id == roomId);
+        Assert.Equal(newRoomName, updatedRoom.Name);
+        Assert.Equal(newCapacity, updatedRoom.Capacity);
+        Assert.Equal(newRoomGender, updatedRoom.Gender);
+    }
+
+    [Fact]
+    public void UpdateRoom_WhenRoomDoesNotExist_ShouldThrowNotFoundException()
+    {
+        // Arrange
+        var dormitory = DormitoryFactory.Create();
+        var nonExistentRoomId = Guid.NewGuid();
+
+        // Act & Assert
+        var exception = Assert.Throws<NotFoundException>(() =>
+            dormitory.UpdateRoom(nonExistentRoomId, _ => { }));
+        
+        Assert.Equal(nameof(Room), exception.EntityName);
+        Assert.Equal(nonExistentRoomId, exception.EntityId);
+    }
+
+    [Fact]
+    public void UpdateRoom_WhenUpdateActionIsNull_ShouldThrowArgumentNullException()
+    {
+        // Arrange
+        var (dormitory, roomId) = DormitoryFactory.CreateWithOneRoom();
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() =>
+            dormitory.UpdateRoom(roomId, null!));
+    }
+
+    #endregion
+
     #region ChangeAddress Tests
 
     [Fact]
