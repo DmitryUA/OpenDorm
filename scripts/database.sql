@@ -1,6 +1,6 @@
 -- =================================================================================================
 -- BASELINE SCHEMA SNAPSHOT
--- Generated: 2026-10-14
+-- Generated: 2026-10-15
 -- WARNING: This is a point-in-time snapshot. This snapshot does not contain the EFMigrations table.
 -- If you need to apply future changes, please use EF Core migrations 
 -- or ask the team to generate an updated snapshot.
@@ -24,9 +24,10 @@ CREATE TABLE public.dormitories (
 	address_street varchar(255) NOT NULL, -- улица
 	address_house varchar(20) NOT NULL, -- номер дома
 	floor_count int4 NOT NULL, -- общее количество этажей в здании
-	CONSTRAINT "CK_Address_City_MinLength" null,
-	CONSTRAINT "CK_Address_Street_MinLength" null,
-	CONSTRAINT "PK_dormitories" null
+	created_at timestamptz DEFAULT now() NOT NULL,
+	CONSTRAINT "CK_Address_City_MinLength" CHECK ((length((address_city)::text) >= 3)),
+	CONSTRAINT "CK_Address_Street_MinLength" CHECK ((length((address_street)::text) >= 3)),
+	CONSTRAINT "PK_dormitories" PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.dormitories IS 'общежития';
 
@@ -53,7 +54,8 @@ CREATE TABLE public.occupants (
 	gender bpchar(1) NOT NULL, -- гендер (m - мужчина, f - женщина)
 	birth_date_encrypted bytea NOT NULL, -- зашифрованная дата рождения
 	is_active bool NOT NULL, -- активен ли проживающий, true - да, false - нет
-	CONSTRAINT "PK_occupants" null
+	created_at timestamptz DEFAULT now() NOT NULL,
+	CONSTRAINT "PK_occupants" PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.occupants IS 'жильцы';
 
@@ -99,9 +101,9 @@ CREATE TABLE public.system_flags (
 	"name" varchar(128) NOT NULL,
 	value varchar(512) NOT NULL,
 	created_at timestamptz NOT NULL,
-	CONSTRAINT "PK_system_flags" null
+	CONSTRAINT "PK_system_flags" PRIMARY KEY (id)
 );
-CREATE UNIQUE INDEX "IX_system_flags_name" ON public.system_flags ("name" text_ops);
+CREATE UNIQUE INDEX "IX_system_flags_name" ON public.system_flags USING btree (name);
 
 -- Column comments
 
@@ -123,8 +125,8 @@ CREATE TABLE public.users (
 	created_at timestamptz NOT NULL,
 	login varchar(20) NOT NULL,
 	password_hash varchar(255) NOT NULL,
-	CONSTRAINT "CK_Login_MinLength" null,
-	CONSTRAINT "PK_users" null
+	CONSTRAINT "CK_Login_MinLength" CHECK ((length((login)::text) >= 4)),
+	CONSTRAINT "PK_users" PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.users IS 'пользователи';
 
@@ -149,11 +151,11 @@ CREATE TABLE public.refresh_tokens (
 	expires_at timestamptz NOT NULL,
 	is_revoked bool NOT NULL,
 	created_at timestamptz NOT NULL,
-	CONSTRAINT "PK_refresh_tokens" null,
+	CONSTRAINT "PK_refresh_tokens" PRIMARY KEY (id),
 	CONSTRAINT "FK_refresh_tokens_users" FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
 );
-CREATE UNIQUE INDEX "IX_refresh_tokens_token" ON public.refresh_tokens ("token" text_ops);
-CREATE INDEX "IX_refresh_tokens_user_id" ON public.refresh_tokens (user_id uuid_ops);
+CREATE UNIQUE INDEX "IX_refresh_tokens_token" ON public.refresh_tokens USING btree (token);
+CREATE INDEX "IX_refresh_tokens_user_id" ON public.refresh_tokens USING btree (user_id);
 COMMENT ON TABLE public.refresh_tokens IS 'токены обновления';
 
 -- Column comments
@@ -169,27 +171,28 @@ COMMENT ON COLUMN public.refresh_tokens.id IS 'идентификатор ток
 
 CREATE TABLE public.rooms (
 	id uuid NOT NULL, -- идентификатор комнаты
-	capacity int4 NOT NULL, -- вместимость
 	gender bpchar(1) NOT NULL, -- гендер, m - мужская, f - женская
-	floor_number int4 NOT NULL, -- номер этажа
 	is_active bool DEFAULT true NOT NULL, -- активна ли комната
 	dormitory_id uuid NOT NULL, -- идентификатор общежития
+	created_at timestamptz DEFAULT now() NOT NULL,
+	capacity int4 NOT NULL, -- вместимость
+	floor_number int4 NOT NULL, -- номер этажа
 	"name" varchar(128) NOT NULL, -- номер комнаты
-	CONSTRAINT "CK_Name_MinLength" null,
-	CONSTRAINT "PK_rooms" null,
+	CONSTRAINT "CK_Name_MinLength" CHECK ((length((name)::text) >= 1)),
+	CONSTRAINT "PK_rooms" PRIMARY KEY (id),
 	CONSTRAINT "FK_rooms_dormitories_dormitory_id" FOREIGN KEY (dormitory_id) REFERENCES public.dormitories(id) ON DELETE CASCADE
 );
-CREATE INDEX "IX_rooms_dormitory_id" ON public.rooms (dormitory_id uuid_ops);
+CREATE INDEX "IX_rooms_dormitory_id" ON public.rooms USING btree (dormitory_id);
 COMMENT ON TABLE public.rooms IS 'комнаты в общежитиях';
 
 -- Column comments
 
 COMMENT ON COLUMN public.rooms.id IS 'идентификатор комнаты';
-COMMENT ON COLUMN public.rooms.capacity IS 'вместимость';
 COMMENT ON COLUMN public.rooms.gender IS 'гендер, m - мужская, f - женская';
-COMMENT ON COLUMN public.rooms.floor_number IS 'номер этажа';
 COMMENT ON COLUMN public.rooms.is_active IS 'активна ли комната';
 COMMENT ON COLUMN public.rooms.dormitory_id IS 'идентификатор общежития';
+COMMENT ON COLUMN public.rooms.capacity IS 'вместимость';
+COMMENT ON COLUMN public.rooms.floor_number IS 'номер этажа';
 COMMENT ON COLUMN public.rooms."name" IS 'номер комнаты';
 
 
@@ -203,12 +206,13 @@ CREATE TABLE public.user_roles (
 	id uuid NOT NULL, -- идентификатор роли пользователя
 	user_id uuid NOT NULL,
 	role_id uuid NOT NULL,
-	CONSTRAINT "PK_user_roles" null,
+	created_at timestamptz DEFAULT now() NOT NULL,
+	CONSTRAINT "PK_user_roles" PRIMARY KEY (id),
 	CONSTRAINT "FK_user_roles_roles" FOREIGN KEY (role_id) REFERENCES public.roles(id) ON DELETE RESTRICT,
 	CONSTRAINT "FK_user_roles_users" FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
 );
-CREATE INDEX "IX_user_roles_role_id" ON public.user_roles (role_id uuid_ops);
-CREATE UNIQUE INDEX "IX_user_roles_user_id_role_id" ON public.user_roles (user_id uuid_ops,role_id uuid_ops);
+CREATE INDEX "IX_user_roles_role_id" ON public.user_roles USING btree (role_id);
+CREATE UNIQUE INDEX "IX_user_roles_user_id_role_id" ON public.user_roles USING btree (user_id, role_id);
 COMMENT ON TABLE public.user_roles IS 'роли пользователя';
 
 -- Column comments
@@ -228,12 +232,12 @@ CREATE TABLE public.accommodations (
 	check_in_date timestamptz NOT NULL, -- дата и время заселения
 	check_out_date timestamptz NULL, -- дата и время выселения
 	occupant_id uuid NOT NULL, -- идентификатор жильца
-	CONSTRAINT "PK_accommodations" null,
+	CONSTRAINT "PK_accommodations" PRIMARY KEY (id),
 	CONSTRAINT "FK_accommodations_occupants_occupant_id" FOREIGN KEY (occupant_id) REFERENCES public.occupants(id) ON DELETE CASCADE,
 	CONSTRAINT "FK_accommodations_rooms_room_id" FOREIGN KEY (room_id) REFERENCES public.rooms(id) ON DELETE RESTRICT
 );
-CREATE INDEX "IX_accommodations_room_id" ON public.accommodations (room_id uuid_ops);
-CREATE INDEX "UX_Accommodations_OccupantId_Active" ON public.accommodations (occupant_id uuid_ops);
+CREATE INDEX "IX_accommodations_room_id" ON public.accommodations USING btree (room_id);
+CREATE INDEX "UX_Accommodations_OccupantId_Active" ON public.accommodations USING btree (occupant_id) WHERE (check_out_date IS NULL);
 COMMENT ON TABLE public.accommodations IS 'заселения';
 
 -- Column comments
