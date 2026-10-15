@@ -25,6 +25,11 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
             .HasColumnName("role_id")
             .IsRequired();
         
+        builder.Property<DateTime>("created_at")
+            .HasColumnType("timestamp with time zone")
+            .IsRequired()
+            .HasDefaultValueSql("NOW()");
+        
         builder.HasOne<User>()
             .WithMany(u => u.UserRoles)
             .HasForeignKey(ur => ur.UserId)

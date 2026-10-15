@@ -13,7 +13,7 @@ using OpenDorm.Infrastructure;
 namespace OpenDorm.Infrastructure.Migrations
 {
     [DbContext(typeof(OpenDormDbContext))]
-    [Migration("20261014063826_InitialCreate")]
+    [Migration("20261015022212_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -37,6 +37,11 @@ namespace OpenDorm.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("floor_count")
                         .HasComment("общее количество этажей в здании");
+
+                    b.Property<DateTime>("created_at")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
 
                     b.HasKey("Id");
 
@@ -69,6 +74,11 @@ namespace OpenDorm.Infrastructure.Migrations
                         .HasDefaultValue(true)
                         .HasColumnName("is_active")
                         .HasComment("активна ли комната");
+
+                    b.Property<DateTime>("created_at")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
 
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Capacity", "OpenDorm.Domain.Aggregates.Dormitory.Room.Capacity#RoomCapacity", b1 =>
                         {
@@ -194,6 +204,11 @@ namespace OpenDorm.Infrastructure.Migrations
                         .HasColumnType("bytea")
                         .HasColumnName("patronymic_encrypted")
                         .HasComment("зашифрованное отчество");
+
+                    b.Property<DateTime>("created_at")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
 
                     b.HasKey("Id");
 
@@ -400,6 +415,11 @@ namespace OpenDorm.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
+
+                    b.Property<DateTime>("created_at")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
 
                     b.HasKey("Id");
 

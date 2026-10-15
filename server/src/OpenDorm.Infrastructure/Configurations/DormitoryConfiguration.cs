@@ -65,6 +65,11 @@ public class DormitoryConfiguration : IEntityTypeConfiguration<Dormitory>
             });
         });
         
+        builder.Property<DateTime>("created_at")
+            .HasColumnType("timestamp with time zone")
+            .IsRequired()
+            .HasDefaultValueSql("NOW()");
+        
         builder.HasMany<Room>("_rooms")
             .WithOne()
             .HasForeignKey("DormitoryId")

@@ -21,7 +21,8 @@ namespace OpenDorm.Infrastructure.Migrations
                     address_city = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false, comment: "город"),
                     address_street = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false, comment: "улица"),
                     address_house = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false, comment: "номер дома"),
-                    floor_count = table.Column<int>(type: "integer", nullable: false, comment: "общее количество этажей в здании")
+                    floor_count = table.Column<int>(type: "integer", nullable: false, comment: "общее количество этажей в здании"),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
                 },
                 constraints: table =>
                 {
@@ -41,7 +42,8 @@ namespace OpenDorm.Infrastructure.Migrations
                     patronymic_encrypted = table.Column<byte[]>(type: "bytea", nullable: true, comment: "зашифрованное отчество"),
                     gender = table.Column<char>(type: "character(1)", nullable: false, comment: "гендер (m - мужчина, f - женщина)"),
                     birth_date_encrypted = table.Column<byte[]>(type: "bytea", nullable: false, comment: "зашифрованная дата рождения"),
-                    is_active = table.Column<bool>(type: "boolean", nullable: false, comment: "активен ли проживающий, true - да, false - нет")
+                    is_active = table.Column<bool>(type: "boolean", nullable: false, comment: "активен ли проживающий, true - да, false - нет"),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
                 },
                 constraints: table =>
                 {
@@ -105,6 +107,7 @@ namespace OpenDorm.Infrastructure.Migrations
                     gender = table.Column<char>(type: "character(1)", nullable: false, comment: "гендер, m - мужская, f - женская"),
                     is_active = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true, comment: "активна ли комната"),
                     dormitory_id = table.Column<Guid>(type: "uuid", nullable: false, comment: "идентификатор общежития"),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
                     capacity = table.Column<int>(type: "integer", nullable: false, comment: "вместимость"),
                     floor_number = table.Column<int>(type: "integer", nullable: false, comment: "номер этажа"),
                     name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false, comment: "номер комнаты")
@@ -151,7 +154,8 @@ namespace OpenDorm.Infrastructure.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, comment: "идентификатор роли пользователя"),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    role_id = table.Column<Guid>(type: "uuid", nullable: false)
+                    role_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
                 },
                 constraints: table =>
                 {

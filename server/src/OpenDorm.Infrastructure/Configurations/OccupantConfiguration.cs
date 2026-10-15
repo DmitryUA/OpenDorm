@@ -69,6 +69,11 @@ public class OccupantConfiguration(IEncryptionService encryptionService) : IEnti
             .HasColumnName("is_active")
             .HasComment("активен ли проживающий, true - да, false - нет")
             .IsRequired();
+        
+        builder.Property<DateTime>("created_at")
+            .HasColumnType("timestamp with time zone")
+            .IsRequired()
+            .HasDefaultValueSql("NOW()");
 
         builder.HasMany<Accommodation>("_accommodations")
             .WithOne()

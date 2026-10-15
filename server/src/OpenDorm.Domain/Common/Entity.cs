@@ -2,8 +2,7 @@ namespace OpenDorm.Domain.Common;
 
 public abstract class Entity
 {
-    public Guid Id { get; private set; }
-
+    public Guid Id { get; }
     protected Entity() { } // For EF Core only
 
     protected Entity(Guid id)
