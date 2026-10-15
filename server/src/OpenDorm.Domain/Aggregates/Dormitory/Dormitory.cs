@@ -9,7 +9,7 @@ namespace OpenDorm.Domain.Aggregates.Dormitory;
 public class Dormitory : AggregateRoot
 {
     public Address Address { get; private set; } = null!;
-    public int FloorCount { get; private set; }
+    public int FloorCount { get; }
     private readonly List<Room> _rooms = [];
     
     internal IReadOnlyCollection<Room> Rooms => _rooms.AsReadOnly();
@@ -18,10 +18,9 @@ public class Dormitory : AggregateRoot
     private Dormitory() {}  // For EF Core only
     public Dormitory(Guid id, Address address, int floorCount = 1) : base(id)
     {
-        ArgumentNullException.ThrowIfNull(address);
-        ArgumentOutOfRangeException.ThrowIfLessThan(floorCount, 1);
+        if (floorCount < 1) throw new InvalidDormitoryException("Floor count cannot be less than 1.");
         
-        Address = address;
+        Address = address ?? throw new InvalidDormitoryException("Dormitory address cannot be null.");
         FloorCount = floorCount;
     }
 
@@ -47,7 +46,6 @@ public class Dormitory : AggregateRoot
 
         return room.Id;
     }
-
     public void RemoveRoom(Guid id)
     {
         var roomIndex = _rooms.FindIndex(r => r.Id == id);
@@ -60,7 +58,6 @@ public class Dormitory : AggregateRoot
                 
         _rooms.RemoveAt(roomIndex);
     }
-
     public void DeactivateRoom(Guid id)
     {
         var room = _rooms.FirstOrDefault(r => r.Id == id);
@@ -69,7 +66,6 @@ public class Dormitory : AggregateRoot
         
         room.Deactivate();
     }
-
     public void ActivateRoom(Guid id)
     {
         var room = _rooms.FirstOrDefault(r => r.Id == id);
@@ -78,4 +74,6 @@ public class Dormitory : AggregateRoot
         
         room.Activate();
     }
+    public void ChangeAddress(Address address) =>
+        Address = address ?? throw new InvalidDormitoryException("Dormitory address cannot be null.");
 }

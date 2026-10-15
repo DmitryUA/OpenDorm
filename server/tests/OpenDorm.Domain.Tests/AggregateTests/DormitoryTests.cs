@@ -43,25 +43,32 @@ public class DormitoryTests
     }
 
     [Fact]
-    public void Constructor_NullAddress_ThrowsArgumentNullException()
-    { 
+    public void Constructor_NullAddress_ThrowsInvalidDormitoryException()
+    {
+        // Arrange
+        const string expectedMessage = "Dormitory address cannot be null.";
+        
         // Act & Assert
-        var exception = Assert.Throws<ArgumentNullException>(() => new Dormitory(Guid.NewGuid(), null!));
-        Assert.Equal("address", exception.ParamName);
+        var exception = Assert.Throws<InvalidDormitoryException>(() => new Dormitory(Guid.NewGuid(), null!));
+        
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
     [InlineData(-100)]
-    public void Constructor_InvalidFloorCount_ThrowsArgumentOutRangeException(int floorCount)
+    public void Constructor_InvalidFloorCount_ThrowsInvalidDormitoryException(int floorCount)
     {
+        // Arrange
+        const string expectedMessage = "Floor count cannot be less than 1.";
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(
+        var exception = Assert.Throws<InvalidDormitoryException>(
             () => DormitoryFactory.Create(floorCount: floorCount));
         
-        Assert.Equal("floorCount", exception.ParamName);
+        Assert.Equal(expectedMessage, exception.Message);
     }
+    
     #endregion
 
     #region AddRoom Tests
@@ -244,6 +251,37 @@ public class DormitoryTests
         
         Assert.Equal(nameof(Room), exception.EntityName);
         Assert.Equal(roomId, exception.EntityId);
+    }
+
+    #endregion
+
+    #region ChangeAddress Tests
+
+    [Fact]
+    public void ChangeAddress_Address_UpdateAddress()
+    {
+        // Arrange
+        var dormitory = DormitoryFactory.Create();
+        var newAddress = AddressFactory.Random();
+        
+        // Act
+        dormitory.ChangeAddress(newAddress);
+        
+        // Assert
+        Assert.Equal(newAddress, dormitory.Address);
+    }
+
+    [Fact]
+    public void ChangeAddress_NullAddress_ThrowsInvalidDormitoryException()
+    {
+        // Arrange
+        var dormitory = DormitoryFactory.Create();
+        const string expectedMessage = "Dormitory address cannot be null.";
+
+        // Act & Assert
+        var exception = Assert.Throws<InvalidDormitoryException>(() => dormitory.ChangeAddress(null!));
+        
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     #endregion
