@@ -12,8 +12,8 @@ public class Occupant : AggregateRoot
     public FirstName FirstName { get; private set; } = null!;
     public Patronymic? Patronymic { get; private set; }
     public string FullName => Patronymic == null ? $"{LastName} {FirstName}" : $"{LastName} {FirstName} {Patronymic}";
-    public Gender Gender { get; private set; }
-    public BirthDate BirthDate { get; private set; } = null!;
+    public Gender Gender { get; }
+    public BirthDate BirthDate { get; } = null!;
     public bool IsActive { get; private set; } = true;
 
     private readonly List<Accommodation> _accommodations = [];
@@ -25,15 +25,11 @@ public class Occupant : AggregateRoot
     private Occupant() {} // For EF Core only
     public Occupant(Guid id, LastName lastName, FirstName firstName, Patronymic? patronymic, Gender gender, BirthDate birthDate) : base(id)
     {
-        ArgumentNullException.ThrowIfNull(lastName);
-        ArgumentNullException.ThrowIfNull(firstName);
-        ArgumentNullException.ThrowIfNull(birthDate);
-        
-        LastName = lastName;
-        FirstName = firstName;
+        LastName = lastName ?? throw new InvalidOccupantException("Occupant last name cannot be null.");
+        FirstName = firstName ?? throw new InvalidOccupantException("Occupant first name cannot be null.");
         Patronymic = patronymic;
         Gender = gender;
-        BirthDate = birthDate;
+        BirthDate = birthDate ?? throw new InvalidOccupantException("Occupant birth date cannot be null.");
     }
 
     public Guid CheckIn(Guid roomId)
@@ -41,7 +37,7 @@ public class Occupant : AggregateRoot
         if (!IsActive) throw new DomainException($"Inactive occupant cannot be moved in. Occupant id: '{Id}'.");
             
         if (_accommodations.Any(a => a.IsActive))
-            throw new DomainException($"'{FullName}' is already living in another room. Occupant id: '{Id}'");
+            throw new DomainException($"Occupant '{FullName}' is already living in another room. Occupant id: '{Id}'.");
 
         var accommodation = new Accommodation(Guid.NewGuid(), roomId, DateTime.UtcNow);
         _accommodations.Add(accommodation);
@@ -96,4 +92,13 @@ public class Occupant : AggregateRoot
 
         IsActive = false;
     }
+
+    public void ChangeLastName(LastName lastName) =>
+        LastName = lastName ?? throw new InvalidOccupantException("Occupant last name cannot be null.");
+    
+    public void ChangeFirstName(FirstName firstName) =>
+        FirstName = firstName ?? throw new InvalidOccupantException("Occupant first name cannot be null.");
+
+    public void ChangePatronymic(Patronymic patronymic) =>
+        Patronymic = patronymic;
 }

@@ -60,7 +60,7 @@ public class OccupantTests
     }
 
     [Fact]
-    public void Constructor_NullLastName_ThrowsArgumentNullException()
+    public void Constructor_NullLastName_ThrowsInvalidOccupantException()
     {
         // Arrange
         var id = Guid.NewGuid();
@@ -68,17 +68,18 @@ public class OccupantTests
         var patronymic = new Patronymic("Иванович");
         var birthDate = new BirthDate(new DateOnly(2003, 01, 01));
         const Gender gender = Gender.Male;
+        const string expectedMessage = "Occupant last name cannot be null.";
 
         // Act & Assert
         var exception =
-            Assert.Throws<ArgumentNullException>(() =>
+            Assert.Throws<InvalidOccupantException>(() =>
                 new Occupant(id, null!, firstName, patronymic, gender, birthDate));
         
-        Assert.Equal("lastName", exception.ParamName);
+        Assert.Equal(expectedMessage, exception.Message);
     }
     
     [Fact]
-    public void Constructor_NullFirstName_ThrowsArgumentNullException()
+    public void Constructor_NullFirstName_ThrowsInvalidOccupantException()
     {
         // Arrange
         var id = Guid.NewGuid();
@@ -86,17 +87,18 @@ public class OccupantTests
         var patronymic = new Patronymic("Иванович");
         var birthDate = new BirthDate(new DateOnly(2003, 01, 01));
         const Gender gender = Gender.Male;
+        const string expectedMessage = "Occupant first name cannot be null.";
 
         // Act & Assert
         var exception =
-            Assert.Throws<ArgumentNullException>(() =>
+            Assert.Throws<InvalidOccupantException>(() =>
                 new Occupant(id, lastName, null!, patronymic, gender, birthDate));
         
-        Assert.Equal("firstName", exception.ParamName);
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Fact]
-    public void Constructor_NullBirthDate_ThrowsArgumentNullException()
+    public void Constructor_NullBirthDate_ThrowsInvalidOccupantException()
     {
         // Arrange
         var id = Guid.NewGuid();
@@ -104,13 +106,14 @@ public class OccupantTests
         var firstName = new FirstName("Иван");
         var patronymic = new Patronymic("Иванович");
         const Gender gender = Gender.Male;
+        const string expectedMessage = "Occupant birth date cannot be null.";
 
         // Act & Assert
         var exception =
-            Assert.Throws<ArgumentNullException>(() =>
+            Assert.Throws<InvalidOccupantException>(() =>
                 new Occupant(id, lastName, firstName, patronymic, gender, null!));
         
-        Assert.Equal("birthDate", exception.ParamName);
+        Assert.Equal(expectedMessage, exception.Message);
     }
     
     #endregion
@@ -122,7 +125,7 @@ public class OccupantTests
     {
         // Arrange
         var roomId = Guid.NewGuid();
-        var occupant = new OccupantBuilder().Build();
+        var occupant = OccupantFactory.Create();
         
         // Act
         occupant.CheckIn(roomId);
@@ -137,23 +140,27 @@ public class OccupantTests
     public void CheckIn_OccupantIsAlreadyLivingInAnotherRoom_ThrowsDomainException()
     {
         // Arrange
-        var occupant = new OccupantBuilder().Build();
-        occupant.CheckIn(Guid.NewGuid());
+        var occupant = OccupantFactory.CreateCheckedIn(Guid.NewGuid()).Occupant;
+        var expectedMessage =
+            $"Occupant '{occupant.FullName}' is already living in another room. Occupant id: '{occupant.Id}'.";
         
         // Act & Assert
-        Assert.Throws<DomainException>(() => occupant.CheckIn(Guid.NewGuid()));
+        var exception = Assert.Throws<DomainException>(() => occupant.CheckIn(Guid.NewGuid()));
+        
+        Assert.Equal(expectedMessage, exception.Message);
     }
 
     [Fact]
     public void CheckIn_InactiveOccupant_ThrowsDomainException()
     {
         // Arrange
-        var occupant = new OccupantBuilder().Build();
+        var occupant = OccupantFactory.Create();
         occupant.Deactivate();
         var expectedMessage = $"Inactive occupant cannot be moved in. Occupant id: '{occupant.Id}'.";
         
         // Act & Assert
         var exception = Assert.Throws<DomainException>(() => occupant.CheckIn(Guid.NewGuid()));
+        
         Assert.Equal(expectedMessage, exception.Message);
     }
 
@@ -165,9 +172,8 @@ public class OccupantTests
     public void CheckOut_OccupantWithActiveAccommodation_OccupantCheckedOutEventWillBeCreated()
     {
         // Arrange
-        var occupant = new OccupantBuilder().Build();
         var roomId = Guid.NewGuid();
-        occupant.CheckIn(roomId);
+        var occupant = OccupantFactory.CreateCheckedIn(roomId).Occupant;
         
         // Act
         occupant.CheckOut();
@@ -186,7 +192,7 @@ public class OccupantTests
     public void Activate_Active_IsActiveIsTrue()
     {
         // Arrange
-        var occupant = new OccupantBuilder().Build();
+        var occupant = OccupantFactory.Create();
         
         // Act
         occupant.Activate();
@@ -199,7 +205,7 @@ public class OccupantTests
     public void Activate_Inactive_IsActiveIsTrue()
     {
         // Arrange
-        var occupant = new OccupantBuilder().Build();
+        var occupant = OccupantFactory.Create();
         occupant.Deactivate();
         
         // Act
@@ -217,7 +223,7 @@ public class OccupantTests
     public void Deactivate_Active_IsActiveIsFalse()
     {
         // Arrange
-        var occupant = new OccupantBuilder().Build();
+        var occupant = OccupantFactory.Create();
         
         // Act
         occupant.Deactivate();
@@ -230,7 +236,7 @@ public class OccupantTests
     public void Deactivate_Inactive_IsActiveIsFalse()
     {
         // Arrange
-        var occupant = new OccupantBuilder().Build();
+        var occupant = OccupantFactory.Create();
         occupant.Deactivate();
         
         // Act
@@ -244,7 +250,7 @@ public class OccupantTests
     public void Deactivate_ActiveAccommodation_ThrowsDomainException()
     {
         // Arrange
-        var occupant = new OccupantBuilder().Build();
+        var occupant = OccupantFactory.Create();
         occupant.CheckIn(Guid.NewGuid());
         var expectedMessage =
             $"Cannot deactivate occupant '{occupant.FullName}' with active accommodation. Occupant id: '{occupant.Id}'.";
@@ -294,46 +300,84 @@ public class OccupantTests
     }
 
     #endregion
-    
-    private class OccupantBuilder
+
+    #region ChangeLastName Tests
+
+    [Fact]
+    public void ChangeLastName_ValidLastName_SaveValue()
     {
-        private readonly Guid _id = Guid.NewGuid();
-        private LastName _lastName = new("Иванов");
-        private FirstName _firstName = new("Иван");
-        private Patronymic _patronymic = new("Иванович");
-        private Gender _gender = Gender.Male;
-        private BirthDate _birthDate = new(new DateOnly(2003, 01, 21));
-
-        public OccupantBuilder WithLastName(LastName lastName)
-        {
-            _lastName = lastName;
-            return this;
-        }
-
-        public OccupantBuilder WithFirstName(FirstName firstName)
-        {
-            _firstName = firstName;
-            return this;
-        }
-
-        public OccupantBuilder WithPatronymic(Patronymic patronymic)
-        {
-            _patronymic = patronymic;
-            return this;
-        }
-
-        public OccupantBuilder WithGender(Gender gender)
-        {
-            _gender = gender;
-            return this;
-        }
-
-        public OccupantBuilder WithBirthDate(BirthDate birthDate)
-        {
-            _birthDate = birthDate;
-            return this;
-        }
-
-        public Occupant Build() => new(_id, _lastName, _firstName, _patronymic, _gender, _birthDate);
+        // Arrange
+        var occupant = OccupantFactory.Create();
+        var newLastName = new LastName("Шариков");
+        
+        // Act
+        occupant.ChangeLastName(newLastName);
+        
+        // Assert
+        Assert.Equal(newLastName, occupant.LastName);
     }
+
+    [Fact]
+    public void ChangeLastName_Null_ThrowsInvalidOccupantException()
+    {
+        // Arrange
+        var occupant = OccupantFactory.Create();
+        const string expectedMessage = "Occupant last name cannot be null.";
+        
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOccupantException>(() => occupant.ChangeLastName(null!));
+        
+        Assert.Equal(expectedMessage, exception.Message);
+    }
+
+    #endregion
+
+    #region ChangeFirstName Tests
+
+    [Fact]
+    public void ChangeFirstName_ValidFirstName_SaveValue()
+    {
+        // Arrange
+        var occupant = OccupantFactory.Create();
+        var newFirstName = new FirstName("Аркадий");
+        
+        // Act
+        occupant.ChangeFirstName(newFirstName);
+        
+        // Assert
+        Assert.Equal(newFirstName, occupant.FirstName);
+    }
+
+    [Fact]
+    public void ChangeFirstName_Null_ThrowsInvalidOccupantException()
+    {
+        // Arrange
+        var occupant = OccupantFactory.Create();
+        const string expectedMessage = "Occupant first name cannot be null.";
+        
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOccupantException>(() => occupant.ChangeFirstName(null!));
+        
+        Assert.Equal(expectedMessage, exception.Message);
+    }
+
+    #endregion
+
+    #region ChangePatronymic Tests
+
+    [Fact]
+    public void ChangePatronymic_ValidPatronymic_SaveValue()
+    {
+        // Arrange
+        var occupant = OccupantFactory.Create();
+        var newPatronymic = new Patronymic("Аркадьевич");
+        
+        // Act
+        occupant.ChangePatronymic(newPatronymic);
+        
+        // Assert
+        Assert.Equal(newPatronymic, occupant.Patronymic);
+    }
+
+    #endregion
 }
