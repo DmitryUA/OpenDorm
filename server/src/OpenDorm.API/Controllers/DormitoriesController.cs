@@ -8,6 +8,7 @@ using OpenDorm.Application.Features.Dormitories.Commands.ActivateRoom;
 using OpenDorm.Application.Features.Dormitories.Commands.CreateDormitory;
 using OpenDorm.Application.Features.Dormitories.Commands.CreateRoom;
 using OpenDorm.Application.Features.Dormitories.Commands.DeactivateRoom;
+using OpenDorm.Application.Features.Dormitories.Commands.UpdateRoom;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryDetails;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryList;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryRoomsList;
@@ -164,7 +165,7 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
         return StatusCode(StatusCodes.Status201Created, response);
     }
     
-    // POST /api/dormitories/{dormitory-id}/rooms/{room-id}/deactivate
+    // POST: api/dormitories/{dormitory-id}/rooms/{room-id}/deactivate
     /// <summary>Сделать комнату неактивной.</summary>
     /// <param name="dormitoryId">Идентификатор общежития.</param>
     /// <param name="roomId">Идентификатор комнаты.</param>
@@ -191,7 +192,7 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
         return Ok();
     }
     
-    // POST /api/dormitories/{dormitory-id}/rooms/{room-id}/activate
+    // POST: api/dormitories/{dormitory-id}/rooms/{room-id}/activate
     /// <summary>Сделать комнату активной.</summary>
     /// <param name="dormitoryId">Идентификатор общежития.</param>
     /// <param name="roomId">Идентификатор комнаты.</param>
@@ -215,5 +216,42 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
         await mediator.Send(command, cancellationToken);
 
         return Ok();
+    }
+    
+    // PUT: api/dormitories/{dormitory-id}/rooms/{room-id}
+    /// <summary>Обновить данные комнаты.</summary>
+    /// <param name="dormitoryId">Идентификатор общежития.</param>
+    /// <param name="roomId">Идентификатор комнаты.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <param name="request">Данные для обновления.</param>
+    /// <response code="204">Комната обновлена.</response>
+    /// <response code="401">Пользователь не аутентифицирован.</response>
+    /// <response code="403">Недостаточно прав.</response>
+    /// <response code="404">Общежитие или комната не найдены.</response>
+    /// <response code="409">Конфликт.</response>
+    [HttpPut("{dormitory-id:guid}/rooms/{room-id}")]
+    [Authorize(Policy = Permissions.Rooms.Update)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Update(
+        [FromRoute(Name = "dormitory-id")] Guid dormitoryId,
+        [FromRoute(Name = "room-id")] Guid roomId,
+        CancellationToken cancellationToken,
+        [FromBody] UpdateRoomRequest request)
+    {
+        var command = new UpdateRoomCommand(
+            roomId,
+            dormitoryId,
+            request.Name,
+            request.Capacity,
+            request.Gender);
+
+        await mediator.Send(command, cancellationToken);
+
+        return NoContent();
     }
 }
