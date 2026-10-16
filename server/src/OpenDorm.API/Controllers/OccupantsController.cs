@@ -10,6 +10,7 @@ using OpenDorm.Application.Features.Occupants.Commands.CreateAccommodation;
 using OpenDorm.Application.Features.Occupants.Commands.CreateOccupant;
 using OpenDorm.Application.Features.Occupants.Commands.DeactivateOccupant;
 using OpenDorm.Application.Features.Occupants.Commands.TransferOccupant;
+using OpenDorm.Application.Features.Occupants.Commands.UpdateOccupant;
 using OpenDorm.Application.Features.Occupants.Queries.GetOccupantAccommodationList;
 using OpenDorm.Application.Features.Occupants.Queries.GetOccupantList;
 using OpenDorm.Domain.Enums;
@@ -245,5 +246,37 @@ public class OccupantsController(IMediator mediator) : ControllerBase
         await mediator.Send(command, cancellationToken);
 
         return Ok();
+    }
+    
+    // PUT: api/occupants/{id}
+    /// <summary>Обновить жильца.</summary>
+    /// <param name="id">идентификатор жильца.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <param name="request">Данные для обновления.</param>
+    /// <response code="204">Жилец обновлён</response>
+    /// <response code="401">Пользователь не аутентифицирован</response>
+    /// <response code="403">Недостаточно прав</response>
+    /// <response code="404">Жилец не найден</response>
+    [HttpPut("{id:guid}")]
+    [Authorize(Policy = Permissions.Occupants.Update)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(
+        Guid id,
+        CancellationToken cancellationToken,
+        [FromBody] UpdateOccupantRequest request)
+    {
+        var command = new UpdateOccupantCommand(
+            id,
+            request.LastName,
+            request.FirstName,
+            request.Patronymic);
+
+        await mediator.Send(command, cancellationToken);
+
+        return NoContent();
     }
 }
