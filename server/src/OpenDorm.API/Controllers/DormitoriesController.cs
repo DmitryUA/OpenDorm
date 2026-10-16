@@ -8,6 +8,7 @@ using OpenDorm.Application.Features.Dormitories.Commands.ActivateRoom;
 using OpenDorm.Application.Features.Dormitories.Commands.CreateDormitory;
 using OpenDorm.Application.Features.Dormitories.Commands.CreateRoom;
 using OpenDorm.Application.Features.Dormitories.Commands.DeactivateRoom;
+using OpenDorm.Application.Features.Dormitories.Commands.UpdateDormitory;
 using OpenDorm.Application.Features.Dormitories.Commands.UpdateRoom;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryDetails;
 using OpenDorm.Application.Features.Dormitories.Queries.GetDormitoryList;
@@ -218,6 +219,38 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
         return Ok();
     }
     
+    // PUT: api/dormitories/{id}
+    /// <summary>Обновить общежитие.</summary>
+    /// <param name="id">Идентификатор общежития.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <param name="request">Данные для обновления.</param>
+    /// <response code="204">Общежитие обновлено.</response>
+    /// <response code="401">Пользователь не аутентифицирован.</response>
+    /// <response code="403">Недостаточно прав.</response>
+    /// <response code="404">Общежитие не найдено.</response>
+    [HttpPut("{id:guid}")]
+    [Authorize(Policy = Permissions.Dormitories.Update)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(
+        Guid id,
+        CancellationToken cancellationToken,
+        [FromBody] UpdateDormitoryRequest request)
+    {
+        var command = new UpdateDormitoryCommand(
+            id,
+            request.City,
+            request.Street,
+            request.House);
+
+        await mediator.Send(command, cancellationToken);
+
+        return NoContent();
+    }
+    
     // PUT: api/dormitories/{dormitory-id}/rooms/{room-id}
     /// <summary>Обновить данные комнаты.</summary>
     /// <param name="dormitoryId">Идентификатор общежития.</param>
@@ -237,7 +270,7 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Update(
+    public async Task<IActionResult> UpdateRoom(
         [FromRoute(Name = "dormitory-id")] Guid dormitoryId,
         [FromRoute(Name = "room-id")] Guid roomId,
         CancellationToken cancellationToken,
