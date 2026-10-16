@@ -1,0 +1,69 @@
+:root { 
+  /* Цвет А - акцидентный (5%) - для важных действий, предупреждений */
+  --color-accent: #FF5000;
+  --color-accent-light: #FF7A33;
+  --color-accent-dark: #CC4000;
+  
+  /* Цвет Б - основной (75%) - primary, кнопки, активные состояния */
+  --color-primary: #0055BB;
+  --color-primary-light: #3377CC;
+  --color-primary-lighter: #6699DD;
+  --color-primary-dark: #004499;
+  --color-primary-bg: #E6F0FA;
+  
+  /* Цвет В - дополнительный (10%) - info, ссылки, второстепенные акценты */
+  --color-info: #00BBEE;
+  --color-info-light: #33CCFF;
+  --color-info-dark: #0099CC;
+  --color-info-bg: #E6F8FD;
+  
+  /* Цвет Г - дополнительный (10%) - вторичный текст, границы, disabled */
+  --color-secondary: #8F9092;
+  --color-secondary-light: #B0B1B3;
+  --color-secondary-dark: #6F7072;
+  
+  /* === Семантические цвета === */
+  --color-success: #22C55E;
+  --color-success-light: #4ADE80;
+  --color-success-bg: #ECFDF5;
+  
+  --color-warning: #F59E0B;
+  --color-warning-light: #FBBF24;
+  --color-warning-bg: #FFFBEB;
+  
+  --color-danger: #EF4444;
+  --color-danger-light: #F87171;
+  --color-danger-bg: #FEF2F2;
+  
+  /* === Градиенты === */
+  --gradient-primary: linear-gradient(90deg, #0055BB 0%, #00BBEE 100%);
+  --gradient-primary-soft: linear-gradient(90deg, #0055BB 0%, #0055BB 50%, #00BBEE 100%);
+  
+  /* === Нейтральные цвета (текст, фон, границы) === */
+  --color-text-primary: #1F2937;
+  --color-text-regular: #374151;
+  --color-text-secondary: #6B7280;
+  --color-text-placeholder: #9CA3AF;
+  --color-text-disabled: var(--color-secondary);
+  
+  --color-bg-page: #F8FAFC;
+  --color-bg-white: #FFFFFF;
+  --color-bg-hover: #F1F5F9;
+  --color-bg-active: var(--color-primary-bg);
+  
+  --color-border: #E5E7EB;
+  --color-border-light: #F1F5F9;
+  --color-border-dark: var(--color-secondary-light);
+  
+  /* === Типографика === */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 30px;
+  
+  /* === От
