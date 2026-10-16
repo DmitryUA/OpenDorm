@@ -99,6 +99,6 @@ public class Occupant : AggregateRoot
     public void ChangeFirstName(FirstName firstName) =>
         FirstName = firstName ?? throw new InvalidOccupantException("Occupant first name cannot be null.");
 
-    public void ChangePatronymic(Patronymic patronymic) =>
+    public void ChangePatronymic(Patronymic? patronymic) =>
         Patronymic = patronymic;
 }
