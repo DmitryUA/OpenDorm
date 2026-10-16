@@ -1,7 +1,7 @@
 using FluentValidation;
 using OpenDorm.Domain.ValueObjects;
 
-namespace OpenDorm.Application.Features.Dormitories.Commands.UpdateRoomCommand;
+namespace OpenDorm.Application.Features.Dormitories.Commands.UpdateRoom;
 
 public class UpdateRoomCommandValidator : AbstractValidator<UpdateRoomCommand>
 {

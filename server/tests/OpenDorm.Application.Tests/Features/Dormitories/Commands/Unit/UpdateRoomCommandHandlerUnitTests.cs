@@ -1,5 +1,5 @@
 using OpenDorm.Application.Abstractions.Persistence;
-using OpenDorm.Application.Features.Dormitories.Commands.UpdateRoomCommand;
+using OpenDorm.Application.Features.Dormitories.Commands.UpdateRoom;
 using OpenDorm.Domain.Abstractions;
 using OpenDorm.Domain.Aggregates.Dormitory;
 using OpenDorm.Domain.Exceptions;

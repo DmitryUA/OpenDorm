@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using OpenDorm.Application.Features.Dormitories.Commands.UpdateRoomCommand;
+using OpenDorm.Application.Features.Dormitories.Commands.UpdateRoom;
 using OpenDorm.Domain.Aggregates.Dormitory;
 using OpenDorm.Domain.Enums;
 using OpenDorm.Domain.Exceptions;

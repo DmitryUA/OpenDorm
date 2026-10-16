@@ -1,7 +1,7 @@
 using MediatR;
 using OpenDorm.Domain.Enums;
 
-namespace OpenDorm.Application.Features.Dormitories.Commands.UpdateRoomCommand;
+namespace OpenDorm.Application.Features.Dormitories.Commands.UpdateRoom;
 
 public record UpdateRoomCommand(
     Guid RoomId,

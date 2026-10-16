@@ -6,7 +6,7 @@ using OpenDorm.Domain.Aggregates.Dormitory;
 using OpenDorm.Domain.Exceptions;
 using OpenDorm.Domain.ValueObjects;
 
-namespace OpenDorm.Application.Features.Dormitories.Commands.UpdateRoomCommand;
+namespace OpenDorm.Application.Features.Dormitories.Commands.UpdateRoom;
 
 public class UpdateRoomCommandHandler(
     IApplicationDbContext context,
