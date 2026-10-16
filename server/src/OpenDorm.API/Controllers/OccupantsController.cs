@@ -118,10 +118,11 @@ public class OccupantsController(IMediator mediator) : ControllerBase
     /// <param name="id">Идентификатор жильца.</param>
     /// <param name="request">Параметры для создания заселения.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
-    /// <response code="201">Заселение создано</response>
-    /// <response code="401">Пользователь не аутентифицирован</response>
-    /// <response code="403">Недостаточно прав</response>
-    /// <response code="404">Жилец не найден</response>
+    /// <response code="201">Заселение создано.</response>
+    /// <response code="401">Пользователь не аутентифицирован.</response>
+    /// <response code="403">Недостаточно прав.</response>
+    /// <response code="404">Жилец не найден.</response>
+    /// <response code="409">Конфликт.</response>
     [HttpPost("{id:guid}/check-in")]
     [Authorize(Policy = Permissions.Accommodations.CheckIn)]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
@@ -144,13 +145,14 @@ public class OccupantsController(IMediator mediator) : ControllerBase
     /// <summary>Выселить жильца.</summary>
     /// <param name="id">Идентификатор жильца.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
-    /// <response code="200">Жилец выселен</response>
+    /// <response code="204">Жилец выселен</response>
     /// <response code="401">Пользователь не аутентифицирован</response>
     /// <response code="403">Недостаточно прав</response>
     /// <response code="404">Жилец не найден</response>
+    /// <response code="409">Конфликт.</response>
     [HttpPost("{id:guid}/check-out")]
     [Authorize(Policy = Permissions.Accommodations.CheckOut)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -162,7 +164,7 @@ public class OccupantsController(IMediator mediator) : ControllerBase
         var command = new CheckOutOccupantCommand(id);
         await mediator.Send(command, cancellationToken);
 
-        return Ok();
+        return NoContent();
     }
     
     // POST: api/occupants/{id}/transfer
@@ -178,6 +180,7 @@ public class OccupantsController(IMediator mediator) : ControllerBase
     /// <response code="401">Пользователь не аутентифицирован</response>
     /// <response code="403">Недостаточно прав</response>
     /// <response code="404">Жилец не найден</response>
+    /// <response code="409">Конфликт.</response>
     [HttpPost("{id:guid}/transfer")]
     [Authorize(Policy = Permissions.Accommodations.Transfer)]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
@@ -201,13 +204,14 @@ public class OccupantsController(IMediator mediator) : ControllerBase
     /// <summary>Сделать жильца неактивным.</summary>
     /// <param name="id">Идентификатор жильца.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
-    /// <response code="200">Жилец деактивирован</response>
-    /// <response code="401">Пользователь не аутентифицирован</response>
-    /// <response code="403">Недостаточно прав</response>
-    /// <response code="404">Жилец не найден</response>
+    /// <response code="204">Жилец деактивирован.</response>
+    /// <response code="401">Пользователь не аутентифицирован.</response>
+    /// <response code="403">Недостаточно прав.</response>
+    /// <response code="404">Жилец не найден.</response>
+    /// <response code="409">Конфликт.</response>
     [HttpPost("{id:guid}/deactivate")]
     [Authorize(Policy = Permissions.Occupants.Deactivate)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -220,20 +224,20 @@ public class OccupantsController(IMediator mediator) : ControllerBase
         var command = new DeactivateOccupantCommand(id);
         await mediator.Send(command, cancellationToken);
 
-        return Ok();
+        return NoContent();
     }
     
     // POST: api/occupants/{id}/activate
     /// <summary>Сделать жильца неактивным.</summary>
     /// <param name="id">Идентификатор жильца.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
-    /// <response code="200">Жилец активирован</response>
+    /// <response code="204">Жилец активирован</response>
     /// <response code="401">Пользователь не аутентифицирован</response>
     /// <response code="403">Недостаточно прав</response>
     /// <response code="404">Жилец не найден</response>
     [HttpPost("{id:guid}/activate")]
     [Authorize(Policy = Permissions.Occupants.Activate)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -245,7 +249,7 @@ public class OccupantsController(IMediator mediator) : ControllerBase
         var command = new ActivateOccupantCommand(id);
         await mediator.Send(command, cancellationToken);
 
-        return Ok();
+        return NoContent();
     }
     
     // PUT: api/occupants/{id}

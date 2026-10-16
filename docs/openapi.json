@@ -792,6 +792,26 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "Конфликт",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -823,7 +843,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Комната деактивированна"
           },
           "400": {
@@ -956,7 +976,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Комната активирована"
           },
           "400": {
@@ -1724,7 +1744,7 @@
         },
         "responses": {
           "201": {
-            "description": "Заселение создано",
+            "description": "Заселение создано.",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1747,7 +1767,7 @@
             }
           },
           "401": {
-            "description": "Пользователь не аутентифицирован",
+            "description": "Пользователь не аутентифицирован.",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1767,7 +1787,7 @@
             }
           },
           "403": {
-            "description": "Недостаточно прав",
+            "description": "Недостаточно прав.",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1787,7 +1807,7 @@
             }
           },
           "404": {
-            "description": "Жилец не найден",
+            "description": "Жилец не найден.",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1807,7 +1827,7 @@
             }
           },
           "409": {
-            "description": "Conflict",
+            "description": "Конфликт.",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1848,7 +1868,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Жилец выселен"
           },
           "401": {
@@ -1912,7 +1932,7 @@
             }
           },
           "409": {
-            "description": "Conflict",
+            "description": "Конфликт.",
             "content": {
               "text/plain": {
                 "schema": {
@@ -2079,7 +2099,7 @@
             }
           },
           "409": {
-            "description": "Conflict",
+            "description": "Конфликт.",
             "content": {
               "text/plain": {
                 "schema": {
@@ -2120,8 +2140,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Жилец деактивирован"
+          "204": {
+            "description": "Жилец деактивирован."
           },
           "400": {
             "description": "Bad Request",
@@ -2144,7 +2164,7 @@
             }
           },
           "401": {
-            "description": "Пользователь не аутентифицирован",
+            "description": "Пользователь не аутентифицирован.",
             "content": {
               "text/plain": {
                 "schema": {
@@ -2164,7 +2184,7 @@
             }
           },
           "403": {
-            "description": "Недостаточно прав",
+            "description": "Недостаточно прав.",
             "content": {
               "text/plain": {
                 "schema": {
@@ -2184,7 +2204,7 @@
             }
           },
           "404": {
-            "description": "Жилец не найден",
+            "description": "Жилец не найден.",
             "content": {
               "text/plain": {
                 "schema": {
@@ -2204,7 +2224,7 @@
             }
           },
           "409": {
-            "description": "Conflict",
+            "description": "Конфликт.",
             "content": {
               "text/plain": {
                 "schema": {
@@ -2245,7 +2265,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Жилец активирован"
           },
           "400": {

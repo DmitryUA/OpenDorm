@@ -142,6 +142,7 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
     /// <response code="401">Пользователь не аутентифицирован</response>
     /// <response code="403">Недостаточно прав</response>
     /// <response code="404">Общежитие не найдено</response>
+    /// <response code="409">Конфликт</response>
     [HttpPost("{id:guid}/add-rooms")]
     [Authorize(Policy = Permissions.Rooms.Create)]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
@@ -149,6 +150,7 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CreateRoom(
         Guid id,
         [FromBody] CreateRoomRequest request,
@@ -171,12 +173,12 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
     /// <param name="dormitoryId">Идентификатор общежития.</param>
     /// <param name="roomId">Идентификатор комнаты.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
-    /// <response code="200">Комната деактивированна</response>
+    /// <response code="204">Комната деактивированна</response>
     /// <response code="401">Пользователь не аутентифицирован</response>
     /// <response code="403">Недостаточно прав</response>
     [HttpPost("{dormitory-id:guid}/rooms/{room-id}/deactivate")]
     [Authorize(Policy = Permissions.Rooms.Deactivate)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -190,7 +192,7 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
         var command = new DeactivateRoomCommand(dormitoryId, roomId);
         await mediator.Send(command, cancellationToken);
 
-        return Ok();
+        return NoContent();
     }
     
     // POST: api/dormitories/{dormitory-id}/rooms/{room-id}/activate
@@ -198,12 +200,12 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
     /// <param name="dormitoryId">Идентификатор общежития.</param>
     /// <param name="roomId">Идентификатор комнаты.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
-    /// <response code="200">Комната активирована</response>
+    /// <response code="204">Комната активирована</response>
     /// <response code="401">Пользователь не аутентифицирован</response>
     /// <response code="403">Недостаточно прав</response>
     [HttpPost("{dormitory-id:guid}/rooms/{room-id}/activate")]
     [Authorize(Policy = Permissions.Rooms.Activate)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -216,7 +218,7 @@ public class DormitoriesController(IMediator mediator) : ControllerBase
         var command = new ActivateRoomCommand(dormitoryId, roomId);
         await mediator.Send(command, cancellationToken);
 
-        return Ok();
+        return NoContent();
     }
     
     // PUT: api/dormitories/{id}
