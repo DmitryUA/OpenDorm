@@ -17,13 +17,20 @@
 
 Проект находится в активной разработке.
 
-## 📚 Документация API (Scalar)
+## 📚 Документация API
 
-После запуска проекта (`OpenDorm.API`) интерактивная документация API доступна в браузере по следующим адресам (режим Development):
+🌐 **[Открыть интерактивную документацию API (Scalar)](https://DmitryUA.github.io/OpenDorm/)**
+
+Онлайн-документация содержит полное описание всех эндпоинтов, схем запросов/ответов и примеров JSON.
+
+<details>
+<summary><b>💻 Локальный запуск (для разработчиков)</b></summary>
+<br>
+После запуска проекта (<code>OpenDorm.API</code>) в режиме <code>Development</code> интерактивная документация также доступна в браузере по адресам:
 
 - **HTTP:** [http://localhost:5140/scalar](http://localhost:5140/scalar)
 - **HTTPS:** [https://localhost:7170/scalar](https://localhost:7170/scalar)
-
+</details>
 ## Контакты
 
 - **Email:** dreamysnail0921@gmail.com
