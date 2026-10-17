@@ -1,13 +1,5 @@
 import type { Component } from 'vue'
-import {
-  House,
-  OfficeBuilding,
-  User,
-  Tickets,
-  UserFilled,
-  Setting,
-  HomeFilled,
-} from '@element-plus/icons-vue'
+import { House, OfficeBuilding, User, UserFilled } from '@element-plus/icons-vue'
 
 export interface MenuItem {
   key: string
@@ -32,22 +24,10 @@ export const menuItems: MenuItem[] = [
     icon: OfficeBuilding,
   },
   {
-    key: 'rooms',
-    path: '/rooms',
-    title: 'Комнаты',
-    icon: HomeFilled,
-  },
-  {
     key: 'occupants',
     path: '/occupants',
     title: 'Жильцы',
     icon: User,
-  },
-  {
-    key: 'accommodations',
-    path: '/accommodations',
-    title: 'Заселения',
-    icon: Tickets,
   },
   {
     key: 'users',
@@ -55,12 +35,5 @@ export const menuItems: MenuItem[] = [
     title: 'Пользователи',
     icon: UserFilled,
     roles: ['Administrator'], // Только для администратора
-  },
-  {
-    key: 'settings',
-    path: '/settings',
-    title: 'Настройки',
-    icon: Setting,
-    roles: ['Administrator'],
   },
 ]

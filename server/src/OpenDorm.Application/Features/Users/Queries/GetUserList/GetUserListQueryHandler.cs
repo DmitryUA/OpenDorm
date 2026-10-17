@@ -6,9 +6,9 @@ using OpenDorm.Application.Features.Users.Queries.Common;
 namespace OpenDorm.Application.Features.Users.Queries.GetUserList;
 
 public class GetUserListQueryHandler(IApplicationDbContext context) 
-    : IRequestHandler<GetUserListQuery, IEnumerable<UserDto>>
+    : IRequestHandler<GetUserListQuery, IReadOnlyCollection<UserDto>>
 {
-    public async Task<IEnumerable<UserDto>> Handle(GetUserListQuery query, CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<UserDto>> Handle(GetUserListQuery query, CancellationToken cancellationToken)
     {
         var rawData = await context.Users
             .AsNoTracking()

@@ -33,7 +33,40 @@ const routes: RouteRecordRaw[] = [
         name: 'Dashboard',
         component: () => import('@/pages/dashboard/DashboardPage.vue'),
       },
-      // В будущем здесь будут: dormitories, rooms, occupants и т.д.
+      {
+        path: 'dormitories',
+        name: 'Dormitories',
+        component: () => import('@/pages/dormitories/DormitoriesPage.vue'),
+      },
+      {
+        path: 'occupants',
+        name: 'Occupants',
+        component: () => import('@/pages/occupants/OccupantsPage.vue'),
+      },
+      {
+        path: 'occupants/:id',
+        name: 'OccupantDetails',
+        component: () => import('@/pages/occupants/OccupantDetailsPage.vue'),
+        meta: { title: 'Жилец' },
+      },
+      {
+        path: 'dormitories/:id',
+        name: 'DormitoryDetails',
+        component: () => import('@/pages/dormitories/DormitoryDetailsPage.vue'),
+        meta: { title: 'Общежитие' },
+      },
+      {
+        path: 'dormitories/:dormitoryId/rooms/:roomId',
+        name: 'RoomDetails',
+        component: () => import('@/pages/rooms/RoomDetailsPage.vue'),
+        meta: { title: 'Комната' },
+      },
+      {
+        path: 'users',
+        name: 'Users',
+        component: () => import('@/pages/users/UsersPage.vue'),
+        meta: { roles: ['Administrator'] },
+      },
     ],
   },
 

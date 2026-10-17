@@ -105,10 +105,14 @@ const handleLogout = async () => {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
+  width: 100%;
   margin-bottom: var(--spacing-lg);
 }
 
 .role-button {
+  width: 100%;
+  box-sizing: border-box;
+  margin-left: 0;
   height: 72px;
   font-size: var(--font-size-md);
   display: flex;

@@ -125,7 +125,7 @@ const activeMenu = computed(() => route.path)
 // Текущая страница (для хлебных крошек)
 const currentPageTitle = computed(() => {
   const item = menuItems.find((i) => i.path === route.path)
-  return item?.title || 'Главная'
+  return item?.title || (route.meta.title as string | undefined) || 'Главная'
 })
 
 // Меню с учётом ролей
