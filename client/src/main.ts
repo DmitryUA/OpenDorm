@@ -7,17 +7,23 @@ import ru from 'element-plus/es/locale/lang/ru'
 
 import App from './App.vue'
 import router from './app/router'
+import { useAuthStore } from './entities/auth/store/authStore'
 import './app/styles/global.css'
 
 const app = createApp(App)
+const pinia = createPinia()
+
+app.use(pinia)
+app.use(router)
+app.use(ElementPlus, { locale: ru })
 
 // Регистрируем все иконки Element Plus глобально
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 
-app.use(createPinia())
-app.use(router)
-app.use(ElementPlus, { locale: ru })
+// Инициализируем auth store (восстановление сессии из localStorage)
+const authStore = useAuthStore()
+authStore.init()
 
 app.mount('#app')
