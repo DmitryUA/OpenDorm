@@ -43,4 +43,9 @@ public static class Permissions
         public const string CheckOut = "accommodations.checkout";
         public const string Transfer = "accommodations.transfer";
     }
+    
+    public static class Dashboards
+    {
+        public const string Summary = "dashboards.summary";
+    }
 }

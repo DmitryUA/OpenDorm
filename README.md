@@ -6,6 +6,13 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![EF Core](https://img.shields.io/badge/EF_Core-10-512BD4?logo=dotnet&logoColor=white)](https://learn.microsoft.com/ef/core/)
 [![Scalar](https://img.shields.io/badge/Scalar-API_Reference-1a1a1a?logo=scalar&logoColor=white)](https://scalar.com)
+[![Vue.js](https://img.shields.io/badge/Vue.js-3-4FC08D?logo=vuedotjs&logoColor=white)](https://vuejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
+[![Pinia](https://img.shields.io/badge/Pinia-State_Management-FADA5E?logo=pinia&logoColor=black)](https://pinia.vuejs.org/)
+[![Vue Router](https://img.shields.io/badge/Vue_Router-5-4FC08D?logo=vuedotjs&logoColor=white)](https://router.vuejs.org/)
+[![Element Plus](https://img.shields.io/badge/Element_Plus-UI-409EFF?logo=element&logoColor=white)](https://element-plus.org/)
+[![Orval](https://img.shields.io/badge/Orval-OpenAPI_Client-6E56CF)](https://orval.dev/)
 
 [![Architecture](https://img.shields.io/badge/Architecture-DDD%20%7C%20Clean%20%7C%20Vertical%20Slice-007ACC)]()
 [![Pattern](https://img.shields.io/badge/Pattern-CQRS-007ACC)]()
@@ -16,6 +23,8 @@
 [![Testcontainers](https://img.shields.io/badge/Testcontainers-PostgreSQL-239120)](https://testcontainers.com/)
 
 Проект находится в активной разработке.
+
+**Frontend:** клиентское SPA на Vue 3 и TypeScript находится в каталоге `client/`. API-клиент и типы генерируются из OpenAPI-спецификации с помощью Orval.
 
 ## 📚 Документация API
 

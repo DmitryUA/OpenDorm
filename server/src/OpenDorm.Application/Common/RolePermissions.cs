@@ -38,7 +38,10 @@ public static class RolePermissions
             Permissions.Accommodations.CheckIn,
             Permissions.Accommodations.CheckOut,
             Permissions.Accommodations.Transfer,
-            Permissions.Accommodations.Read
+            Permissions.Accommodations.Read,
+            
+            // Dashboards
+            Permissions.Dashboards.Summary
         ],
 
         [RoleName.Manager] =
@@ -64,7 +67,10 @@ public static class RolePermissions
             Permissions.Accommodations.CheckIn,
             Permissions.Accommodations.CheckOut,
             Permissions.Accommodations.Transfer,
-            Permissions.Accommodations.Read
+            Permissions.Accommodations.Read,
+            
+            // Dashboards
+            Permissions.Dashboards.Summary
         ]
     };
 

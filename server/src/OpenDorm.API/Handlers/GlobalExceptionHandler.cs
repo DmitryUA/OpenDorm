@@ -52,11 +52,16 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
                 group => group.Select(failure => failure.ErrorMessage).ToArray()
             );
 
+        var detail = string.Join(
+            "; ",
+            validationException.Errors.Select(failure => failure.ErrorMessage).Distinct()
+        );
+        
         return new ValidationProblemDetails(errors)
         {
             Status = StatusCodes.Status400BadRequest,
             Title = "Validation Error",
-            Detail = "One or more validation errors occurred.",
+            Detail = detail,
             Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1"
         };
     }

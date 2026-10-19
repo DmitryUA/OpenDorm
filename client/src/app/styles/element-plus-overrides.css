@@ -1,0 +1,79 @@
+:root {
+  /* Primary */
+  --el-color-primary: #0055BB;
+  --el-color-primary-light-3: #3377CC;
+  --el-color-primary-light-5: #6699DD;
+  --el-color-primary-light-7: #99BBEE;
+  --el-color-primary-light-8: #CCE0F7;
+  --el-color-primary-light-9: #E6F0FA;
+  --el-color-primary-dark-2: #004499;
+  
+  /* Success */
+  --el-color-success: #22C55E;
+  --el-color-success-light-3: #4ADE80;
+  --el-color-success-light-5: #86EFAC;
+  --el-color-success-light-7: #BBF7D0;
+  --el-color-success-light-8: #DCFCE7;
+  --el-color-success-light-9: #ECFDF5;
+  --el-color-success-dark-2: #16A34A;
+  
+  /* Warning */
+  --el-color-warning: #F59E0B;
+  --el-color-warning-light-3: #FBBF24;
+  --el-color-warning-light-5: #FCD34D;
+  --el-color-warning-light-7: #FDE68A;
+  --el-color-warning-light-8: #FEF3C7;
+  --el-color-warning-light-9: #FFFBEB;
+  --el-color-warning-dark-2: #D97706;
+  
+  /* Danger */
+  --el-color-danger: #EF4444;
+  --el-color-danger-light-3: #F87171;
+  --el-color-danger-light-5: #FCA5A5;
+  --el-color-danger-light-7: #FECACA;
+  --el-color-danger-light-8: #FEE2E2;
+  --el-color-danger-light-9: #FEF2F2;
+  --el-color-danger-dark-2: #DC2626;
+  
+  /* Info */
+  --el-color-info: #00BBEE;
+  --el-color-info-light-3: #33CCFF;
+  --el-color-info-light-5: #66DDFF;
+  --el-color-info-light-7: #99EEFF;
+  --el-color-info-light-8: #CCF7FF;
+  --el-color-info-light-9: #E6F8FD;
+  --el-color-info-dark-2: #0099CC;
+  
+  /* Нейтральные */
+  --el-color-white: #FFFFFF;
+  --el-color-black: #1F2937;
+  
+  --el-bg-color: #FFFFFF;
+  --el-bg-color-page: #F8FAFC;
+  --el-bg-color-overlay: #FFFFFF;
+  
+  --el-text-color-primary: #1F2937;
+  --el-text-color-regular: #374151;
+  --el-text-color-secondary: #6B7280;
+  --el-text-color-placeholder: #9CA3AF;
+  --el-text-color-disabled: #8F9092;
+  
+  --el-border-color: #E5E7EB;
+  --el-border-color-light: #F1F5F9;
+  --el-border-color-lighter: #F8FAFC;
+  --el-border-color-dark: #B0B1B3;
+  
+  --el-fill-color: #F1F5F9;
+  --el-fill-color-light: #F8FAFC;
+  --el-fill-color-lighter: #FCFCFD;
+  --el-fill-color-blank: #FFFFFF;
+  
+  /* Типографика */
+  --el-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --el-font-size-base: 14px;
+  
+  /* Радиусы */
+  --el-border-radius-base: 8px;
+  --el-border-radius-small: 4px;
+  --el-border-radius-round: 9999px;
+}
