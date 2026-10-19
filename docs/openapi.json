@@ -206,6 +206,76 @@
         }
       }
     },
+    "/api/Dashboards/summary": {
+      "get": {
+        "tags": [
+          "Dashboards"
+        ],
+        "summary": "Получить общую статистику по количеству общежитий, комнат, жильцов, заселений.",
+        "responses": {
+          "200": {
+            "description": "Статистика получена.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SummaryDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SummaryDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SummaryDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Пользователь не аутентифицирован.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Недостаточно прав.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Dormitories": {
       "get": {
         "tags": [
@@ -4346,6 +4416,49 @@
       "SortOrder": {
         "type": "integer"
       },
+      "SummaryDto": {
+        "required": [
+          "dormitoryCount",
+          "activeRoomCount",
+          "accommodationCount",
+          "activeOccupantCount"
+        ],
+        "type": "object",
+        "properties": {
+          "dormitoryCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "activeRoomCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "accommodationCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "activeOccupantCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
       "TransferOccupantRequest": {
         "required": [
           "targetRoomId"
@@ -4392,7 +4505,10 @@
             "type": "string"
           },
           "patronymic": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -4529,6 +4645,9 @@
   "tags": [
     {
       "name": "Auth"
+    },
+    {
+      "name": "Dashboards"
     },
     {
       "name": "Dormitories"

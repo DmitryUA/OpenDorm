@@ -8,5 +8,6 @@
 export interface UpdateOccupantRequest {
   lastName: string;
   firstName: string;
-  patronymic: string;
+  /** @nullable */
+  patronymic: string | null;
 }

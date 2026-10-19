@@ -10,13 +10,11 @@
       </el-button>
     </div>
 
-    <el-alert v-if="roomError" :title="roomError" type="error" :closable="false" show-icon>
-      <template #default>
-        <el-button link type="primary" @click="loadRoomAndRelatedData"
-          >Повторить загрузку</el-button
-        >
-      </template>
-    </el-alert>
+    <RetryErrorAlert
+      v-if="roomError"
+      :message="roomError"
+      @retry="loadRoomAndRelatedData"
+    />
 
     <div v-loading="isRoomLoading" class="room-content">
       <template v-if="room">
@@ -57,6 +55,10 @@
         </header>
 
         <dl class="room-summary">
+          <div v-if="isAdmin">
+            <dt>ID комнаты</dt>
+            <dd><CopyableId :id="room.id" label="комнаты" /></dd>
+          </div>
           <div>
             <dt>Этаж</dt>
             <dd>{{ room.floorNumber }}</dd>
@@ -81,17 +83,11 @@
         </div>
       </header>
 
-      <el-alert
+      <RetryErrorAlert
         v-if="occupantsError"
-        :title="occupantsError"
-        type="error"
-        :closable="false"
-        show-icon
-      >
-        <template #default>
-          <el-button link type="primary" @click="loadOccupants">Повторить загрузку</el-button>
-        </template>
-      </el-alert>
+        :message="occupantsError"
+        @retry="loadOccupants"
+      />
 
       <div v-loading="isOccupantsLoading" class="occupants-content">
         <div v-if="occupants?.length" class="occupant-list">
@@ -156,16 +152,19 @@
         </el-button>
       </el-form>
 
-      <el-alert v-if="historyError" :title="historyError" type="error" :closable="false" show-icon>
-        <template #default>
-          <el-button link type="primary" @click="loadHistory(historyPage)">
-            Повторить загрузку
-          </el-button>
-        </template>
-      </el-alert>
+      <RetryErrorAlert
+        v-if="historyError"
+        :message="historyError"
+        @retry="loadHistory(historyPage)"
+      />
 
       <div v-loading="isHistoryLoading" class="history-content">
         <el-table v-if="historyResult?.items.length" :data="historyResult.items" stripe>
+          <el-table-column v-if="isAdmin" label="ID заселения" min-width="280">
+            <template #default="{ row }">
+              <CopyableId :id="row.accommodationId" label="заселения" />
+            </template>
+          </el-table-column>
           <el-table-column label="Жилец" min-width="210">
             <template #default="{ row }">
               {{ fullName(row.lastName, row.firstName, row.patronymic) }}
@@ -246,6 +245,8 @@ import { reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { ArrowLeft, Edit } from '@element-plus/icons-vue'
+import CopyableId from '@/components/CopyableId.vue'
+import RetryErrorAlert from '@/components/RetryErrorAlert.vue'
 import { getDormitories } from '@/shared/api/generated/dormitories'
 import { getRooms } from '@/shared/api/generated/rooms/rooms'
 import type {
@@ -269,7 +270,7 @@ const HISTORY_PAGE_SIZE = 10
 
 const route = useRoute()
 const router = useRouter()
-const { can } = usePermissions()
+const { can, isAdmin } = usePermissions()
 const {
   getApiDormitoriesIdRooms,
   putApiDormitoriesDormitoryIdRoomsRoomId,

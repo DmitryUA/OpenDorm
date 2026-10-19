@@ -33,6 +33,7 @@ export * from './roomListDto';
 export * from './roomOccupancyHistoryListDto';
 export * from './roomOccupantDto';
 export * from './sortOrder';
+export * from './summaryDto';
 export * from './transferOccupantRequest';
 export * from './updateDormitoryRequest';
 export * from './updateOccupantRequest';

@@ -35,62 +35,20 @@
       </el-form-item>
     </el-form>
 
-    <el-alert v-if="error" :title="error" type="error" :closable="false" show-icon>
-      <template #default>
-        <el-button link type="primary" @click="loadUsers">Повторить загрузку</el-button>
-      </template>
-    </el-alert>
+    <RetryErrorAlert v-if="error" :message="error" @retry="loadUsers" />
 
     <div v-loading="isLoading" class="users-content">
       <div v-if="filteredUsers.length" class="user-grid">
-        <article v-for="user in filteredUsers" :key="user.id" class="user-card">
-          <header class="user-card-header">
-            <el-avatar :size="44" class="user-avatar">
-              {{ initials(user.firstName, user.lastName) }}
-            </el-avatar>
-            <el-tag :type="user.isActive ? 'success' : 'info'" effect="light">
-              {{ user.isActive ? 'Активен' : 'Неактивен' }}
-            </el-tag>
-          </header>
-
-          <div class="user-identity">
-            <h2>{{ fullName(user.lastName, user.firstName, user.patronymic) }}</h2>
-            <p>@{{ user.login }}</p>
-          </div>
-
-          <div class="user-card-footer">
-            <div class="role-list">
-              <el-tag v-for="role in user.roles" :key="role" size="small" effect="plain">
-                {{ roleLabel(role) }}
-              </el-tag>
-              <span v-if="!user.roles.length" class="no-role">Роль не назначена</span>
-            </div>
-            <span class="created-date">Создан {{ formatDate(user.createdAt) }}</span>
-            <div class="user-actions">
-              <el-button v-if="can('users.update')" text @click="openEditDialog(user)">
-                Редактировать
-              </el-button>
-              <el-button
-                v-if="user.isActive && can('users.deactivate')"
-                text
-                type="danger"
-                :loading="statusUpdatingId === user.id"
-                @click="changeUserStatus(user, false)"
-              >
-                Деактивировать
-              </el-button>
-              <el-button
-                v-else-if="!user.isActive && can('users.activate')"
-                text
-                type="success"
-                :loading="statusUpdatingId === user.id"
-                @click="changeUserStatus(user, true)"
-              >
-                Активировать
-              </el-button>
-            </div>
-          </div>
-        </article>
+        <UserCard
+          v-for="user in filteredUsers"
+          :key="user.id"
+          :user="user"
+          :is-admin="isAdmin"
+          :is-updating="statusUpdatingId === user.id"
+          @edit="openEditDialog"
+          @edit-roles="openRolesDialog"
+          @change-status="changeUserStatus"
+        />
       </div>
 
       <el-empty
@@ -225,6 +183,49 @@
         </div>
       </template>
     </el-dialog>
+
+    <el-dialog
+      v-model="isRolesDialogVisible"
+      title="Роли пользователя"
+      width="min(480px, calc(100vw - 32px))"
+      destroy-on-close
+      @closed="resetRolesForm"
+    >
+      <el-form label-position="top">
+        <el-form-item
+          :label="
+            rolesUser
+              ? fullName(rolesUser.lastName, rolesUser.firstName, rolesUser.patronymic)
+              : 'Роли'
+          "
+        >
+          <el-select
+            v-model="rolesForm.roles"
+            class="full-width"
+            multiple
+            collapse-tags
+            collapse-tags-tooltip
+            placeholder="Выберите роли"
+          >
+            <el-option
+              v-for="role in ROLE_OPTIONS"
+              :key="role.value"
+              :label="role.label"
+              :value="role.value"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <div class="dialog-actions">
+          <el-button @click="isRolesDialogVisible = false">Отмена</el-button>
+          <el-button type="primary" :loading="isRolesSubmitting" @click="handleRolesUpdate">
+            Сохранить роли
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </section>
 </template>
 
@@ -232,6 +233,8 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { Plus, Search } from '@element-plus/icons-vue'
+import RetryErrorAlert from '@/components/RetryErrorAlert.vue'
+import UserCard from '@/components/users/UserCard.vue'
 import { getUsers } from '@/shared/api/generated/users/users'
 import type { CreateUserRequest, UpdateUserRequest, UserDto } from '@/shared/api/generated/models'
 import { usePermissions } from '@/shared/composables/usePermissions'
@@ -247,16 +250,26 @@ interface UserEditForm {
   newPassword: string
 }
 
+interface UserRolesForm {
+  roles: string[]
+}
+
 const namePattern = /^[А-ЯA-ZЁ][а-яa-zё]+$/u
 const loginPattern = /^[a-z0-9_.-]+$/
+const ROLE_OPTIONS = [
+  { label: 'Администратор', value: 'Administrator' },
+  { label: 'Менеджер', value: 'Manager' },
+]
 
-const { can } = usePermissions()
+const { can, isAdmin } = usePermissions()
 const {
   getApiUsers,
   postApiUsers,
   putApiUsersId,
   postApiUsersIdActivate,
   postApiUsersIdDeactivate,
+  postApiUsersIdAssignRole,
+  deleteApiUsersIdRevokeRole,
 } = getUsers()
 const users = ref<UserDto[]>([])
 const isLoading = ref(false)
@@ -269,6 +282,10 @@ const editFormRef = ref<FormInstance>()
 const isEditSubmitting = ref(false)
 const statusUpdatingId = ref<string | null>(null)
 const editingUser = ref<UserDto | null>(null)
+const isRolesDialogVisible = ref(false)
+const isRolesSubmitting = ref(false)
+const rolesUser = ref<UserDto | null>(null)
+const rolesForm = reactive<UserRolesForm>({ roles: [] })
 
 const filters = reactive({
   search: '',
@@ -405,28 +422,6 @@ const filteredUsers = computed(() => {
 const fullName = (lastName: string, firstName: string, patronymic: string | null) =>
   [lastName, firstName, patronymic].filter(Boolean).join(' ')
 
-const initials = (firstName: string, lastName: string) =>
-  `${firstName.charAt(0)}${lastName.charAt(0)}`.toLocaleUpperCase('ru-RU')
-
-const roleLabel = (role: string) => {
-  const labels: Record<string, string> = {
-    ADMINISTRATOR: 'Администратор',
-    MANAGER: 'Менеджер',
-  }
-  return labels[role.toLocaleUpperCase('en-US')] || role
-}
-
-const formatDate = (value: string) => {
-  const date = new Date(value)
-  return Number.isNaN(date.getTime())
-    ? value
-    : new Intl.DateTimeFormat('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      }).format(date)
-}
-
 const loadUsers = async () => {
   isLoading.value = true
   error.value = null
@@ -451,6 +446,25 @@ const openEditDialog = (user: UserDto) => {
   editForm.patronymic = user.patronymic || ''
   editForm.newPassword = ''
   isEditDialogVisible.value = true
+}
+
+const canonicalRoleName = (role: string) => {
+  const normalizedRole = role.toLocaleUpperCase('en-US')
+  return ROLE_OPTIONS.find((option) => option.value.toLocaleUpperCase('en-US') === normalizedRole)
+    ?.value
+}
+
+const openRolesDialog = (user: UserDto) => {
+  rolesUser.value = user
+  rolesForm.roles = [
+    ...new Set(user.roles.map(canonicalRoleName).filter((role): role is string => Boolean(role))),
+  ]
+  isRolesDialogVisible.value = true
+}
+
+const resetRolesForm = () => {
+  rolesUser.value = null
+  rolesForm.roles = []
 }
 
 const resetForm = () => {
@@ -527,6 +541,53 @@ const handleUpdate = async () => {
     ElMessage.error(apiError.response?.data?.title || 'Не удалось обновить пользователя')
   } finally {
     isEditSubmitting.value = false
+  }
+}
+
+const handleRolesUpdate = async () => {
+  const user = rolesUser.value
+  if (!user) return
+
+  const currentRoles = new Set(user.roles.map((role) => role.toLocaleUpperCase('en-US')))
+  const selectedRoles = new Set(rolesForm.roles.map((role) => role.toLocaleUpperCase('en-US')))
+  const rolesToAssign = ROLE_OPTIONS.filter(
+    (role) =>
+      selectedRoles.has(role.value.toLocaleUpperCase('en-US')) &&
+      !currentRoles.has(role.value.toLocaleUpperCase('en-US')),
+  )
+  const rolesToRevoke = ROLE_OPTIONS.filter(
+    (role) =>
+      currentRoles.has(role.value.toLocaleUpperCase('en-US')) &&
+      !selectedRoles.has(role.value.toLocaleUpperCase('en-US')),
+  )
+
+  isRolesSubmitting.value = true
+  try {
+    for (const role of rolesToAssign) {
+      await postApiUsersIdAssignRole(user.id, { roleName: role.value })
+    }
+    for (const role of rolesToRevoke) {
+      await deleteApiUsersIdRevokeRole(user.id, { roleName: role.value })
+    }
+
+    await loadUsers()
+    ElMessage.success('Роли пользователя обновлены')
+    isRolesDialogVisible.value = false
+  } catch (caughtError) {
+    await loadUsers()
+    const updatedUser = users.value.find((item) => item.id === user.id)
+    if (updatedUser) {
+      rolesUser.value = updatedUser
+      rolesForm.roles = [
+        ...new Set(
+          updatedUser.roles.map(canonicalRoleName).filter((role): role is string => Boolean(role)),
+        ),
+      ]
+    }
+    const apiError = caughtError as { response?: { data?: { title?: string } } }
+    ElMessage.error(apiError.response?.data?.title || 'Не удалось обновить роли пользователя')
+  } finally {
+    isRolesSubmitting.value = false
   }
 }
 
@@ -623,73 +684,6 @@ onMounted(loadUsers)
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: var(--spacing-md);
-}
-
-.user-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  min-width: 0;
-  padding: var(--spacing-lg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-md);
-  background: var(--color-bg-white);
-}
-
-.user-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-sm);
-}
-
-.user-avatar {
-  background: var(--color-primary-bg);
-  color: var(--color-primary);
-  font-weight: 600;
-}
-
-.user-identity h2 {
-  min-height: 2.7em;
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
-}
-
-.user-identity p {
-  margin: var(--spacing-xs) 0 0;
-  color: var(--color-text-secondary);
-}
-
-.user-card-footer {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  margin-top: auto;
-  padding-top: var(--spacing-md);
-  border-top: 1px solid var(--color-border-light);
-}
-
-.user-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-xs);
-  margin: 0 calc(var(--spacing-sm) * -1);
-}
-
-.role-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-xs);
-}
-
-.no-role,
-.created-date {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
 }
 
 .name-fields {

@@ -6,11 +6,7 @@
       </el-button>
     </div>
 
-    <el-alert v-if="error" :title="error" type="error" :closable="false" show-icon>
-      <template #default>
-        <el-button link type="primary" @click="loadOccupantData">Повторить загрузку</el-button>
-      </template>
-    </el-alert>
+    <RetryErrorAlert v-if="error" :message="error" @retry="loadOccupantData" />
 
     <div v-loading="isLoading" class="occupant-content">
       <template v-if="occupant">
@@ -31,8 +27,16 @@
 
           <div class="action-group">
             <el-button
+              v-if="can('occupants.update')"
+              :icon="Edit"
+              @click="openEditDialog"
+            >
+              Редактировать
+            </el-button>
+            <el-button
               v-if="can('accommodations.checkin')"
               type="primary"
+              :disabled="isCurrentlyAccommodated"
               @click="openCheckInDialog"
             >
               Заселение
@@ -41,6 +45,7 @@
               v-if="occupant.isActive && can('accommodations.checkout')"
               type="warning"
               plain
+              :disabled="!isCurrentlyAccommodated"
               :loading="isStatusUpdating"
               @click="handleCheckOut"
             >
@@ -50,6 +55,7 @@
               v-if="can('accommodations.transfer')"
               type="info"
               plain
+              :disabled="!isCurrentlyAccommodated"
               @click="openTransferDialog"
             >
               Переселение
@@ -76,6 +82,10 @@
         </header>
 
         <dl class="common-summary">
+          <div v-if="isAdmin">
+            <dt>ID жильца</dt>
+            <dd><CopyableId :id="occupant.id" label="жильца" /></dd>
+          </div>
           <div>
             <dt>Пол</dt>
             <dd>{{ genderLabel(occupant.gender) }}</dd>
@@ -106,14 +116,15 @@
         </div>
       </header>
 
-      <el-alert v-if="historyError" :title="historyError" type="error" :closable="false" show-icon>
-        <template #default>
-          <el-button link type="primary" @click="loadHistory">Повторить загрузку</el-button>
-        </template>
-      </el-alert>
+      <RetryErrorAlert v-if="historyError" :message="historyError" @retry="loadHistory" />
 
       <div v-loading="isHistoryLoading" class="history-content">
         <el-table v-if="history.length" :data="history" stripe>
+          <el-table-column v-if="isAdmin" label="ID заселения" min-width="280">
+            <template #default="{ row }">
+              <CopyableId :id="row.id" label="заселения" />
+            </template>
+          </el-table-column>
           <el-table-column label="Период" min-width="180">
             <template #default="{ row }">
               {{ formatDate(row.checkInDate) }}
@@ -162,7 +173,12 @@
       <template #footer>
         <div class="dialog-actions">
           <el-button @click="isCheckInDialogVisible = false">Отмена</el-button>
-          <el-button type="primary" :loading="isActionLoading" @click="handleCheckIn">
+          <el-button
+            type="primary"
+            :disabled="isCurrentlyAccommodated"
+            :loading="isActionLoading"
+            @click="handleCheckIn"
+          >
             Заселить
           </el-button>
         </div>
@@ -196,8 +212,41 @@
       <template #footer>
         <div class="dialog-actions">
           <el-button @click="isTransferDialogVisible = false">Отмена</el-button>
-          <el-button type="primary" :loading="isActionLoading" @click="handleTransfer">
+          <el-button
+            type="primary"
+            :disabled="!isCurrentlyAccommodated"
+            :loading="isActionLoading"
+            @click="handleTransfer"
+          >
             Переселить
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <el-dialog
+      v-model="isEditDialogVisible"
+      title="Редактирование жильца"
+      width="min(480px, calc(100vw - 32px))"
+      destroy-on-close
+    >
+      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-position="top">
+        <el-form-item label="Фамилия" prop="lastName">
+          <el-input v-model="editForm.lastName" maxlength="100" />
+        </el-form-item>
+        <el-form-item label="Имя" prop="firstName">
+          <el-input v-model="editForm.firstName" maxlength="100" />
+        </el-form-item>
+        <el-form-item label="Отчество" prop="patronymic">
+          <el-input v-model="editForm.patronymic" maxlength="100" />
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <div class="dialog-actions">
+          <el-button @click="isEditDialogVisible = false">Отмена</el-button>
+          <el-button type="primary" :loading="isOccupantUpdating" @click="handleOccupantUpdate">
+            Сохранить
           </el-button>
         </div>
       </template>
@@ -206,13 +255,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { ArrowLeft } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
+import { ArrowLeft, Edit } from '@element-plus/icons-vue'
+import CopyableId from '@/components/CopyableId.vue'
+import RetryErrorAlert from '@/components/RetryErrorAlert.vue'
 import { getDormitories } from '@/shared/api/generated/dormitories'
 import { getOccupants } from '@/shared/api/generated/occupants/occupants'
-import type { AccommodationDto, OccupantListDto, RoomListDto } from '@/shared/api/generated/models'
+import type {
+  AccommodationDto,
+  OccupantListDto,
+  RoomListDto,
+  UpdateOccupantRequest,
+} from '@/shared/api/generated/models'
 import { usePermissions } from '@/shared/composables/usePermissions'
 
 interface RoomSelectOption extends RoomListDto {
@@ -220,9 +276,11 @@ interface RoomSelectOption extends RoomListDto {
   dormitoryAddress: string
 }
 
+type OccupantEditForm = UpdateOccupantRequest
+
 const route = useRoute()
 const router = useRouter()
-const { can } = usePermissions()
+const { can, isAdmin } = usePermissions()
 
 const occupantId = computed(() => {
   const value = route.params.id
@@ -233,6 +291,7 @@ const occupant = ref<OccupantListDto | null>(null)
 const history = ref<AccommodationDto[]>([])
 const error = ref<string | null>(null)
 const historyError = ref<string | null>(null)
+const isCurrentlyAccommodated = computed(() => Boolean(occupant.value?.currentAccommodation))
 const availableRooms = ref<RoomSelectOption[]>([])
 const selectedRoomId = ref('')
 const targetRoomId = ref('')
@@ -240,8 +299,20 @@ const isLoading = ref(false)
 const isHistoryLoading = ref(false)
 const isActionLoading = ref(false)
 const isStatusUpdating = ref(false)
+const isOccupantUpdating = ref(false)
 const isCheckInDialogVisible = ref(false)
 const isTransferDialogVisible = ref(false)
+const isEditDialogVisible = ref(false)
+const editFormRef = ref<FormInstance>()
+const editForm = reactive<OccupantEditForm>({
+  lastName: '',
+  firstName: '',
+  patronymic: '',
+})
+const editRules: FormRules<OccupantEditForm> = {
+  lastName: [{ required: true, message: 'Укажите фамилию', trigger: 'blur' }],
+  firstName: [{ required: true, message: 'Укажите имя', trigger: 'blur' }],
+}
 
 const fullName = (lastName: string, firstName: string, patronymic?: string | null) => {
   const parts = [lastName, firstName, patronymic].filter(Boolean)
@@ -335,6 +406,59 @@ const loadAvailableRooms = async () => {
     availableRooms.value = roomGroups.flat().filter((room) => room.isActive)
   } catch {
     availableRooms.value = []
+  }
+}
+
+const openEditDialog = () => {
+  if (!occupant.value) return
+
+  editForm.lastName = occupant.value.lastName
+  editForm.firstName = occupant.value.firstName
+  editForm.patronymic = occupant.value.patronymic ?? ''
+  isEditDialogVisible.value = true
+}
+
+const handleOccupantUpdate = async () => {
+  const id = occupantId.value
+  if (!id || !occupant.value) return
+
+  try {
+    await editFormRef.value?.validate()
+  } catch {
+    return
+  }
+
+  isOccupantUpdating.value = true
+
+  try {
+    const { putApiOccupantsId } = getOccupants()
+    await putApiOccupantsId(id, {
+      lastName: editForm.lastName,
+      firstName: editForm.firstName,
+      patronymic: (editForm.patronymic ?? '').trim() || null,
+    })
+    ElMessage.success('Данные жильца обновлены')
+    isEditDialogVisible.value = false
+    await loadOccupantData()
+  } catch (caughtError) {
+    const apiError = caughtError as {
+      response?: {
+        data?: {
+          title?: string
+          detail?: string
+          errors?: Record<string, string[]>
+        }
+      }
+    }
+    const validationMessages = Object.values(apiError.response?.data?.errors ?? {}).flat()
+    const message =
+      apiError.response?.data?.detail ||
+      validationMessages.join('; ') ||
+      apiError.response?.data?.title ||
+      'Не удалось обновить данные жильца'
+    ElMessage.error(message)
+  } finally {
+    isOccupantUpdating.value = false
   }
 }
 

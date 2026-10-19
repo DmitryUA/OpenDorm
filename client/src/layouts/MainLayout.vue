@@ -1,7 +1,11 @@
 <template>
   <el-container class="main-layout">
     <!-- Боковое меню -->
-    <el-aside :width="isCollapsed ? '64px' : '240px'" class="sidebar">
+    <el-aside
+      :width="isCollapsed ? '64px' : '240px'"
+      class="sidebar"
+      :class="{ 'sidebar--admin': authStore.selectedRole === 'Administrator' }"
+    >
       <div class="sidebar-header">
         <el-icon :size="28" color="#fff">
           <OfficeBuilding />
@@ -196,6 +200,10 @@ const handleUserCommand = async (command: string) => {
   flex-direction: column;
   overflow: hidden;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
+}
+
+.sidebar--admin {
+  background: var(--color-accent);
 }
 
 .sidebar-header {

@@ -26,6 +26,7 @@ import type {
   RefreshTokenCommand,
   RevokeRoleRequest,
   RoomOccupantDto,
+  SummaryDto,
   TransferOccupantRequest,
   UpdateDormitoryRequest,
   UpdateOccupantRequest,
@@ -80,6 +81,18 @@ const postApiAuthLogout = (
       {url: `/api/auth/logout`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: logoutCommand
+    },
+      );
+    }
+
+/**
+ * @summary Получить общую статистику по количеству общежитий, комнат, жильцов, заселений.
+ */
+const getApiDashboardsSummary = (
+
+ ) => {
+      return customInstance<SummaryDto>(
+      {url: `/api/Dashboards/summary`, method: 'GET'
     },
       );
     }
@@ -475,10 +488,11 @@ const postApiUsersIdActivate = (
       );
     }
 
-return {postApiAuthLogin,postApiAuthRefresh,postApiAuthLogout,getApiDormitories,postApiDormitories,getApiDormitoriesIdDetails,getApiDormitoriesIdRooms,postApiDormitoriesIdAddRooms,postApiDormitoriesDormitoryIdRoomsRoomIdDeactivate,postApiDormitoriesDormitoryIdRoomsRoomIdActivate,putApiDormitoriesId,putApiDormitoriesDormitoryIdRoomsRoomId,getApiOccupants,postApiOccupants,getApiOccupantsIdAccommodations,postApiOccupantsIdCheckIn,postApiOccupantsIdCheckOut,postApiOccupantsIdTransfer,postApiOccupantsIdDeactivate,postApiOccupantsIdActivate,putApiOccupantsId,getApiRoomsIdOccupants,getApiRoomsIdHistory,getApiUsers,postApiUsers,getApiUsersId,putApiUsersId,postApiUsersIdAssignRole,deleteApiUsersIdRevokeRole,postApiUsersIdDeactivate,postApiUsersIdActivate}};
+return {postApiAuthLogin,postApiAuthRefresh,postApiAuthLogout,getApiDashboardsSummary,getApiDormitories,postApiDormitories,getApiDormitoriesIdDetails,getApiDormitoriesIdRooms,postApiDormitoriesIdAddRooms,postApiDormitoriesDormitoryIdRoomsRoomIdDeactivate,postApiDormitoriesDormitoryIdRoomsRoomIdActivate,putApiDormitoriesId,putApiDormitoriesDormitoryIdRoomsRoomId,getApiOccupants,postApiOccupants,getApiOccupantsIdAccommodations,postApiOccupantsIdCheckIn,postApiOccupantsIdCheckOut,postApiOccupantsIdTransfer,postApiOccupantsIdDeactivate,postApiOccupantsIdActivate,putApiOccupantsId,getApiRoomsIdOccupants,getApiRoomsIdHistory,getApiUsers,postApiUsers,getApiUsersId,putApiUsersId,postApiUsersIdAssignRole,deleteApiUsersIdRevokeRole,postApiUsersIdDeactivate,postApiUsersIdActivate}};
 export type PostApiAuthLoginResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getOpenDormAPIV1>['postApiAuthLogin']>>>
 export type PostApiAuthRefreshResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getOpenDormAPIV1>['postApiAuthRefresh']>>>
 export type PostApiAuthLogoutResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getOpenDormAPIV1>['postApiAuthLogout']>>>
+export type GetApiDashboardsSummaryResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getOpenDormAPIV1>['getApiDashboardsSummary']>>>
 export type GetApiDormitoriesResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getOpenDormAPIV1>['getApiDormitories']>>>
 export type PostApiDormitoriesResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getOpenDormAPIV1>['postApiDormitories']>>>
 export type GetApiDormitoriesIdDetailsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getOpenDormAPIV1>['getApiDormitoriesIdDetails']>>>

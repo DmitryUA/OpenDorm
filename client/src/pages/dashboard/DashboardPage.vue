@@ -7,7 +7,13 @@
       </p>
     </div>
 
-    <el-row :gutter="20">
+    <RetryErrorAlert
+      v-if="summaryError"
+      :message="summaryError"
+      @retry="loadSummary"
+    />
+
+    <el-row v-loading="isSummaryLoading" :gutter="20">
       <el-col :xs="24" :sm="12" :md="6">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
@@ -15,7 +21,7 @@
               <el-icon :size="28"><OfficeBuilding /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-value">—</div>
+              <div class="stat-value">{{ summary?.dormitoryCount ?? '—' }}</div>
               <div class="stat-label">Общежитий</div>
             </div>
           </div>
@@ -29,7 +35,7 @@
               <el-icon :size="28"><HomeFilled /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-value">—</div>
+              <div class="stat-value">{{ summary?.activeRoomCount ?? '—' }}</div>
               <div class="stat-label">Комнат</div>
             </div>
           </div>
@@ -43,7 +49,7 @@
               <el-icon :size="28"><User /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-value">—</div>
+              <div class="stat-value">{{ summary?.activeOccupantCount ?? '—' }}</div>
               <div class="stat-label">Жильцов</div>
             </div>
           </div>
@@ -57,7 +63,7 @@
               <el-icon :size="28"><Tickets /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-value">—</div>
+              <div class="stat-value">{{ summary?.accommodationCount ?? '—' }}</div>
               <div class="stat-label">Заселений</div>
             </div>
           </div>
@@ -83,10 +89,35 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import { OfficeBuilding, HomeFilled, User, Tickets } from '@element-plus/icons-vue'
+import RetryErrorAlert from '@/components/RetryErrorAlert.vue'
 import { useAuthStore } from '@/entities/auth/store/authStore'
+import { getOpenDormAPIV1 } from '@/shared/api/generated/endpoints'
+import type { SummaryDto } from '@/shared/api/generated/models'
 
 const authStore = useAuthStore()
+const summary = ref<SummaryDto | null>(null)
+const isSummaryLoading = ref(false)
+const summaryError = ref<string | null>(null)
+
+const loadSummary = async () => {
+  isSummaryLoading.value = true
+  summaryError.value = null
+
+  try {
+    const { getApiDashboardsSummary } = getOpenDormAPIV1()
+    summary.value = await getApiDashboardsSummary()
+  } catch (caughtError) {
+    const apiError = caughtError as { response?: { data?: { title?: string; detail?: string } } }
+    summaryError.value =
+      apiError.response?.data?.detail ||
+      apiError.response?.data?.title ||
+      'Не удалось загрузить статистику'
+  } finally {
+    isSummaryLoading.value = false
+  }
+}
 
 const getRoleLabel = (role: string): string => {
   const labels: Record<string, string> = {
@@ -95,6 +126,8 @@ const getRoleLabel = (role: string): string => {
   }
   return labels[role] || role
 }
+
+onMounted(loadSummary)
 </script>
 
 <style scoped>

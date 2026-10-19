@@ -6,11 +6,11 @@
       </el-button>
     </div>
 
-    <el-alert v-if="detailsError" :title="detailsError" type="error" :closable="false" show-icon>
-      <template #default>
-        <el-button link type="primary" @click="loadDetails">Повторить загрузку</el-button>
-      </template>
-    </el-alert>
+    <RetryErrorAlert
+      v-if="detailsError"
+      :message="detailsError"
+      @retry="loadDetails"
+    />
 
     <div v-loading="isDetailsLoading" class="details-content">
       <template v-if="details">
@@ -85,40 +85,20 @@
         </el-button>
       </el-form>
 
-      <el-alert v-if="roomsError" :title="roomsError" type="error" :closable="false" show-icon>
-        <template #default>
-          <el-button link type="primary" @click="loadRooms(currentPage)">
-            Повторить загрузку
-          </el-button>
-        </template>
-      </el-alert>
+      <RetryErrorAlert
+        v-if="roomsError"
+        :message="roomsError"
+        @retry="loadRooms(currentPage)"
+      />
 
       <div v-loading="isRoomsLoading" class="rooms-content">
         <div v-if="roomsResult?.items.length" class="room-grid">
-          <article v-for="room in roomsResult.items" :key="room.id" class="room-card">
-            <button type="button" class="room-card-link" @click="openRoom(room)">
-              <header class="room-card-header">
-                <h3 class="room-name">Комната {{ room.name }}</h3>
-                <el-tag :type="room.isActive ? 'success' : 'info'" effect="light">
-                  {{ room.isActive ? 'Активна' : 'Неактивна' }}
-                </el-tag>
-              </header>
-              <dl class="room-details">
-                <div>
-                  <dt>Этаж</dt>
-                  <dd>{{ room.floorNumber }}</dd>
-                </div>
-                <div>
-                  <dt>Тип</dt>
-                  <dd>{{ genderLabel(room.gender) }}</dd>
-                </div>
-                <div>
-                  <dt>Жильцы</dt>
-                  <dd>{{ room.occupantCount }} / {{ room.capacity }}</dd>
-                </div>
-              </dl>
-            </button>
-          </article>
+          <RoomCard
+            v-for="room in roomsResult.items"
+            :key="room.id"
+            :room="room"
+            @open="openRoom"
+          />
         </div>
 
         <el-empty v-else-if="!isRoomsLoading && !roomsError" description="Комнаты не найдены" />
@@ -184,6 +164,8 @@ import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { ArrowLeft, OfficeBuilding, Plus } from '@element-plus/icons-vue'
+import RetryErrorAlert from '@/components/RetryErrorAlert.vue'
+import RoomCard from '@/components/rooms/RoomCard.vue'
 import { getDormitories } from '@/shared/api/generated/dormitories'
 import type {
   CreateRoomRequest,
@@ -238,12 +220,6 @@ const rules: FormRules<RoomForm> = {
   gender: [{ required: true, message: 'Выберите тип комнаты', trigger: 'change' }],
   capacity: [{ required: true, message: 'Укажите количество мест', trigger: 'change' }],
   floorNumber: [{ required: true, message: 'Укажите этаж', trigger: 'change' }],
-}
-
-const genderLabel = (gender: Gender | string) => {
-  if (gender === 0 || gender === 'Male') return 'Мужская'
-  if (gender === 1 || gender === 'Female') return 'Женская'
-  return 'Не указан'
 }
 
 const loadDetails = async () => {
@@ -470,71 +446,6 @@ watch(
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
   gap: var(--spacing-md);
-}
-
-.room-card {
-  min-width: 0;
-  padding: var(--spacing-md);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-md);
-  background: var(--color-bg-white);
-}
-
-.room-card-link {
-  display: block;
-  width: 100%;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  text-align: left;
-}
-
-.room-card-link:focus-visible {
-  border-radius: var(--border-radius-sm);
-  outline: 2px solid var(--color-primary);
-  outline-offset: 4px;
-}
-
-.room-card-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--spacing-sm);
-  padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid var(--color-border-light);
-}
-
-.room-name {
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: var(--font-size-md);
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-.room-details {
-  display: grid;
-  gap: var(--spacing-sm);
-  margin: var(--spacing-md) 0 0;
-}
-
-.room-details > div {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--spacing-sm);
-}
-
-.room-details dt {
-  color: var(--color-text-secondary);
-}
-
-.room-details dd {
-  margin: 0;
-  color: var(--color-text-primary);
-  font-weight: 500;
-  text-align: right;
 }
 
 .full-width {

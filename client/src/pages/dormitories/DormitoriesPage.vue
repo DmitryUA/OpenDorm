@@ -10,56 +10,21 @@
       </el-button>
     </header>
 
-    <el-alert
+    <RetryErrorAlert
       v-if="dormitoryStore.error"
-      :title="dormitoryStore.error"
-      type="error"
-      :closable="false"
-      show-icon
-    >
-      <template #default>
-        <el-button link type="primary" @click="loadDormitories">Повторить загрузку</el-button>
-      </template>
-    </el-alert>
+      :message="dormitoryStore.error"
+      @retry="loadDormitories"
+    />
 
     <div v-loading="dormitoryStore.isLoading" class="dormitories-content">
       <div v-if="dormitoryStore.dormitories.length" class="dormitory-grid">
-        <article
+        <DormitoryCard
           v-for="dormitory in dormitoryStore.dormitories"
           :key="dormitory.id"
-          class="dormitory-card"
-        >
-          <button
-            type="button"
-            class="card-main"
-            :aria-label="`Открыть общежитие: ${dormitory.city}, ${dormitory.street}, ${dormitory.house}`"
-            @click="openDormitory(dormitory.id)"
-          >
-            <div class="card-address">
-              <el-icon class="address-icon"><OfficeBuilding /></el-icon>
-              <h2>{{ dormitory.city }}, {{ dormitory.street }}, {{ dormitory.house }}</h2>
-            </div>
-
-            <div class="card-floors">
-              <span class="detail-label">Этажей</span>
-              <span class="detail-value">{{ dormitory.floorCount }}</span>
-            </div>
-          </button>
-
-          <div v-if="isAdmin" class="card-id">
-            <span class="detail-label">ID общежития</span>
-            <el-button
-              class="id-copy-button"
-              text
-              :title="`Скопировать ID ${dormitory.id}`"
-              :aria-label="`Скопировать ID общежития ${dormitory.id}`"
-              @click="copyId(dormitory.id)"
-            >
-              <span>{{ dormitory.id }}</span>
-              <el-icon><CopyDocument /></el-icon>
-            </el-button>
-          </div>
-        </article>
+          :dormitory="dormitory"
+          :is-admin="isAdmin"
+          @open="openDormitory"
+        />
       </div>
 
       <el-empty
@@ -116,7 +81,9 @@
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { CopyDocument, OfficeBuilding, Plus } from '@element-plus/icons-vue'
+import { Plus } from '@element-plus/icons-vue'
+import RetryErrorAlert from '@/components/RetryErrorAlert.vue'
+import DormitoryCard from '@/components/dormitories/DormitoryCard.vue'
 import { useDormitoryStore } from '@/entities/dormitory/store/dormitoryStore'
 import { usePermissions } from '@/shared/composables/usePermissions'
 
@@ -205,15 +172,6 @@ const handleCreate = async () => {
   }
 }
 
-const copyId = async (id: string) => {
-  try {
-    await navigator.clipboard.writeText(id)
-    ElMessage.success('ID скопирован')
-  } catch {
-    ElMessage.error('Не удалось скопировать ID')
-  }
-}
-
 onMounted(loadDormitories)
 </script>
 
@@ -251,105 +209,6 @@ onMounted(loadDormitories)
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
   gap: var(--spacing-md);
-}
-
-.dormitory-card {
-  min-width: 0;
-  padding: var(--spacing-lg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-md);
-  background: var(--color-bg-white);
-  box-shadow: var(--shadow-sm);
-}
-
-.card-main {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  text-align: left;
-}
-
-.card-main:focus-visible {
-  border-radius: var(--border-radius-sm);
-  outline: 2px solid var(--color-primary);
-  outline-offset: 4px;
-}
-
-.card-address {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-lg);
-}
-
-.address-icon {
-  flex: 0 0 auto;
-  margin-top: 3px;
-  color: var(--color-primary);
-  font-size: var(--font-size-lg);
-}
-
-.card-address h2 {
-  min-width: 0;
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
-}
-
-.card-floors,
-.card-id {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-sm);
-}
-
-.card-id {
-  flex-direction: column;
-  align-items: stretch;
-  margin-top: var(--spacing-md);
-  padding-top: var(--spacing-md);
-  border-top: 1px solid var(--color-border-light);
-}
-
-.detail-label {
-  flex: 0 0 auto;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-.detail-value {
-  color: var(--color-text-primary);
-  font-weight: 600;
-}
-
-.id-copy-button {
-  display: flex;
-  justify-content: flex-start;
-  gap: var(--spacing-sm);
-  min-width: 0;
-  max-width: 100%;
-  height: auto;
-  white-space: normal;
-  padding: 2px 0 2px 8px;
-  color: var(--color-primary);
-}
-
-.id-copy-button span {
-  flex: 1;
-  min-width: 0;
-  font-family: monospace;
-  overflow-wrap: anywhere;
-  text-align: left;
-  white-space: normal;
 }
 
 .dialog-actions {

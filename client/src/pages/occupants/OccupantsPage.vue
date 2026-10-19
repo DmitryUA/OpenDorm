@@ -28,49 +28,16 @@
       </el-form-item>
     </el-form>
 
-    <el-alert v-if="error" :title="error" type="error" :closable="false" show-icon>
-      <template #default>
-        <el-button link type="primary" @click="loadOccupants(page)">Повторить загрузку</el-button>
-      </template>
-    </el-alert>
+    <RetryErrorAlert v-if="error" :message="error" @retry="loadOccupants(page)" />
 
     <div v-loading="loading" class="occupants-content">
       <div v-if="occupants.length" class="occupant-grid">
-        <article v-for="occupant in occupants" :key="occupant.id" class="occupant-card">
-          <button
-            type="button"
-            class="card-main"
-            :aria-label="`Открыть жильца: ${fullName(occupant.lastName, occupant.firstName, occupant.patronymic)}`"
-            @click="openOccupant(occupant.id)"
-          >
-            <div class="card-header">
-              <el-avatar :size="42" class="occupant-avatar">
-                {{ getInitials(occupant.firstName, occupant.lastName) }}
-              </el-avatar>
-              <span
-                class="status-badge"
-                :class="occupant.isActive ? 'status-active' : 'status-inactive'"
-              >
-                {{ occupant.isActive ? 'Активен' : 'Неактивен' }}
-              </span>
-            </div>
-
-            <h2>{{ fullName(occupant.lastName, occupant.firstName, occupant.patronymic) }}</h2>
-
-            <div class="meta-list">
-              <span>{{ genderLabel(occupant.gender) }}</span>
-              <span>{{ formatDate(occupant.birthDate) }}</span>
-            </div>
-
-            <p class="accommodation-text">
-              <template v-if="occupant.currentAccommodation">
-                {{ occupant.currentAccommodation.dormitoryAddress }} ·
-                {{ occupant.currentAccommodation.roomName }}
-              </template>
-              <template v-else>На данный момент не заселен</template>
-            </p>
-          </button>
-        </article>
+        <OccupantCard
+          v-for="occupant in occupants"
+          :key="occupant.id"
+          :occupant="occupant"
+          @open="openOccupant"
+        />
       </div>
 
       <el-empty v-else-if="!loading && !error" description="Жильцов пока нет">
@@ -148,6 +115,8 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
+import OccupantCard from '@/components/occupants/OccupantCard.vue'
+import RetryErrorAlert from '@/components/RetryErrorAlert.vue'
 import { getOccupants } from '@/shared/api/generated/occupants/occupants'
 import type { GetApiOccupantsParams, OccupantListDto } from '@/shared/api/generated/models'
 import { usePermissions } from '@/shared/composables/usePermissions'
@@ -192,34 +161,6 @@ const rules: FormRules<OccupantForm> = {
   firstName: [{ required: true, message: 'Укажите имя', trigger: 'blur' }],
   gender: [{ required: true, message: 'Выберите пол', trigger: 'change' }],
   birthDate: [{ required: true, message: 'Укажите дату рождения', trigger: 'change' }],
-}
-
-const getInitials = (firstName: string, lastName: string) => {
-  return `${firstName?.charAt(0)?.toUpperCase() || ''}${lastName?.charAt(0)?.toUpperCase() || ''}`
-}
-
-const fullName = (lastName: string, firstName: string, patronymic?: string | null) => {
-  const parts = [lastName, firstName, patronymic].filter(Boolean)
-  return parts.join(' ')
-}
-
-const genderLabel = (gender: number) => {
-  return gender === 1 ? 'Женский' : 'Мужской'
-}
-
-const formatDate = (value?: string | null) => {
-  if (!value) return '—'
-
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) {
-    return value
-  }
-
-  return new Intl.DateTimeFormat('ru-RU', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(date)
 }
 
 const loadOccupants = async (targetPage = page.value) => {
@@ -367,91 +308,6 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: var(--spacing-md);
-}
-
-.occupant-card {
-  display: flex;
-  min-width: 0;
-}
-
-.card-main {
-  width: 100%;
-  height: 100%;
-  min-height: 204px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-md);
-  background: var(--color-bg-card);
-  text-align: left;
-  cursor: pointer;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
-}
-
-.card-main:hover {
-  border-color: var(--color-primary);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-  transform: translateY(-1px);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.occupant-avatar {
-  background: linear-gradient(135deg, var(--color-primary), #7bb7ff);
-  color: white;
-  font-weight: 600;
-}
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.status-active {
-  color: #1b8e5a;
-  background: rgba(39, 174, 96, 0.12);
-}
-
-.status-inactive {
-  color: #5c6877;
-  background: rgba(96, 109, 128, 0.12);
-}
-
-.card-main h2 {
-  min-height: 2.7em;
-  margin: 0;
-  font-size: var(--font-size-lg);
-  color: var(--color-text-primary);
-  line-height: 1.35;
-  overflow-wrap: anywhere;
-}
-
-.meta-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-sm);
-  color: var(--color-text-secondary);
-  font-size: 0.9rem;
-}
-
-.accommodation-text {
-  margin: auto 0 0;
-  color: var(--color-text-secondary);
-  line-height: 1.5;
 }
 
 .full-width {

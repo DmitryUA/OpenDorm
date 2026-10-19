@@ -10,6 +10,7 @@
         type="primary"
         size="large"
         class="role-button"
+        :class="{ 'role-button--administrator': role === 'Administrator' }"
         @click="handleSelectRole(role)"
       >
         <el-icon :size="24" class="role-icon">
@@ -129,6 +130,16 @@ const handleLogout = async () => {
   opacity: 0.9;
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+}
+
+.role-button--administrator,
+.role-button--administrator:hover,
+.role-button--administrator:focus {
+  background: var(--color-accent);
+}
+
+.role-button--administrator:hover {
+  background: var(--color-accent-dark);
 }
 
 .role-icon {
