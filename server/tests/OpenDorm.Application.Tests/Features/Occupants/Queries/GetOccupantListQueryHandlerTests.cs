@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using OpenDorm.Application.Abstractions.Search;
 using OpenDorm.Application.Features.Occupants.Queries.GetOccupantList;
 using OpenDorm.Domain.Enums;
+using OpenDorm.Domain.ValueObjects;
 using OpenDorm.Infrastructure;
 using OpenDorm.Infrastructure.Services;
 using OpenDorm.Shared.Tests.Factories;
@@ -18,15 +20,18 @@ public class GetOccupantListQueryHandlerTests : IAsyncLifetime
     
     private OpenDormDbContext _context = null!;
     private GetOccupantListQueryHandler _handler = null!;
+    private IOccupantSearchIndex _searchIndex = null!;
     
     public async Task InitializeAsync()
     {
         await _postgres.StartAsync();
 
         var connectionString = _postgres.GetConnectionString();
+        _searchIndex = TestDbContextOptionsExtensions.CreateOccupantSearchIndex();
 
         var options = new DbContextOptionsBuilder<OpenDormDbContext>()
             .UseNpgsql(connectionString)
+            .UseOccupantSearchIndexForTests(_searchIndex)
             .Options;
 
         var encryptionService = new AesGcmEncryptionService(new byte[32]);
@@ -35,7 +40,7 @@ public class GetOccupantListQueryHandlerTests : IAsyncLifetime
 
         await _context.Database.MigrateAsync();
 
-        _handler = new GetOccupantListQueryHandler(_context);
+        _handler = new GetOccupantListQueryHandler(_context, _searchIndex);
     }
 
     [Fact]
@@ -129,6 +134,61 @@ public class GetOccupantListQueryHandlerTests : IAsyncLifetime
 
         Assert.Single(result.Items);
         Assert.Equal(status, result.Items.First().IsActive);
+    }
+
+    [Fact]
+    public async Task Handle_FilterByName_UsesNormalizedHmacIndexInSql()
+    {
+        var matchingOccupant = OccupantFactory.Create(
+            lastName: "Ёжов",
+            firstName: "Иван",
+            patronymic: "Иванович");
+        var otherOccupant = OccupantFactory.Create(lastName: "Петров");
+
+        await _context.AddRangeAsync(matchingOccupant, otherOccupant);
+        await _context.SaveChangesAsync();
+        _context.ChangeTracker.Clear();
+
+        var result = await _handler.Handle(
+            new GetOccupantListQuery(LastName: "  ежов ", FirstName: "иВАН"),
+            CancellationToken.None);
+
+        var occupant = Assert.Single(result.Items);
+        Assert.Equal(matchingOccupant.Id, occupant.Id);
+
+        var sql = _context.Occupants
+            .AsNoTracking()
+            .Where(o => EF.Property<byte[]?>(o, "last_name_search_hash") ==
+                        _searchIndex.ComputeHash("ЕЖОВ"))
+            .Select(o => o.Id)
+            .ToQueryString();
+
+        Assert.Contains("last_name_search_hash", sql);
+        Assert.DoesNotContain("last_name_encrypted", sql);
+    }
+
+    [Fact]
+    public async Task Handle_AfterNameChange_UsesUpdatedHmacIndex()
+    {
+        var occupant = OccupantFactory.Create(lastName: "Иванов");
+        await _context.AddAsync(occupant);
+        await _context.SaveChangesAsync();
+        _context.ChangeTracker.Clear();
+
+        var trackedOccupant = await _context.OccupantsDbSet.SingleAsync(o => o.Id == occupant.Id);
+        trackedOccupant.ChangeLastName(new LastName("Петров"));
+        await _context.SaveChangesAsync();
+        _context.ChangeTracker.Clear();
+
+        var oldNameResult = await _handler.Handle(
+            new GetOccupantListQuery(LastName: "Иванов"),
+            CancellationToken.None);
+        var newNameResult = await _handler.Handle(
+            new GetOccupantListQuery(LastName: "Петров"),
+            CancellationToken.None);
+
+        Assert.Empty(oldNameResult.Items);
+        Assert.Equal(occupant.Id, Assert.Single(newNameResult.Items).Id);
     }
 
     public async Task DisposeAsync()

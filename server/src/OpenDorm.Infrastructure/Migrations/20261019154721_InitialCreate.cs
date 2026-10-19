@@ -43,7 +43,10 @@ namespace OpenDorm.Infrastructure.Migrations
                     gender = table.Column<char>(type: "character(1)", nullable: false, comment: "гендер (m - мужчина, f - женщина)"),
                     birth_date_encrypted = table.Column<byte[]>(type: "bytea", nullable: false, comment: "зашифрованная дата рождения"),
                     is_active = table.Column<bool>(type: "boolean", nullable: false, comment: "активен ли проживающий, true - да, false - нет"),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
+                    first_name_search_hash = table.Column<byte[]>(type: "bytea", nullable: false, comment: "HMAC-индекс для поиска по имени"),
+                    last_name_search_hash = table.Column<byte[]>(type: "bytea", nullable: false, comment: "HMAC-индекс для поиска по фамилии"),
+                    patronymic_search_hash = table.Column<byte[]>(type: "bytea", nullable: true, comment: "HMAC-индекс для поиска по отчеству")
                 },
                 constraints: table =>
                 {
@@ -222,6 +225,21 @@ namespace OpenDorm.Infrastructure.Migrations
                 table: "accommodations",
                 column: "occupant_id",
                 filter: "check_out_date IS NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_occupants_first_name_search_hash",
+                table: "occupants",
+                column: "first_name_search_hash");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_occupants_last_name_search_hash",
+                table: "occupants",
+                column: "last_name_search_hash");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_occupants_patronymic_search_hash",
+                table: "occupants",
+                column: "patronymic_search_hash");
 
             migrationBuilder.CreateIndex(
                 name: "IX_refresh_tokens_token",

@@ -27,11 +27,14 @@ public class OccupantsController(IMediator mediator) : ControllerBase
     /// <remarks>
     /// Возвращает краткую информацию о жильцах.
     /// Поддерживает пагинацию.
-    /// Поддерживает фильтры по: гендеру и статусу.
+    /// Поддерживает точные фильтры по ФИО, гендеру и статусу.
     /// </remarks>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <param name="status">Фильтр по статусу.</param>
     /// <param name="gender">Фильтр по полу.</param>
+    /// <param name="lastName">Фильтр по фамилии.</param>
+    /// <param name="firstName">Фильтр по имени.</param>
+    /// <param name="patronymic">Фильтр по отчеству.</param>
     /// <param name="page">Номер страницы (пагинация).</param>
     /// <param name="pageSize">Размер страницы (пагинация).</param>
     /// <response code="200">Список жильцов получен</response>
@@ -47,9 +50,12 @@ public class OccupantsController(IMediator mediator) : ControllerBase
         [FromQuery] bool? status = null,
         [FromQuery] Gender? gender = null,
         [FromQuery] int page = PagedQuery.DefaultPage,
-        [FromQuery] int pageSize = PagedQuery.DefaultPageSize)
+        [FromQuery] int pageSize = PagedQuery.DefaultPageSize,
+        [FromQuery] string? lastName = null,
+        [FromQuery] string? firstName = null,
+        [FromQuery] string? patronymic = null)
     {
-        var query = new GetOccupantListQuery(gender, status, page, pageSize);
+        var query = new GetOccupantListQuery(gender, status, lastName, firstName, patronymic, page, pageSize);
         var response = await mediator.Send(query, cancellationToken);
 
         return Ok(response);

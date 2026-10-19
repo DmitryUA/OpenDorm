@@ -74,21 +74,24 @@ public class OccupantConfiguration(IEncryptionService encryptionService) : IEnti
             .IsRequired()
             .HasDefaultValueSql("NOW()");
         
-        // поисковые хеши-иденксы
+        // HMAC search indexes
         builder.Property<byte[]>("last_name_search_hash")
             .HasColumnName("last_name_search_hash")
-            .HasComment("хеш для поиска по фамилии")
+            .HasComment("HMAC-индекс для поиска по фамилии")
             .IsRequired();
         
         builder.Property<byte[]>("first_name_search_hash")
             .HasColumnName("first_name_search_hash")
-            .HasComment("хеш для поиска по имени")
+            .HasComment("HMAC-индекс для поиска по имени")
             .IsRequired();
-        
+
         builder.Property<byte[]>("patronymic_search_hash")
             .HasColumnName("patronymic_search_hash")
-            .HasComment("хеш для поиска по отчеству")
-            .IsRequired(false);
+            .HasComment("HMAC-индекс для поиска по отчеству");
+
+        builder.HasIndex("last_name_search_hash");
+        builder.HasIndex("first_name_search_hash");
+        builder.HasIndex("patronymic_search_hash");
 
         // связи
         builder.HasMany<Accommodation>("_accommodations")
