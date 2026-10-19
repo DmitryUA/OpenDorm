@@ -2,7 +2,6 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using OpenDorm.Domain.Abstractions;
-using OpenDorm.Domain.Aggregates.Dormitory;
 using OpenDorm.Domain.Aggregates.Occupant;
 using OpenDorm.Domain.Enums;
 using OpenDorm.Domain.ValueObjects;
@@ -74,7 +73,24 @@ public class OccupantConfiguration(IEncryptionService encryptionService) : IEnti
             .HasColumnType("timestamp with time zone")
             .IsRequired()
             .HasDefaultValueSql("NOW()");
+        
+        // поисковые хеши-иденксы
+        builder.Property<byte[]>("last_name_search_hash")
+            .HasColumnName("last_name_search_hash")
+            .HasComment("хеш для поиска по фамилии")
+            .IsRequired();
+        
+        builder.Property<byte[]>("first_name_search_hash")
+            .HasColumnName("first_name_search_hash")
+            .HasComment("хеш для поиска по имени")
+            .IsRequired();
+        
+        builder.Property<byte[]>("patronymic_search_hash")
+            .HasColumnName("patronymic_search_hash")
+            .HasComment("хеш для поиска по отчеству")
+            .IsRequired(false);
 
+        // связи
         builder.HasMany<Accommodation>("_accommodations")
             .WithOne()
             .HasForeignKey("OccupantId")
