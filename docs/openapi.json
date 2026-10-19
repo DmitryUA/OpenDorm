@@ -1418,7 +1418,7 @@
           "Occupants"
         ],
         "summary": "Получить краткую информацию о жильцах.",
-        "description": "Возвращает краткую информацию о жильцах.\nПоддерживает пагинацию.\nПоддерживает фильтры по: гендеру и статусу.",
+        "description": "Возвращает краткую информацию о жильцах.\nПоддерживает пагинацию.\nПоддерживает точные фильтры по ФИО, гендеру и статусу.",
         "parameters": [
           {
             "name": "status",
@@ -1462,6 +1462,30 @@
               ],
               "format": "int32",
               "default": 20
+            }
+          },
+          {
+            "name": "lastName",
+            "in": "query",
+            "description": "Фильтр по фамилии.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "firstName",
+            "in": "query",
+            "description": "Фильтр по имени.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "patronymic",
+            "in": "query",
+            "description": "Фильтр по отчеству.",
+            "schema": {
+              "type": "string"
             }
           }
         ],

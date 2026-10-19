@@ -28,6 +28,8 @@
 
 **Backend:** серверная часть на .NET 10 и PostgreSQL находится в каталоге `server/`.
 
+Для API задайте `SearchIndex__HmacKey` как Base64-кодированный случайный ключ не короче 32 байт. Он должен быть отдельным от `Encryption__Key` и храниться вне базы данных (например, в secret store переменных окружения). Смена ключа делает сохранённые индексы недействительными: перед запуском с новым ключом очистите значения `last_name_search_hash`, `first_name_search_hash` и `patronymic_search_hash`; при старте API заполнит их повторно.
+
 ## 📚 Документация API
 
 🌐 **[Открыть интерактивную документацию API (Scalar)](https://DmitryUA.github.io/OpenDorm/)**

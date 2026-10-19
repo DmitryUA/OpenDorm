@@ -13,7 +13,7 @@ using OpenDorm.Infrastructure;
 namespace OpenDorm.Infrastructure.Migrations
 {
     [DbContext(typeof(OpenDormDbContext))]
-    [Migration("20261015022212_InitialCreate")]
+    [Migration("20261019154721_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -210,7 +210,30 @@ namespace OpenDorm.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("NOW()");
 
+                    b.Property<byte[]>("first_name_search_hash")
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("first_name_search_hash")
+                        .HasComment("HMAC-индекс для поиска по имени");
+
+                    b.Property<byte[]>("last_name_search_hash")
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("last_name_search_hash")
+                        .HasComment("HMAC-индекс для поиска по фамилии");
+
+                    b.Property<byte[]>("patronymic_search_hash")
+                        .HasColumnType("bytea")
+                        .HasColumnName("patronymic_search_hash")
+                        .HasComment("HMAC-индекс для поиска по отчеству");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("first_name_search_hash");
+
+                    b.HasIndex("last_name_search_hash");
+
+                    b.HasIndex("patronymic_search_hash");
 
                     b.ToTable("occupants", null, t =>
                         {

@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\OpenDorm.Domain\OpenDorm.Domain.csproj" />
+      <ProjectReference Include="..\..\src\OpenDorm.Infrastructure\OpenDorm.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

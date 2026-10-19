@@ -1,20 +1,38 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using OpenDorm.Application.Abstractions.Persistence;
+using OpenDorm.Application.Abstractions.Search;
 using OpenDorm.Application.Common;
 using OpenDorm.Application.Features.Occupants.Queries.Common;
 
 namespace OpenDorm.Application.Features.Occupants.Queries.GetOccupantList;
 
-public class GetOccupantListQueryHandler(IApplicationDbContext dbContext)
+public class GetOccupantListQueryHandler(
+    IApplicationDbContext dbContext,
+    IOccupantSearchIndex searchIndex)
     : IRequestHandler<GetOccupantListQuery, PagedResult<OccupantListDto>>
 {
     public async Task<PagedResult<OccupantListDto>> Handle(GetOccupantListQuery request, CancellationToken cancellationToken)
     {
-        var query = from occupant in dbContext.Occupants.AsNoTracking()
-            where !request.Gender.HasValue || occupant.Gender == request.Gender
-            where !request.IsActive.HasValue || occupant.IsActive == request.IsActive
-            select occupant;
+        var lastNameHash = searchIndex.ComputeHash(request.LastName);
+        var firstNameHash = searchIndex.ComputeHash(request.FirstName);
+        var patronymicHash = searchIndex.ComputeHash(request.Patronymic);
+
+        var query = dbContext.Occupants.AsNoTracking()
+            .Where(occupant => !request.Gender.HasValue || occupant.Gender == request.Gender)
+            .Where(occupant => !request.IsActive.HasValue || occupant.IsActive == request.IsActive);
+
+        if (lastNameHash is not null)
+            query = query.Where(occupant =>
+                EF.Property<byte[]?>(occupant, "last_name_search_hash") == lastNameHash);
+
+        if (firstNameHash is not null)
+            query = query.Where(occupant =>
+                EF.Property<byte[]?>(occupant, "first_name_search_hash") == firstNameHash);
+
+        if (patronymicHash is not null)
+            query = query.Where(occupant =>
+                EF.Property<byte[]?>(occupant, "patronymic_search_hash") == patronymicHash);
 
         var totalCount = await query.CountAsync(cancellationToken);
 

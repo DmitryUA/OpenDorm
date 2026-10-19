@@ -26,6 +26,7 @@ public class GetRoomOccupantsQueryHandlerIntegrationTests : IAsyncLifetime
 
         var options = new DbContextOptionsBuilder<OpenDormDbContext>()
             .UseNpgsql(connectionString)
+            .UseOccupantSearchIndexForTests()
             .Options;
         
         var encryptionService = new AesGcmEncryptionService(new byte[32]);

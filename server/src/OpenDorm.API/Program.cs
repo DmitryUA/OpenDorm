@@ -1,4 +1,5 @@
 using System.Text;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text.Json.Serialization;
 using FluentValidation;
@@ -9,6 +10,7 @@ using OpenDorm.API.Extensions;
 using OpenDorm.API.Handlers;
 using OpenDorm.Application.Abstractions;
 using OpenDorm.Application.Abstractions.Persistence;
+using OpenDorm.Application.Abstractions.Search;
 using OpenDorm.Application.Common;
 using OpenDorm.Domain.Abstractions;
 using OpenDorm.Infrastructure;
@@ -19,16 +21,31 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Регистрация DbContext
-builder.Services.AddDbContext<OpenDormDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("OpenDormConnectionString")));
-
 // Add services to the container.
 
 // Encryption
 var keyBase64 = builder.Configuration["Encryption:Key"]!;
 var keyBytes = Convert.FromBase64String(keyBase64);
 builder.Services.AddSingleton<IEncryptionService>(new AesGcmEncryptionService(keyBytes));
+
+// Search indexes use a separate secret from field encryption.
+var searchIndexKeyBase64 = builder.Configuration["SearchIndex:HmacKey"]
+                           ?? throw new InvalidOperationException("Search-index HMAC key is not configured.");
+var searchIndexKeyBytes = Convert.FromBase64String(searchIndexKeyBase64);
+if (searchIndexKeyBytes.Length < 32)
+    throw new InvalidOperationException("Search-index HMAC key must be at least 32 bytes.");
+if (CryptographicOperations.FixedTimeEquals(keyBytes, searchIndexKeyBytes))
+    throw new InvalidOperationException("Search-index HMAC key must be different from the encryption key.");
+
+var occupantSearchIndex = new HmacOccupantSearchIndex(searchIndexKeyBytes);
+CryptographicOperations.ZeroMemory(searchIndexKeyBytes);
+builder.Services.AddSingleton<IOccupantSearchIndex>(occupantSearchIndex);
+builder.Services.AddSingleton<OccupantSearchIndexInterceptor>();
+builder.Services.AddScoped<OccupantSearchIndexInitializer>();
+builder.Services.AddDbContext<OpenDormDbContext>((serviceProvider, options) =>
+    options
+        .UseNpgsql(builder.Configuration.GetConnectionString("OpenDormConnectionString"))
+        .AddInterceptors(serviceProvider.GetRequiredService<OccupantSearchIndexInterceptor>()));
 
 // JWT
 builder.Services.Configure<JwtSettings>(
@@ -156,6 +173,13 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseCors("AllowFrontend");
+
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    await scope.ServiceProvider
+        .GetRequiredService<OccupantSearchIndexInitializer>()
+        .InitializeAsync();
+}
 
 await app.SeedDataAsync();
 

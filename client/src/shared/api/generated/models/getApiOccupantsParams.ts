@@ -25,4 +25,16 @@ page?: number | string;
  * @pattern ^-?(?:0|[1-9]\d*)$
  */
 pageSize?: number | string;
+/**
+ * Фильтр по фамилии.
+ */
+lastName?: string;
+/**
+ * Фильтр по имени.
+ */
+firstName?: string;
+/**
+ * Фильтр по отчеству.
+ */
+patronymic?: string;
 };

@@ -10,7 +10,34 @@
       </el-button>
     </header>
 
-    <el-form class="filters" inline @submit.prevent="loadOccupants(1)">
+    <el-form class="filters" inline @submit.prevent="applyFilters">
+      <el-form-item label="Фамилия">
+        <el-input
+          v-model="filters.lastName"
+          clearable
+          placeholder="Точное совпадение"
+          @clear="applyFilters"
+        />
+      </el-form-item>
+
+      <el-form-item label="Имя">
+        <el-input
+          v-model="filters.firstName"
+          clearable
+          placeholder="Точное совпадение"
+          @clear="applyFilters"
+        />
+      </el-form-item>
+
+      <el-form-item label="Отчество">
+        <el-input
+          v-model="filters.patronymic"
+          clearable
+          placeholder="Точное совпадение"
+          @clear="applyFilters"
+        />
+      </el-form-item>
+
       <el-form-item label="Статус">
         <el-select v-model="filters.status" clearable @change="loadOccupants(1)">
           <el-option label="Все" value="all" />
@@ -26,6 +53,8 @@
           <el-option label="Женский" :value="1" />
         </el-select>
       </el-form-item>
+
+      <el-button type="primary" :loading="loading" @click="applyFilters">Применить</el-button>
     </el-form>
 
     <RetryErrorAlert v-if="error" :message="error" @retry="loadOccupants(page)" />
@@ -144,6 +173,9 @@ const isCreateDialogVisible = ref(false)
 const isSubmitting = ref(false)
 
 const filters = reactive({
+  lastName: '',
+  firstName: '',
+  patronymic: '',
   status: 'all',
   gender: 'all',
 })
@@ -182,6 +214,13 @@ const loadOccupants = async (targetPage = page.value) => {
       params.gender = Number(filters.gender)
     }
 
+    const lastName = filters.lastName.trim()
+    const firstName = filters.firstName.trim()
+    const patronymic = filters.patronymic.trim()
+    if (lastName) params.lastName = lastName
+    if (firstName) params.firstName = firstName
+    if (patronymic) params.patronymic = patronymic
+
     const response = await getApiOccupants(params)
     occupants.value = response.items ?? []
     totalCount.value = Number(response.totalCount ?? 0)
@@ -200,6 +239,11 @@ const openCreateDialog = () => {
 
 const openOccupant = (id: string) => {
   router.push({ name: 'OccupantDetails', params: { id } })
+}
+
+const applyFilters = () => {
+  page.value = 1
+  void loadOccupants(1)
 }
 
 const resetForm = () => {
@@ -300,6 +344,10 @@ onMounted(() => {
   width: 160px;
 }
 
+.filters :deep(.el-input) {
+  width: 180px;
+}
+
 .occupants-content {
   min-height: 180px;
 }
@@ -327,7 +375,8 @@ onMounted(() => {
   }
 
   .filters :deep(.el-form-item),
-  .filters :deep(.el-select) {
+  .filters :deep(.el-select),
+  .filters :deep(.el-input) {
     width: 100%;
   }
 }
