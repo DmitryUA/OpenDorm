@@ -53,6 +53,7 @@ CREATE TABLE public.occupants (
 	patronymic_encrypted bytea NULL, -- зашифрованное отчество
 	gender bpchar(1) NOT NULL, -- гендер (m - мужчина, f - женщина)
 	birth_date_encrypted bytea NOT NULL, -- зашифрованная дата рождения
+	phone_encrypted bytea NOT NULL, -- зашифрованный номер телефона
 	is_active bool NOT NULL, -- активен ли проживающий, true - да, false - нет
 	created_at timestamptz DEFAULT now() NOT NULL,
 	first_name_search_hash bytea NOT NULL, -- HMAC-индекс для поиска по имени
@@ -73,6 +74,7 @@ COMMENT ON COLUMN public.occupants.first_name_encrypted IS 'зашифрован
 COMMENT ON COLUMN public.occupants.patronymic_encrypted IS 'зашифрованное отчество';
 COMMENT ON COLUMN public.occupants.gender IS 'гендер (m - мужчина, f - женщина)';
 COMMENT ON COLUMN public.occupants.birth_date_encrypted IS 'зашифрованная дата рождения';
+COMMENT ON COLUMN public.occupants.phone_encrypted IS 'зашифрованный номер телефона';
 COMMENT ON COLUMN public.occupants.is_active IS 'активен ли проживающий, true - да, false - нет';
 COMMENT ON COLUMN public.occupants.first_name_search_hash IS 'HMAC-индекс для поиска по имени';
 COMMENT ON COLUMN public.occupants.last_name_search_hash IS 'HMAC-индекс для поиска по фамилии';
