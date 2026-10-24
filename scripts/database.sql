@@ -1,6 +1,6 @@
 -- =================================================================================================
 -- BASELINE SCHEMA SNAPSHOT
--- Generated: 2026-10-15
+-- Generated: 2026-10-24
 -- WARNING: This is a point-in-time snapshot. This snapshot does not contain the EFMigrations table.
 -- If you need to apply future changes, please use EF Core migrations 
 -- or ask the team to generate an updated snapshot.
@@ -55,8 +55,14 @@ CREATE TABLE public.occupants (
 	birth_date_encrypted bytea NOT NULL, -- зашифрованная дата рождения
 	is_active bool NOT NULL, -- активен ли проживающий, true - да, false - нет
 	created_at timestamptz DEFAULT now() NOT NULL,
+	first_name_search_hash bytea NOT NULL, -- HMAC-индекс для поиска по имени
+	last_name_search_hash bytea NOT NULL, -- HMAC-индекс для поиска по фамилии
+	patronymic_search_hash bytea NULL, -- HMAC-индекс для поиска по отчеству
 	CONSTRAINT "PK_occupants" PRIMARY KEY (id)
 );
+CREATE INDEX "IX_occupants_first_name_search_hash" ON public.occupants USING btree (first_name_search_hash);
+CREATE INDEX "IX_occupants_last_name_search_hash" ON public.occupants USING btree (last_name_search_hash);
+CREATE INDEX "IX_occupants_patronymic_search_hash" ON public.occupants USING btree (patronymic_search_hash);
 COMMENT ON TABLE public.occupants IS 'жильцы';
 
 -- Column comments
@@ -68,6 +74,9 @@ COMMENT ON COLUMN public.occupants.patronymic_encrypted IS 'зашифрован
 COMMENT ON COLUMN public.occupants.gender IS 'гендер (m - мужчина, f - женщина)';
 COMMENT ON COLUMN public.occupants.birth_date_encrypted IS 'зашифрованная дата рождения';
 COMMENT ON COLUMN public.occupants.is_active IS 'активен ли проживающий, true - да, false - нет';
+COMMENT ON COLUMN public.occupants.first_name_search_hash IS 'HMAC-индекс для поиска по имени';
+COMMENT ON COLUMN public.occupants.last_name_search_hash IS 'HMAC-индекс для поиска по фамилии';
+COMMENT ON COLUMN public.occupants.patronymic_search_hash IS 'HMAC-индекс для поиска по отчеству';
 
 
 -- public.roles определение
