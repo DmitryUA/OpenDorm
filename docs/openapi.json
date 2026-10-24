@@ -3832,7 +3832,8 @@
           "firstName",
           "patronymic",
           "gender",
-          "birthDate"
+          "birthDate",
+          "phone"
         ],
         "type": "object",
         "properties": {
@@ -3854,6 +3855,9 @@
           "birthDate": {
             "type": "string",
             "format": "date"
+          },
+          "phone": {
+            "type": "string"
           }
         }
       },
@@ -4075,7 +4079,8 @@
           "gender",
           "birthDate",
           "isActive",
-          "currentAccommodation"
+          "currentAccommodation",
+          "phone"
         ],
         "type": "object",
         "properties": {
@@ -4114,6 +4119,9 @@
                 "$ref": "#/components/schemas/AccommodationAddressDto"
               }
             ]
+          },
+          "phone": {
+            "type": "string"
           }
         }
       },
@@ -4529,6 +4537,12 @@
             "type": "string"
           },
           "patronymic": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
             "type": [
               "null",
               "string"
