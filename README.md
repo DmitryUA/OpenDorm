@@ -30,6 +30,16 @@
 
 Для API задайте `SearchIndex__HmacKey` как Base64-кодированный случайный ключ не короче 32 байт. Он должен быть отдельным от `Encryption__Key` и храниться вне базы данных (например, в secret store переменных окружения). Смена ключа делает сохранённые индексы недействительными: перед запуском с новым ключом очистите значения `last_name_search_hash`, `first_name_search_hash` и `patronymic_search_hash`; при старте API заполнит их повторно.
 
+Для запуска API также задайте следующие секреты в хранилище секретов .NET User Secrets проекта `OpenDorm.API`:
+
+```bash
+dotnet user-secrets set "Jwt:SigningKey" "<случайный секрет не короче 32 байт>" --project server/src/OpenDorm.API
+dotnet user-secrets set "Encryption:Key" "<Base64-кодированный случайный ключ из 32 байт>" --project server/src/OpenDorm.API
+dotnet user-secrets set "ConnectionStrings:OpenDormConnectionString" "<строка подключения к PostgreSQL>" --project server/src/OpenDorm.API
+```
+
+`Encryption:Key` должен декодироваться из Base64 ровно в 32 байта для AES-256; не меняйте его после появления зашифрованных данных, иначе их нельзя будет расшифровать. Вместе с указанными выше настройками для индекса поиска (`SearchIndex:HmacKey`) эти значения необходимы API при запуске.
+
 ## 📚 Документация API
 
 🌐 **[Открыть интерактивную документацию API (Scalar)](https://DmitryUA.github.io/OpenDorm/)**
