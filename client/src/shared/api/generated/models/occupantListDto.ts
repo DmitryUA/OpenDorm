@@ -17,4 +17,5 @@ export interface OccupantListDto {
   birthDate: string;
   isActive: boolean;
   currentAccommodation: null | AccommodationAddressDto;
+  phone: string;
 }

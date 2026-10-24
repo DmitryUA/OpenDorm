@@ -20,6 +20,17 @@ const routes: RouteRecordRaw[] = [
       },
     ],
   },
+  {
+    path: '/server-unavailable',
+    component: () => import('@/layouts/AuthLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'ServerUnavailable',
+        component: () => import('@/pages/errors/ServerUnavailablePage.vue'),
+      },
+    ],
+  },
 
   // 2. Основные маршруты приложения (с сайдбаром и шапкой)
   {

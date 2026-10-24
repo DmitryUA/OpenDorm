@@ -10,4 +10,6 @@ export interface UpdateOccupantRequest {
   firstName: string;
   /** @nullable */
   patronymic: string | null;
+  /** @nullable */
+  phone?: string | null;
 }

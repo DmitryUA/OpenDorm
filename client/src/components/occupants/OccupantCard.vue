@@ -22,6 +22,8 @@
         <span>{{ formattedBirthDate }}</span>
       </div>
 
+      <p class="phone-text">{{ occupant.phone || 'Телефон не указан' }}</p>
+
       <p class="accommodation-text">
         <template v-if="occupant.currentAccommodation">
           {{ occupant.currentAccommodation.dormitoryAddress }} ·
@@ -162,5 +164,11 @@ const formattedBirthDate = computed(() => {
   margin: auto 0 0;
   color: var(--color-text-secondary);
   line-height: 1.5;
+}
+
+.phone-text {
+  margin: 0;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
 }
 </style>

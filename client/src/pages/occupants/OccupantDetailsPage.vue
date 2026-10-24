@@ -34,7 +34,7 @@
               Редактировать
             </el-button>
             <el-button
-              v-if="can('accommodations.checkin')"
+              v-if="occupant.isActive && can('accommodations.checkin')"
               type="primary"
               :disabled="isCurrentlyAccommodated"
               @click="openCheckInDialog"
@@ -52,7 +52,7 @@
               Выселение
             </el-button>
             <el-button
-              v-if="can('accommodations.transfer')"
+              v-if="occupant.isActive && can('accommodations.transfer')"
               type="info"
               plain
               :disabled="!isCurrentlyAccommodated"
@@ -93,6 +93,10 @@
           <div>
             <dt>Дата рождения</dt>
             <dd>{{ formatDate(occupant.birthDate) }}</dd>
+          </div>
+          <div>
+            <dt>Телефон</dt>
+            <dd>{{ occupant.phone || 'Не указан' }}</dd>
           </div>
           <div>
             <dt>Текущее проживание</dt>
@@ -240,6 +244,14 @@
         <el-form-item label="Отчество" prop="patronymic">
           <el-input v-model="editForm.patronymic" maxlength="100" />
         </el-form-item>
+        <el-form-item label="Телефон" prop="phone">
+          <el-input
+            v-model="editForm.phone"
+            type="tel"
+            autocomplete="tel"
+            placeholder="Необязательно"
+          />
+        </el-form-item>
       </el-form>
 
       <template #footer>
@@ -276,7 +288,7 @@ interface RoomSelectOption extends RoomListDto {
   dormitoryAddress: string
 }
 
-type OccupantEditForm = UpdateOccupantRequest
+type OccupantEditForm = Omit<UpdateOccupantRequest, 'phone'> & { phone: string }
 
 const route = useRoute()
 const router = useRouter()
@@ -308,6 +320,7 @@ const editForm = reactive<OccupantEditForm>({
   lastName: '',
   firstName: '',
   patronymic: '',
+  phone: '',
 })
 const editRules: FormRules<OccupantEditForm> = {
   lastName: [{ required: true, message: 'Укажите фамилию', trigger: 'blur' }],
@@ -415,6 +428,7 @@ const openEditDialog = () => {
   editForm.lastName = occupant.value.lastName
   editForm.firstName = occupant.value.firstName
   editForm.patronymic = occupant.value.patronymic ?? ''
+  editForm.phone = occupant.value.phone ?? ''
   isEditDialogVisible.value = true
 }
 
@@ -436,6 +450,7 @@ const handleOccupantUpdate = async () => {
       lastName: editForm.lastName,
       firstName: editForm.firstName,
       patronymic: (editForm.patronymic ?? '').trim() || null,
+      phone: editForm.phone.trim() || null,
     })
     ElMessage.success('Данные жильца обновлены')
     isEditDialogVisible.value = false
@@ -463,18 +478,26 @@ const handleOccupantUpdate = async () => {
 }
 
 const openCheckInDialog = () => {
+  if (!occupant.value?.isActive) return
+
   selectedRoomId.value = ''
   isCheckInDialogVisible.value = true
 }
 
 const openTransferDialog = () => {
+  if (!occupant.value?.isActive) return
+
   targetRoomId.value = ''
   isTransferDialogVisible.value = true
 }
 
 const handleCheckIn = async () => {
   const id = occupantId.value
-  if (!id || !selectedRoomId.value) {
+  if (!id || !occupant.value?.isActive) {
+    isCheckInDialogVisible.value = false
+    return
+  }
+  if (!selectedRoomId.value) {
     ElMessage.warning('Выберите комнату для заселения')
     return
   }
@@ -520,7 +543,11 @@ const handleCheckOut = async () => {
 
 const handleTransfer = async () => {
   const id = occupantId.value
-  if (!id || !targetRoomId.value) {
+  if (!id || !occupant.value?.isActive) {
+    isTransferDialogVisible.value = false
+    return
+  }
+  if (!targetRoomId.value) {
     ElMessage.warning('Выберите новую комнату для переселения')
     return
   }

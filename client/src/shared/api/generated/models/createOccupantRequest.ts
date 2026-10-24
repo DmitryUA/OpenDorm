@@ -13,4 +13,5 @@ export interface CreateOccupantRequest {
   patronymic: string | null;
   gender: Gender;
   birthDate: string;
+  phone: string;
 }

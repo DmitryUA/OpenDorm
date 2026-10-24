@@ -56,6 +56,7 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import axios from 'axios'
 import { User, Lock } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/entities/auth/store/authStore'
 import type { LoginRequest } from '@/shared/api/generated/models'
@@ -96,8 +97,20 @@ const handleLogin = async () => {
         } else {
           router.push('/dashboard')
         }
-      } catch (error: any) {
-        const errorMessage = error.response?.data?.title || 'Неверный логин или пароль'
+      } catch (error: unknown) {
+        const apiError = axios.isAxiosError<{ title?: string }>(error) ? error : null
+
+        if (
+          apiError &&
+          (!apiError.response ||
+            apiError.response.status === 408 ||
+            apiError.response.status >= 500)
+        ) {
+          await router.push({ name: 'ServerUnavailable' })
+          return
+        }
+
+        const errorMessage = apiError?.response?.data?.title || 'Неверный логин или пароль'
         ElMessage.error(errorMessage)
       }
     }

@@ -110,6 +110,14 @@
         <el-form-item label="Отчество" prop="patronymic">
           <el-input v-model="form.patronymic" maxlength="100" placeholder="Необязательно" />
         </el-form-item>
+        <el-form-item label="Телефон" prop="phone">
+          <el-input
+            v-model="form.phone"
+            type="tel"
+            autocomplete="tel"
+            placeholder="+7 900 000-00-00"
+          />
+        </el-form-item>
         <el-form-item label="Пол" prop="gender">
           <el-select v-model="form.gender" class="full-width">
             <el-option label="Мужской" :value="0" />
@@ -156,6 +164,7 @@ interface OccupantForm {
   patronymic: string
   gender: number
   birthDate: string
+  phone: string
 }
 
 const router = useRouter()
@@ -186,6 +195,7 @@ const form = reactive<OccupantForm>({
   patronymic: '',
   gender: 0,
   birthDate: '',
+  phone: '',
 })
 
 const rules: FormRules<OccupantForm> = {
@@ -193,6 +203,7 @@ const rules: FormRules<OccupantForm> = {
   firstName: [{ required: true, message: 'Укажите имя', trigger: 'blur' }],
   gender: [{ required: true, message: 'Выберите пол', trigger: 'change' }],
   birthDate: [{ required: true, message: 'Укажите дату рождения', trigger: 'change' }],
+  phone: [{ required: true, message: 'Укажите телефон', trigger: 'blur' }],
 }
 
 const loadOccupants = async (targetPage = page.value) => {
@@ -252,6 +263,7 @@ const resetForm = () => {
   form.patronymic = ''
   form.gender = 0
   form.birthDate = ''
+  form.phone = ''
   formRef.value?.clearValidate()
 }
 
@@ -274,6 +286,7 @@ const handleCreate = async () => {
       patronymic: form.patronymic.trim() || null,
       gender: Number(form.gender),
       birthDate: form.birthDate,
+      phone: form.phone.trim(),
     })
     ElMessage.success('Жилец добавлен')
     isCreateDialogVisible.value = false
