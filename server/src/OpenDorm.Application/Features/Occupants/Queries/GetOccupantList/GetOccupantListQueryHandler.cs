@@ -67,7 +67,8 @@ public class GetOccupantListQueryHandler(
                     occupant.Gender,
                     occupant.BirthDate.Value,
                     occupant.IsActive,
-                    currentAccommodation))
+                    currentAccommodation,
+                    occupant.Phone.Value))
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);

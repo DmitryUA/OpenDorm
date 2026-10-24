@@ -13,10 +13,10 @@ public class UpdateOccupantCommandHandler(
 {
     public async Task Handle(UpdateOccupantCommand command, CancellationToken cancellationToken)
     {
-        var newLastName = new LastName(command.NewLastName);
-        var newFirstName = new FirstName(command.NewFirstName);
-        var newPatronymic = command.NewPatronymic != null
-            ? new Patronymic(command.NewPatronymic)
+        var newLastName = new LastName(command.LastName);
+        var newFirstName = new FirstName(command.FirstName);
+        var newPatronymic = command.Patronymic != null
+            ? new Patronymic(command.Patronymic)
             : null;
         
         var occupant = await repository.GetByIdAsync(command.OccupantId, cancellationToken) ??
@@ -25,6 +25,12 @@ public class UpdateOccupantCommandHandler(
         occupant.ChangeLastName(newLastName);
         occupant.ChangeFirstName(newFirstName);
         occupant.ChangePatronymic(newPatronymic);
+
+        if (command.Phone != null)
+        {
+            var newPhone = new PhoneNumber(command.Phone);
+            occupant.ChangePhone(newPhone);
+        }
 
         await uow.SaveChangesAsync(cancellationToken);
     }

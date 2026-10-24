@@ -16,8 +16,9 @@ public class CreateOccupantCommandHandler(
         var firstName = new FirstName(command.FirstName);
         var patronymic = command.Patronymic == null ? null : new Patronymic(command.Patronymic);
         var birthDate = new BirthDate(command.BirthDate);
+        var phone = new PhoneNumber(command.Phone);
 
-        var occupant = new Occupant(Guid.NewGuid(), lastName, firstName, patronymic, command.Gender, birthDate);
+        var occupant = new Occupant(Guid.NewGuid(), lastName, firstName, patronymic, command.Gender, birthDate, phone);
 
         await repository.AddAsync(occupant);
         await unitOfWork.SaveChangesAsync(cancellationToken);

@@ -7,4 +7,5 @@ public record CreateOccupantRequest(
     string FirstName,
     string? Patronymic,
     Gender Gender,
-    DateOnly BirthDate);
+    DateOnly BirthDate,
+    string Phone);

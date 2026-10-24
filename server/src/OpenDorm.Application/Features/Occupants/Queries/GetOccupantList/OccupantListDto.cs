@@ -11,4 +11,5 @@ public record OccupantListDto(
     Gender Gender,
     DateOnly BirthDate,
     bool IsActive,
-    AccommodationAddressDto? CurrentAccommodation);
+    AccommodationAddressDto? CurrentAccommodation,
+    string Phone);

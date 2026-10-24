@@ -25,9 +25,9 @@ public class UpdateOccupantCommandHandlerUnitTests
         var nonExistingOccupantId = Guid.NewGuid();
         var command = new UpdateOccupantCommand(
             nonExistingOccupantId,
-            NewLastName: "Петров",
-            NewFirstName: "Пётр",
-            NewPatronymic: null);
+            LastName: "Петров",
+            FirstName: "Пётр",
+            Patronymic: null);
 
         _mockRepository
             .GetByIdAsync(nonExistingOccupantId, Arg.Any<CancellationToken>())

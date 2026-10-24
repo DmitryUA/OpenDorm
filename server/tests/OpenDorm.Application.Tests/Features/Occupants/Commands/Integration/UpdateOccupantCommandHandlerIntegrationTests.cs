@@ -53,9 +53,9 @@ public class UpdateOccupantCommandHandlerIntegrationTests : IAsyncLifetime
         // Arrange
         var command = new UpdateOccupantCommand(
             Guid.NewGuid(),
-            NewLastName: "Петров",
-            NewFirstName: "Пётр",
-            NewPatronymic: null);
+            LastName: "Петров",
+            FirstName: "Пётр",
+            Patronymic: null);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<NotFoundException>(
@@ -77,9 +77,10 @@ public class UpdateOccupantCommandHandlerIntegrationTests : IAsyncLifetime
 
         var command = new UpdateOccupantCommand(
             occupant.Id,
-            NewLastName: "Петров",
-            NewFirstName: "Пётр",
-            NewPatronymic: "Петрович");
+            LastName: "Петров",
+            FirstName: "Пётр",
+            Patronymic: "Петрович",
+            Phone: "8 (999) 123-45-67");
 
         // Act
         await _handler.Handle(command, CancellationToken.None);
@@ -91,6 +92,7 @@ public class UpdateOccupantCommandHandlerIntegrationTests : IAsyncLifetime
         Assert.Equal("Петров", loaded.LastName.Value);
         Assert.Equal("Пётр", loaded.FirstName.Value);
         Assert.Equal("Петрович", loaded.Patronymic!.Value);
+        Assert.Equal("+79991234567", loaded.Phone.Value);
     }
 
     [Fact]
@@ -104,9 +106,9 @@ public class UpdateOccupantCommandHandlerIntegrationTests : IAsyncLifetime
 
         var command = new UpdateOccupantCommand(
             occupant.Id,
-            NewLastName: "Петров",
-            NewFirstName: "Пётр",
-            NewPatronymic: null);
+            LastName: "Петров",
+            FirstName: "Пётр",
+            Patronymic: null);
 
         // Act
         await _handler.Handle(command, CancellationToken.None);
@@ -118,6 +120,7 @@ public class UpdateOccupantCommandHandlerIntegrationTests : IAsyncLifetime
         Assert.Equal("Петров", loaded.LastName.Value);
         Assert.Equal("Пётр", loaded.FirstName.Value);
         Assert.Null(loaded.Patronymic);
+        Assert.Equal("+79999999999", loaded.Phone.Value);
     }
     #endregion
 }

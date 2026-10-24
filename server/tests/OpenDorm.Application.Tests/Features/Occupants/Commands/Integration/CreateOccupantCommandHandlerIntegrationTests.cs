@@ -52,10 +52,11 @@ public class CreateOccupantCommandHandlerIntegrationTests : IAsyncLifetime
         // Assert
         const string lastName = "Иванов";
         const string firstName = "Иван";
+        const string phone = "8 (999) 123-45-67";
         const Gender gender = Gender.Male;
         var birthDate = new DateOnly(2003, 01, 21);
 
-        var command = new CreateOccupantCommand(lastName, firstName, patronymic, gender, birthDate);
+        var command = new CreateOccupantCommand(lastName, firstName, patronymic, gender, birthDate, phone);
         
         // Act
         var occupantId = await _handler.Handle(command, CancellationToken.None);
@@ -73,6 +74,7 @@ public class CreateOccupantCommandHandlerIntegrationTests : IAsyncLifetime
         
         Assert.Equal(gender, occupant.Gender);
         Assert.Equal(birthDate, occupant.BirthDate.Value);
+        Assert.Equal("+79991234567", occupant.Phone.Value);
         Assert.True(occupant.IsActive);
     }
 

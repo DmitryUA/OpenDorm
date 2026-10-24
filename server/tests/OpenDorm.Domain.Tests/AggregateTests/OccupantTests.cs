@@ -21,10 +21,11 @@ public class OccupantTests
         var patronymic = new Patronymic("Иванович");
         var fullName = $"{lastName} {firstName} {patronymic}";
         var birthDate = new BirthDate(new DateOnly(2003, 01, 01));
+        var phone = new PhoneNumber("+7 (999) 123-45-67");
         const Gender gender = Gender.Male;
 
         // Act
-        var occupant = new Occupant(id, lastName, firstName, patronymic, gender, birthDate);
+        var occupant = new Occupant(id, lastName, firstName, patronymic, gender, birthDate, phone);
         
         // Assert
         Assert.Equal(id, occupant.Id);
@@ -34,6 +35,7 @@ public class OccupantTests
         Assert.Equal(fullName, occupant.FullName);
         Assert.Equal(gender, occupant.Gender);
         Assert.Equal(birthDate, occupant.BirthDate);
+        Assert.Equal(phone, occupant.Phone);
         Assert.True(occupant.IsActive);
     }
 
@@ -45,10 +47,11 @@ public class OccupantTests
         var lastName = new LastName("Иванов");
         var firstName = new FirstName("Иван");
         var birthDate = new BirthDate(new DateOnly(2003, 01, 01));
+        var phone = new PhoneNumber("+7 (999) 123-45-67");
         const Gender gender = Gender.Male;
 
         // Act
-        var occupant = new Occupant(id, lastName, firstName, null, gender, birthDate);
+        var occupant = new Occupant(id, lastName, firstName, null, gender, birthDate, phone);
         
         // Assert
         Assert.Equal(id, occupant.Id);
@@ -57,6 +60,7 @@ public class OccupantTests
         Assert.Null(occupant.Patronymic);
         Assert.Equal(gender, occupant.Gender);
         Assert.Equal(birthDate, occupant.BirthDate);
+        Assert.Equal(phone, occupant.Phone);
     }
 
     [Fact]
@@ -73,7 +77,7 @@ public class OccupantTests
         // Act & Assert
         var exception =
             Assert.Throws<InvalidOccupantException>(() =>
-                new Occupant(id, null!, firstName, patronymic, gender, birthDate));
+                new Occupant(id, null!, firstName, patronymic, gender, birthDate, new PhoneNumber("+79991234567")));
         
         Assert.Equal(expectedMessage, exception.Message);
     }
@@ -92,7 +96,7 @@ public class OccupantTests
         // Act & Assert
         var exception =
             Assert.Throws<InvalidOccupantException>(() =>
-                new Occupant(id, lastName, null!, patronymic, gender, birthDate));
+                new Occupant(id, lastName, null!, patronymic, gender, birthDate, new PhoneNumber("+79991234567")));
         
         Assert.Equal(expectedMessage, exception.Message);
     }
@@ -111,7 +115,7 @@ public class OccupantTests
         // Act & Assert
         var exception =
             Assert.Throws<InvalidOccupantException>(() =>
-                new Occupant(id, lastName, firstName, patronymic, gender, null!));
+                new Occupant(id, lastName, firstName, patronymic, gender, null!, new PhoneNumber("+79991234567")));
         
         Assert.Equal(expectedMessage, exception.Message);
     }
@@ -377,6 +381,47 @@ public class OccupantTests
         
         // Assert
         Assert.Equal(newPatronymic, occupant.Patronymic);
+    }
+
+    #endregion
+
+    #region Phone Tests
+
+    [Fact]
+    public void Constructor_NullPhone_ThrowsInvalidOccupantException()
+    {
+        var exception = Assert.Throws<InvalidOccupantException>(() =>
+            new Occupant(
+                Guid.NewGuid(),
+                new LastName("Иванов"),
+                new FirstName("Иван"),
+                null,
+                Gender.Male,
+                new BirthDate(new DateOnly(2003, 1, 1)),
+                null!));
+
+        Assert.Equal("Occupant phone cannot be null.", exception.Message);
+    }
+
+    [Fact]
+    public void ChangePhone_ValidPhone_SavesValue()
+    {
+        var occupant = OccupantFactory.Create();
+        var phone = new PhoneNumber("8 (999) 123-45-67");
+
+        occupant.ChangePhone(phone);
+
+        Assert.Equal("+79991234567", occupant.Phone.Value);
+    }
+
+    [Fact]
+    public void ChangePhone_Null_ThrowsInvalidOccupantException()
+    {
+        var occupant = OccupantFactory.Create();
+
+        var exception = Assert.Throws<InvalidOccupantException>(() => occupant.ChangePhone(null!));
+
+        Assert.Equal("Occupant phone cannot be null.", exception.Message);
     }
 
     #endregion

@@ -128,14 +128,16 @@ public class GetDormitoryDetailsQueryHandlerTests : IAsyncLifetime
             new FirstName("Иван"),
             new Patronymic("Иванович"),
             Gender.Male,
-            new BirthDate(new DateOnly(2003, 01, 21)));
+            new BirthDate(new DateOnly(2003, 01, 21)),
+            new PhoneNumber("+7 (999) 123-45-67"));
         
         var secondOccupant = new Occupant(Guid.NewGuid(),
             new LastName("Иванова"),
             new FirstName("Мария"),
             new Patronymic("Александровна"),
             Gender.Female,
-            new BirthDate(new DateOnly(2003, 10, 12)));
+            new BirthDate(new DateOnly(2003, 10, 12)),
+            new PhoneNumber("+7 (999) 765-43-21"));
 
         // TODO:
         // Заменить прямой вызов CheckIn на использование команды на заселение

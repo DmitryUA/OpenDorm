@@ -8,4 +8,5 @@ public record CreateOccupantCommand(
     string FirstName,
     string? Patronymic,
     Gender Gender,
-    DateOnly BirthDate) : IRequest<Guid>;
+    DateOnly BirthDate,
+    string Phone) : IRequest<Guid>;

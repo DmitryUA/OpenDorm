@@ -14,6 +14,7 @@ public class Occupant : AggregateRoot
     public string FullName => Patronymic == null ? $"{LastName} {FirstName}" : $"{LastName} {FirstName} {Patronymic}";
     public Gender Gender { get; }
     public BirthDate BirthDate { get; } = null!;
+    public PhoneNumber Phone { get; private set; } = null!;
     public bool IsActive { get; private set; } = true;
 
     private readonly List<Accommodation> _accommodations = [];
@@ -23,13 +24,14 @@ public class Occupant : AggregateRoot
     
     // ReSharper disable once UnusedMember.Local
     private Occupant() {} // For EF Core only
-    public Occupant(Guid id, LastName lastName, FirstName firstName, Patronymic? patronymic, Gender gender, BirthDate birthDate) : base(id)
+    public Occupant(Guid id, LastName lastName, FirstName firstName, Patronymic? patronymic, Gender gender, BirthDate birthDate, PhoneNumber phone) : base(id)
     {
         LastName = lastName ?? throw new InvalidOccupantException("Occupant last name cannot be null.");
         FirstName = firstName ?? throw new InvalidOccupantException("Occupant first name cannot be null.");
         Patronymic = patronymic;
         Gender = gender;
         BirthDate = birthDate ?? throw new InvalidOccupantException("Occupant birth date cannot be null.");
+        Phone = phone ?? throw new InvalidOccupantException("Occupant phone cannot be null.");
     }
 
     public Guid CheckIn(Guid roomId)
@@ -101,4 +103,7 @@ public class Occupant : AggregateRoot
 
     public void ChangePatronymic(Patronymic? patronymic) =>
         Patronymic = patronymic;
+    
+    public void ChangePhone(PhoneNumber phone) =>
+        Phone = phone ?? throw new InvalidOccupantException("Occupant phone cannot be null.");
 }

@@ -8,7 +8,7 @@ public class CreateOccupantCommandValidator : AbstractValidator<CreateOccupantCo
     public CreateOccupantCommandValidator()
     {
         RuleFor(x => x.LastName)
-            .NotEmpty().WithMessage("Фамилия обязательно.")
+            .NotEmpty().WithMessage("Фамилия обязательна.")
             .MinimumLength(LastName.MinLength)
             .WithMessage($"Фамилия должна быть не короче '{LastName.MinLength}' символов.")
             .MaximumLength(LastName.MaxLength)
@@ -42,5 +42,8 @@ public class CreateOccupantCommandValidator : AbstractValidator<CreateOccupantCo
             .NotEmpty().WithMessage("Дата рождения обязательна.")
             .Must(birthDate => BirthDate.CalculateAgeByBirthDate(birthDate) <= BirthDate.MaxAgeYears)
             .WithMessage($"Возраст не может превышать '{BirthDate.MaxAgeYears}' лет.");
+
+        RuleFor(x => x.Phone)
+            .NotEmpty().WithMessage("Телефон обязателен.");
     }
 }

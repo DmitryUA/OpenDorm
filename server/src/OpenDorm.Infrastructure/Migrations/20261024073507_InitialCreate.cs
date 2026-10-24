@@ -42,6 +42,7 @@ namespace OpenDorm.Infrastructure.Migrations
                     patronymic_encrypted = table.Column<byte[]>(type: "bytea", nullable: true, comment: "зашифрованное отчество"),
                     gender = table.Column<char>(type: "character(1)", nullable: false, comment: "гендер (m - мужчина, f - женщина)"),
                     birth_date_encrypted = table.Column<byte[]>(type: "bytea", nullable: false, comment: "зашифрованная дата рождения"),
+                    phone_encrypted = table.Column<byte[]>(type: "bytea", nullable: false, comment: "зашифрованный номер телефона"),
                     is_active = table.Column<bool>(type: "boolean", nullable: false, comment: "активен ли проживающий, true - да, false - нет"),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
                     first_name_search_hash = table.Column<byte[]>(type: "bytea", nullable: false, comment: "HMAC-индекс для поиска по имени"),

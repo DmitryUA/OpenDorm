@@ -6,8 +6,6 @@ namespace OpenDorm.Shared.Tests.Factories;
 
 public static class OccupantFactory
 {
-    private static int _counter = 1;
-
     /// <summary>
     /// Создаёт жильца без заселений.
     /// </summary>
@@ -16,11 +14,11 @@ public static class OccupantFactory
         string? firstName = null,
         string? patronymic = null,
         Gender gender = Gender.Male,
-        DateOnly? birthDate = null)
+        DateOnly? birthDate = null,
+        string phone = "+7 (999) 999-99-99")
     {
         var last = lastName ?? "Фамилия";
         var first = firstName ?? "Имя";
-        _counter++;
 
         return new Occupant(
             Guid.NewGuid(),
@@ -28,7 +26,8 @@ public static class OccupantFactory
             new FirstName(first),
             patronymic is null ? null : new Patronymic(patronymic),
             gender,
-            new BirthDate(birthDate ?? new DateOnly(2000, 1, 1)));
+            new BirthDate(birthDate ?? new DateOnly(2000, 1, 1)),
+            new PhoneNumber(phone));
     }
 
     /// <summary>

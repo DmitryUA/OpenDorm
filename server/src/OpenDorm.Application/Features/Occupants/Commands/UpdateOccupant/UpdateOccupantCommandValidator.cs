@@ -9,7 +9,7 @@ public class UpdateOccupantCommandValidator : AbstractValidator<UpdateOccupantCo
     {
         RuleFor(x => x.OccupantId).NotEmpty();
 
-        RuleFor(x => x.NewLastName)
+        RuleFor(x => x.LastName)
             .NotEmpty().WithMessage("Фамилия обязательно.")
             .MinimumLength(LastName.MinLength)
             .WithMessage($"Фамилия должна быть не короче '{LastName.MinLength}' символов.")
@@ -18,7 +18,7 @@ public class UpdateOccupantCommandValidator : AbstractValidator<UpdateOccupantCo
             .Matches(LastName.LastNameRegex)
             .WithMessage("Фамилия должна содержать только буквы, и начинаться с заглавной буквы, остальные строчные");
 
-        RuleFor(x => x.NewFirstName)
+        RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("Имя обязательно.")
             .MinimumLength(FirstName.MinLength)
             .WithMessage($"Имя должно быть не короче '{FirstName.MinLength}' символов.")
@@ -27,7 +27,7 @@ public class UpdateOccupantCommandValidator : AbstractValidator<UpdateOccupantCo
             .Matches(FirstName.FirstNameRegex)
             .WithMessage("Имя должно содержать только буквы, и начинаться с заглавной буквы, остальные строчные.");
 
-        RuleFor(x => x.NewPatronymic)
+        RuleFor(x => x.Patronymic)
             .NotEmpty().WithMessage("Отчество не может быть пустой строкой, если оно указано.")
             .MinimumLength(Patronymic.MinLength)
             .WithMessage($"Отчество должно быть не короче '{Patronymic.MinLength}' символов.")
@@ -35,6 +35,10 @@ public class UpdateOccupantCommandValidator : AbstractValidator<UpdateOccupantCo
             .WithMessage($"Отчество должно быть не длиннее '{Patronymic.MaxLength}' символов.")
             .Matches(Patronymic.PatronymicRegex)
             .WithMessage("Отчество должно содержать только буквы и начинаться с заглавной буквы.")
-            .When(x => x.NewPatronymic != null);
+            .When(x => x.Patronymic != null);
+
+        RuleFor(x => x.Phone)
+            .NotEmpty().WithMessage("Номер телефона не может быть пустым если указан.")
+            .When(x => x.Phone != null);
     }
 }

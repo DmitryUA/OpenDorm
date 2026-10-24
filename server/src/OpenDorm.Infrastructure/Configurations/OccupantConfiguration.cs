@@ -63,6 +63,14 @@ public class OccupantConfiguration(IEncryptionService encryptionService) : IEnti
                 value => new BirthDate(DateOnly.Parse(Encoding.UTF8.GetString(encryptionService.Decrypt(value)))))
             .HasComment("зашифрованная дата рождения")
             .IsRequired();
+        
+        builder.Property(o=>o.Phone)
+            .HasColumnName("phone_encrypted")
+            .HasConversion(
+                phone => encryptionService.Encrypt(Encoding.UTF8.GetBytes(phone.Value)),
+                value => new PhoneNumber(Encoding.UTF8.GetString(encryptionService.Decrypt(value))))
+            .HasComment("зашифрованный номер телефона")
+            .IsRequired();
 
         builder.Property(o => o.IsActive)
             .HasColumnName("is_active")

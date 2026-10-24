@@ -57,8 +57,9 @@ public class OccupantRepositoryTests : IAsyncLifetime
         var firstName = new FirstName("Иван");
         var patronymic = new Patronymic("Иванович");
         var birthDate = new BirthDate(new DateOnly(2003, 1, 21));
+        var phone = new PhoneNumber("+7 (999) 123-45-67");
         
-        var occupant = new Occupant(Guid.NewGuid(), lastName, firstName, patronymic, gender, birthDate);
+        var occupant = new Occupant(Guid.NewGuid(), lastName, firstName, patronymic, gender, birthDate, phone);
         
         // Act
         await _occupantRepository.AddAsync(occupant);
@@ -74,6 +75,7 @@ public class OccupantRepositoryTests : IAsyncLifetime
         Assert.Equal(firstName, loaded.FirstName);
         Assert.Equal(patronymic, loaded.Patronymic);
         Assert.Equal(birthDate, loaded.BirthDate);
+        Assert.Equal(phone, loaded.Phone);
     }
 
     [Fact]
@@ -100,8 +102,9 @@ public class OccupantRepositoryTests : IAsyncLifetime
         var firstName = new FirstName("Иван");
         var patronymic = new Patronymic("Иванович");
         var birthDate = new BirthDate(new DateOnly(2003, 1, 21));
+        var phone = new PhoneNumber("+7 (999) 123-45-67");
         
-        var occupant = new Occupant(Guid.NewGuid(), lastName, firstName, patronymic, gender, birthDate);
+        var occupant = new Occupant(Guid.NewGuid(), lastName, firstName, patronymic, gender, birthDate, phone);
         
         var accommodationId = occupant.CheckIn(roomId);
         

@@ -112,7 +112,8 @@ public class OccupantsController(IMediator mediator) : ControllerBase
             request.FirstName,
             request.Patronymic,
             request.Gender,
-            request.BirthDate);
+            request.BirthDate,
+            request.Phone);
 
         var occupantId = await mediator.Send(command, cancellationToken);
 
@@ -283,7 +284,8 @@ public class OccupantsController(IMediator mediator) : ControllerBase
             id,
             request.LastName,
             request.FirstName,
-            request.Patronymic);
+            request.Patronymic,
+            request.Phone);
 
         await mediator.Send(command, cancellationToken);
 

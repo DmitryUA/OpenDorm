@@ -202,6 +202,12 @@ namespace OpenDorm.Infrastructure.Migrations
                         .HasColumnName("patronymic_encrypted")
                         .HasComment("зашифрованное отчество");
 
+                    b.Property<byte[]>("Phone")
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("phone_encrypted")
+                        .HasComment("зашифрованный номер телефона");
+
                     b.Property<DateTime>("created_at")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")

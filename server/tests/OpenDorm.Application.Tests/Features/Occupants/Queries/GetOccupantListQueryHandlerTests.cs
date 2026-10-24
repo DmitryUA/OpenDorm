@@ -77,6 +77,7 @@ public class GetOccupantListQueryHandlerTests : IAsyncLifetime
         Assert.Equal(activeOccupant.FirstName.Value, loadedActiveOccupant.FirstName);
         Assert.Equal(activeOccupant.Patronymic?.Value, loadedActiveOccupant.Patronymic);
         Assert.Equal(activeOccupant.BirthDate.Value, loadedActiveOccupant.BirthDate);
+        Assert.Equal(activeOccupant.Phone.Value, loadedActiveOccupant.Phone);
         Assert.NotNull(loadedActiveOccupant.CurrentAccommodation);
         Assert.Equal(dormitory.Address.ToString(), loadedActiveOccupant.CurrentAccommodation.DormitoryAddress);
         Assert.Equal(dormitory.Rooms.First().Name.Value, loadedActiveOccupant.CurrentAccommodation.RoomName);
