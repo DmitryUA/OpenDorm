@@ -11,6 +11,14 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
     {
         logger.LogError(exception, "Error: {ExceptionMessage}", exception.Message);
 
+        if (exception is ValidationException validationException)
+        {
+            var validationProblemDetails = CreateValidationProblemDetails(validationException);
+            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await httpContext.Response.WriteAsJsonAsync(validationProblemDetails, cancellationToken);
+            return true;
+        }
+
         var problemDetails = exception switch
         {
             NotFoundException notFoundException => new ProblemDetails
@@ -20,8 +28,6 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
                 Detail = notFoundException.Message
             },
             
-            ValidationException validationException => CreateValidationProblemDetails(validationException),
-
             DomainException domainException => new ProblemDetails
             {
                 Status = StatusCodes.Status409Conflict,

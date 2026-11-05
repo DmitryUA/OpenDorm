@@ -292,8 +292,23 @@ const handleCreate = async () => {
     isCreateDialogVisible.value = false
     await loadOccupants(1)
   } catch (caughtError) {
-    const apiError = caughtError as { response?: { data?: { title?: string } } }
-    ElMessage.error(apiError.response?.data?.title || 'Не удалось добавить жильца')
+    const apiError = caughtError as {
+      response?: {
+        data?: {
+          title?: string
+          detail?: string
+          errors?: Record<string, string[]>
+        }
+      }
+    }
+    const problem = apiError.response?.data
+    const validationMessages = Object.values(problem?.errors ?? {}).flat()
+    ElMessage.error(
+      problem?.detail ||
+        validationMessages.join('; ') ||
+        problem?.title ||
+        'Не удалось добавить жильца',
+    )
   } finally {
     isSubmitting.value = false
   }
