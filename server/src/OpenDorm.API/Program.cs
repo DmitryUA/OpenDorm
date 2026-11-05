@@ -20,6 +20,7 @@ using OpenDorm.Infrastructure.Services;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddKeyPerFile("/run/secrets", optional: true);
 
 // Add services to the container.
 
@@ -176,6 +177,11 @@ app.UseCors("AllowFrontend");
 
 await using (var scope = app.Services.CreateAsyncScope())
 {
+    await scope.ServiceProvider
+        .GetRequiredService<OpenDormDbContext>()
+        .Database
+        .MigrateAsync();
+
     await scope.ServiceProvider
         .GetRequiredService<OccupantSearchIndexInitializer>()
         .InitializeAsync();

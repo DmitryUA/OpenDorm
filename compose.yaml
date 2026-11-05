@@ -1,0 +1,65 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    secrets:
+      - postgres_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./server
+      dockerfile: src/OpenDorm.API/Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+    depends_on:
+      db:
+        condition: service_healthy
+    secrets:
+      - source: search_index_hmac_key
+        target: SearchIndex:HmacKey
+      - source: jwt_signing_key
+        target: Jwt:SigningKey
+      - source: encryption_key
+        target: Encryption:Key
+      - source: open_dorm_connection_string
+        target: ConnectionStrings:OpenDormConnectionString
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${APP_HTTP_PORT:-5140}:80"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password
+  search_index_hmac_key:
+    file: ./secrets/search_index_hmac_key
+  jwt_signing_key:
+    file: ./secrets/jwt_signing_key
+  encryption_key:
+    file: ./secrets/encryption_key
+  open_dorm_connection_string:
+    file: ./secrets/open_dorm_connection_string

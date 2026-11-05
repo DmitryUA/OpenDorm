@@ -28,17 +28,36 @@
 
 **Backend:** серверная часть на .NET 10 и PostgreSQL находится в каталоге `server/`.
 
-Для API задайте `SearchIndex__HmacKey` как Base64-кодированный случайный ключ не короче 32 байт. Он должен быть отдельным от `Encryption__Key` и храниться вне базы данных (например, в secret store переменных окружения). Смена ключа делает сохранённые индексы недействительными: перед запуском с новым ключом очистите значения `last_name_search_hash`, `first_name_search_hash` и `patronymic_search_hash`; при старте API заполнит их повторно.
-
-Для запуска API также задайте следующие секреты в хранилище секретов .NET User Secrets проекта `OpenDorm.API`:
+### Приложение в Docker
 
 ```bash
-dotnet user-secrets set "Jwt:SigningKey" "<случайный секрет не короче 32 байт>" --project server/src/OpenDorm.API
-dotnet user-secrets set "Encryption:Key" "<Base64-кодированный случайный ключ из 32 байт>" --project server/src/OpenDorm.API
-dotnet user-secrets set "ConnectionStrings:OpenDormConnectionString" "<строка подключения к PostgreSQL>" --project server/src/OpenDorm.API
+cp .env.example .env
+# Создайте секреты по инструкции ниже
+docker compose up -d --build
+docker compose ps
 ```
 
-`Encryption:Key` должен декодироваться из Base64 ровно в 32 байта для AES-256; не меняйте его после появления зашифрованных данных, иначе их нельзя будет расшифровать. Вместе с указанными выше настройками для индекса поиска (`SearchIndex:HmacKey`) эти значения необходимы API при запуске.
+Создайте локальную директорию с файлами секретов (она добавлена в `.gitignore`). Например, на Linux-сервере:
+
+```bash
+mkdir -p secrets
+openssl rand -hex 32 > secrets/postgres_password
+openssl rand -base64 32 > secrets/search_index_hmac_key
+openssl rand -base64 48 > secrets/jwt_signing_key
+openssl rand -base64 32 > secrets/encryption_key
+cat secrets/postgres_password | awk '{ print "Host=db;Port=5432;Database=open_dorm_db;Username=open_dorm;Password=" $0 }' \
+  > secrets/open_dorm_connection_string
+chmod 0700 secrets
+chmod 0444 secrets/*
+```
+
+Файлы соответствуют конфигурации `SearchIndex:HmacKey`, `Jwt:SigningKey`, `Encryption:Key` и `ConnectionStrings:OpenDormConnectionString`. Контейнер API читает их из Docker secrets; пароль PostgreSQL передаётся образу базы отдельно. В Linux Compose монтирует локальные secret-файлы с исходными правами, поэтому файлы доступны на чтение внутри контейнеров, а доступ на хосте ограничен правами `0700` каталога. При изменении имени пользователя или базы в `.env` обновите строку подключения в `secrets/open_dorm_connection_string`.
+
+`SearchIndex:HmacKey` должен декодироваться из Base64 как минимум в 32 байта и отличаться от ключа шифрования. Его смена делает сохранённые индексы недействительными: очистите значения `last_name_search_hash`, `first_name_search_hash` и `patronymic_search_hash`, после чего API заполнит их повторно. `Encryption:Key` должен декодироваться ровно в 32 байта для AES-256; его нельзя менять после появления зашифрованных данных. `Jwt:SigningKey` должен содержать не менее 32 случайных байт. При старте API автоматически применяет миграции, инициализирует индексы и начальные данные.
+
+Frontend раздаётся Nginx на HTTP-порту `5140`; `/api` проксируется к backend внутри Docker-сети. Backend напрямую наружу не опубликован. База доступна только локально на `5433`. Порты можно изменить через `APP_HTTP_PORT` и `POSTGRES_PORT` в `.env`. HTTP не шифрует трафик: не передавайте через него реальные учётные данные или персональные данные из интернета. Перед публичным использованием настройте HTTPS на порту `7170` через reverse proxy и перенаправление HTTP на HTTPS. `docker compose down` останавливает контейнеры, но сохраняет данные в именованном volume; не используйте `docker compose down -v`, если хотите сохранить базу.
+
+Локальные Docker Compose secrets — read-only файлы, смонтированные в контейнер, а не зашифрованное централизованное хранилище. Для одного сервера это проще и безопаснее, чем переменные окружения (они видны в метаданных контейнера); ограничьте доступ к каталогу `secrets/` и защитите резервные копии шифрованием. Для более сложной инфраструктуры рассмотрите Vault или системное хранилище секретов ОС. Для локальной разработки используйте .NET User Secrets.
 
 ## 📚 Документация API
 

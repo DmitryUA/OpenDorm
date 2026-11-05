@@ -1,2 +1,7 @@
 # Drawio
 *.drawio.bkp
+
+.env
+.env.*
+!.env.example
+/secrets/

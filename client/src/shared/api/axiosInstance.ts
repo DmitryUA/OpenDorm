@@ -2,7 +2,7 @@ import axios from 'axios'
 import type { AxiosRequestConfig } from 'axios'
 
 export const AXIOS_INSTANCE = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5140',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
