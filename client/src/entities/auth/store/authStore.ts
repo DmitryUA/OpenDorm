@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { AXIOS_INSTANCE } from '@/shared/api/axiosInstance'
+import { isAxiosError } from 'axios'
+import { AXIOS_INSTANCE, setTokenRefreshHandler } from '@/shared/api/axiosInstance'
 import { getAuth } from '@/shared/api/generated/auth'
 import { decodeToken, isTokenExpired } from '@/shared/lib/jwt'
 import type { LoginRequest, LoginResponse, LogoutCommand } from '@/shared/api/generated/models'
@@ -11,7 +12,7 @@ const ROLE_CLAIM = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role
 
 export const useAuthStore = defineStore('auth', () => {
   // Получаем сгенерированные Orval функции
-  const { postApiAuthLogin, postApiAuthLogout } = getAuth()
+  const { postApiAuthLogin, postApiAuthLogout, postApiAuthRefresh } = getAuth()
 
   // === State ===
   const accessToken = ref<string | null>(localStorage.getItem('accessToken'))
@@ -19,6 +20,8 @@ export const useAuthStore = defineStore('auth', () => {
   const selectedRole = ref<string | null>(localStorage.getItem('selectedRole'))
   const user = ref<JwtPayload | null>(null)
   const isLoading = ref(false)
+  let refreshPromise: Promise<string> | null = null
+  let refreshTimer: ReturnType<typeof setTimeout> | null = null
 
   // === Getters ===
   const isAuthenticated = computed(() => !!accessToken.value && !isTokenExpired(accessToken.value))
@@ -50,6 +53,7 @@ export const useAuthStore = defineStore('auth', () => {
     refreshToken.value = refresh
     localStorage.setItem('accessToken', access)
     localStorage.setItem('refreshToken', refresh)
+    scheduleTokenRefresh(access)
     AXIOS_INSTANCE.defaults.headers.common['Authorization'] = `Bearer ${access}`
 
     // Декодируем токен и сохраняем данные пользователя
@@ -72,6 +76,11 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const clearTokens = () => {
+    if (refreshTimer) {
+      clearTimeout(refreshTimer)
+      refreshTimer = null
+    }
+
     accessToken.value = null
     refreshToken.value = null
     user.value = null
@@ -80,6 +89,45 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('refreshToken')
     localStorage.removeItem('selectedRole')
     delete AXIOS_INSTANCE.defaults.headers.common['Authorization']
+  }
+
+  const refreshAccessToken = async () => {
+    if (refreshPromise) return refreshPromise
+    if (!refreshToken.value) {
+      clearTokens()
+      window.dispatchEvent(new Event('auth:session-expired'))
+      throw new Error('Refresh token is unavailable.')
+    }
+
+    refreshPromise = postApiAuthRefresh({ refreshToken: refreshToken.value })
+      .then((response) => {
+        setTokens(response.accessToken, response.refreshToken)
+        return response.accessToken
+      })
+      .catch((error: unknown) => {
+        if (isAxiosError(error) && [400, 401].includes(error.response?.status ?? 0)) {
+          clearTokens()
+          window.dispatchEvent(new Event('auth:session-expired'))
+        }
+        throw error
+      })
+      .finally(() => {
+        refreshPromise = null
+      })
+
+    return refreshPromise
+  }
+
+  const scheduleTokenRefresh = (token: string) => {
+    if (refreshTimer) clearTimeout(refreshTimer)
+
+    const payload = decodeToken(token)
+    if (!payload) return
+
+    const refreshInMs = Math.max(payload.exp * 1000 - Date.now() - 60_000, 0)
+    refreshTimer = setTimeout(() => {
+      void refreshAccessToken().catch(() => undefined)
+    }, refreshInMs)
   }
 
   const login = async (dto: LoginRequest) => {
@@ -105,17 +153,30 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const init = () => {
-    if (!accessToken.value) return
+  const init = async () => {
+    setTokenRefreshHandler(refreshAccessToken)
+
+    if (!accessToken.value && !refreshToken.value) return
 
     // Восстанавливаем заголовок авторизации
     AXIOS_INSTANCE.defaults.headers.common['Authorization'] = `Bearer ${accessToken.value}`
 
     // Проверяем срок действия токена
-    if (isTokenExpired(accessToken.value)) {
-      clearTokens()
-      return
+    if (!accessToken.value || isTokenExpired(accessToken.value)) {
+      if (!refreshToken.value) {
+        clearTokens()
+        return
+      }
+
+      try {
+        await refreshAccessToken()
+      } catch {
+        return
+      }
     }
+
+    if (!accessToken.value) return
+    scheduleTokenRefresh(accessToken.value)
 
     // Декодируем токен
     const payload = decodeToken(accessToken.value)
@@ -151,6 +212,7 @@ export const useAuthStore = defineStore('auth', () => {
     // actions
     login,
     logout,
+    refreshAccessToken,
     selectRole,
     init,
     clearTokens,

@@ -14,7 +14,6 @@ const app = createApp(App)
 const pinia = createPinia()
 
 app.use(pinia)
-app.use(router)
 app.use(ElementPlus, { locale: ru })
 
 // Регистрируем все иконки Element Plus глобально
@@ -24,6 +23,15 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 
 // Инициализируем auth store (восстановление сессии из localStorage)
 const authStore = useAuthStore()
-authStore.init()
 
-app.mount('#app')
+const startApp = async () => {
+  await authStore.init()
+  window.addEventListener('auth:session-expired', () => {
+    void router.replace('/login')
+  })
+
+  app.use(router)
+  app.mount('#app')
+}
+
+void startApp()
