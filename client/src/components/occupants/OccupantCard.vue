@@ -58,7 +58,12 @@ const initials = computed(
     `${props.occupant.firstName?.charAt(0)?.toUpperCase() || ''}${props.occupant.lastName?.charAt(0)?.toUpperCase() || ''}`,
 )
 
-const genderLabel = computed(() => (props.occupant.gender === 1 ? 'Женский' : 'Мужской'))
+const genderLabel = computed(() => {
+  const gender: unknown = props.occupant.gender
+  if (gender === 1 || gender === 'Female') return 'Женский'
+  if (gender === 0 || gender === 'Male') return 'Мужской'
+  return 'Не указан'
+})
 
 const formattedBirthDate = computed(() => {
   const value = props.occupant.birthDate

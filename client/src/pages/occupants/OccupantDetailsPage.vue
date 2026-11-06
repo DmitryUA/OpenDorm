@@ -332,8 +332,10 @@ const fullName = (lastName: string, firstName: string, patronymic?: string | nul
   return parts.join(' ')
 }
 
-const genderLabel = (gender: number) => {
-  return gender === 1 ? 'Женский' : 'Мужской'
+const genderLabel = (gender: unknown) => {
+  if (gender === 1 || gender === 'Female') return 'Женский'
+  if (gender === 0 || gender === 'Male') return 'Мужской'
+  return 'Не указан'
 }
 
 const formatDate = (value?: string | null) => {
