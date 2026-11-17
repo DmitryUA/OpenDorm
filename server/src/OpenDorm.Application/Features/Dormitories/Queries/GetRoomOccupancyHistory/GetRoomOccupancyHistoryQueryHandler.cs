@@ -18,8 +18,8 @@ public class GetRoomOccupancyHistoryQueryHandler(IApplicationDbContext dbContext
 
         if (!isRoomExist) throw new NotFoundException(nameof(Room), request.RoomId);
         
-        var startCheckInDate = request.StartCheckInDate?.ToDateTime(TimeOnly.MinValue);
-        var endCheckInDate = request.EndCheckInDate?.ToDateTime(TimeOnly.MaxValue);
+        var startCheckInDate = request.StartCheckInDate?.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+        var endCheckInDate = request.EndCheckInDate?.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc);
 
         var query = dbContext.Accommodations
             .AsNoTracking()
