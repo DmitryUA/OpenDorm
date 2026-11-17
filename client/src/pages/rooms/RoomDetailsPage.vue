@@ -168,13 +168,21 @@
               <CopyableId :id="row.accommodationId" label="заселения" />
             </template>
           </el-table-column>
+          <el-table-column v-if="isAdmin" label="ID жильца" min-width="280">
+            <template #default="{ row }">
+              <CopyableId :id="row.occupantId" label="жильца" />
+            </template>
+          </el-table-column>
           <el-table-column label="Жилец" min-width="210">
             <template #default="{ row }">
               {{ fullName(row.lastName, row.firstName, row.patronymic) }}
             </template>
           </el-table-column>
-          <el-table-column label="Тип комнаты" min-width="130">
-            <template #default="{ row }">{{ genderLabel(row.gender) }}</template>
+          <el-table-column label="Пол" min-width="130">
+            <template #default="{ row }">{{ personGenderLabel(row.gender) }}</template>
+          </el-table-column>
+          <el-table-column label="Дата рождения" min-width="130">
+            <template #default="{ row }">{{ formatDate(row.birthDate) }}</template>
           </el-table-column>
           <el-table-column label="Дата заезда" min-width="130">
             <template #default="{ row }">{{ formatDate(row.checkInDate) }}</template>
@@ -324,6 +332,12 @@ const occupantInitials = (firstName: string, lastName: string) =>
 const genderLabel = (gender: number | string) => {
   if (gender === 0 || gender === 'Male') return 'Мужская'
   if (gender === 1 || gender === 'Female') return 'Женская'
+  return 'Не указан'
+}
+
+const personGenderLabel = (gender: number | string) => {
+  if (gender === 0 || gender === 'Male') return 'Мужской'
+  if (gender === 1 || gender === 'Female') return 'Женский'
   return 'Не указан'
 }
 
