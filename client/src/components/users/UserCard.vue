@@ -4,9 +4,10 @@
       <el-avatar :size="44" class="user-avatar">
         {{ initials(user.firstName, user.lastName) }}
       </el-avatar>
-      <el-tag :type="user.isActive ? 'success' : 'info'" effect="light">
-        {{ user.isActive ? 'Активен' : 'Неактивен' }}
-      </el-tag>
+      <StatusTag
+        :text="user.isActive ? 'Активен' : 'Неактивен'"
+        :is-active="user.isActive"
+      />
     </header>
 
     <div class="user-identity">
@@ -58,6 +59,7 @@
 </template>
 
 <script setup lang="ts">
+import StatusTag from '@/components/StatusTag.vue'
 import CopyableId from '@/components/CopyableId.vue'
 import type { UserDto } from '@/shared/api/generated/models'
 import { usePermissions } from '@/shared/composables/usePermissions'

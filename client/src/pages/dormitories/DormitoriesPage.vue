@@ -22,7 +22,6 @@
           v-for="dormitory in dormitoryStore.dormitories"
           :key="dormitory.id"
           :dormitory="dormitory"
-          :is-admin="isAdmin"
           @open="openDormitory"
         />
       </div>
@@ -96,7 +95,7 @@ interface DormitoryForm {
 
 const dormitoryStore = useDormitoryStore()
 const router = useRouter()
-const { canCreateDormitory, isAdmin } = usePermissions()
+const { canCreateDormitory } = usePermissions()
 const formRef = ref<FormInstance>()
 const isCreateDialogVisible = ref(false)
 const isSubmitting = ref(false)

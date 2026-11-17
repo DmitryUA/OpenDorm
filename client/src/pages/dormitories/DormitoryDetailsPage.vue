@@ -21,7 +21,6 @@
               <h1 class="page-title">
                 {{ details.city }}, {{ details.street }}, {{ details.house }}
               </h1>
-              <p class="page-subtitle">Информация об общежитии</p>
             </div>
           </div>
           <el-button v-if="canCreateRoom" type="primary" :icon="Plus" @click="openCreateDialog">
@@ -29,7 +28,11 @@
           </el-button>
         </header>
 
-        <div class="summary-grid">
+        <div class="summary-grid" :class="{ 'summary-grid--admin': isAdmin }">
+          <div v-if="isAdmin" class="summary-item">
+            <CopyableId :id="details.id" label="общежития" />
+            <span class="summary-label">ID общежития</span>
+          </div>
           <div class="summary-item">
             <span class="summary-value">{{ details.totalRoomCount }}</span>
             <span class="summary-label">Комнат</span>
@@ -164,6 +167,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { ArrowLeft, OfficeBuilding, Plus } from '@element-plus/icons-vue'
+import CopyableId from '@/components/CopyableId.vue'
 import RetryErrorAlert from '@/components/RetryErrorAlert.vue'
 import RoomCard from '@/components/rooms/RoomCard.vue'
 import { getDormitories } from '@/shared/api/generated/dormitories'
@@ -188,7 +192,7 @@ const PAGE_SIZE = 12
 
 const route = useRoute()
 const router = useRouter()
-const { canCreateRoom } = usePermissions()
+const { canCreateRoom, isAdmin } = usePermissions()
 const { getApiDormitoriesIdDetails, getApiDormitoriesIdRooms, postApiDormitoriesIdAddRooms } =
   getDormitories()
 
@@ -381,8 +385,13 @@ watch(
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: var(--spacing-xl);
   border-top: 1px solid var(--color-border);
   border-bottom: 1px solid var(--color-border);
+}
+
+.summary-grid--admin {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .summary-item {

@@ -16,13 +16,12 @@
               <h1 class="page-title">
                 {{ fullName(occupant.lastName, occupant.firstName, occupant.patronymic) }}
               </h1>
-              <el-tag :type="occupant.isActive ? 'success' : 'info'" effect="light">
-                {{ occupant.isActive ? 'Активен' : 'Неактивен' }}
-              </el-tag>
+              <StatusTag
+                :text="occupant.isActive ? 'Активен' : 'Неактивен'"
+                :is-active="occupant.isActive"
+                size="large"
+              />
             </div>
-            <p class="page-subtitle">
-              {{ genderLabel(occupant.gender) }} · {{ formatDate(occupant.birthDate) }}
-            </p>
           </div>
 
           <div class="action-group">
@@ -271,6 +270,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { ArrowLeft, Edit } from '@element-plus/icons-vue'
+import StatusTag from '@/components/StatusTag.vue'
 import CopyableId from '@/components/CopyableId.vue'
 import RetryErrorAlert from '@/components/RetryErrorAlert.vue'
 import { getDormitories } from '@/shared/api/generated/dormitories'
@@ -632,11 +632,6 @@ onMounted(() => {
   font-weight: 600;
 }
 
-.page-subtitle {
-  margin: var(--spacing-xs) 0 0;
-  color: var(--color-text-secondary);
-}
-
 .action-group {
   display: flex;
   flex-wrap: wrap;
@@ -648,7 +643,7 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: var(--spacing-md);
-  margin: 0;
+  margin: var(--spacing-xl) 0 0;
   padding: var(--spacing-lg);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-md);

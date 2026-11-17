@@ -194,6 +194,11 @@ const handleUserCommand = async (command: string) => {
 
 /* ===== Сайдбар ===== */
 .sidebar {
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  flex: 0 0 auto;
   background: var(--color-primary);
   transition: width var(--transition-base);
   display: flex;
@@ -208,6 +213,7 @@ const handleUserCommand = async (command: string) => {
 
 .sidebar-header {
   height: 64px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -226,6 +232,7 @@ const handleUserCommand = async (command: string) => {
 
 .sidebar-menu-wrapper {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
 }
 
@@ -252,6 +259,7 @@ const handleUserCommand = async (command: string) => {
 }
 
 .sidebar-footer {
+  flex-shrink: 0;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding: var(--spacing-sm);
 }

@@ -16,22 +16,15 @@
         <span class="detail-value">{{ dormitory.floorCount }}</span>
       </div>
     </button>
-
-    <div v-if="isAdmin" class="card-id">
-      <span class="detail-label">ID общежития</span>
-      <CopyableId :id="dormitory.id" label="общежития" />
-    </div>
   </article>
 </template>
 
 <script setup lang="ts">
 import { OfficeBuilding } from '@element-plus/icons-vue'
-import CopyableId from '@/components/CopyableId.vue'
 import type { DormitoryListDto } from '@/shared/api/generated/models'
 
 defineProps<{
   dormitory: DormitoryListDto
-  isAdmin: boolean
 }>()
 
 const emit = defineEmits<{
@@ -91,20 +84,11 @@ const emit = defineEmits<{
   overflow-wrap: anywhere;
 }
 
-.card-floors,
-.card-id {
+.card-floors {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-sm);
-}
-
-.card-id {
-  flex-direction: column;
-  align-items: stretch;
-  margin-top: var(--spacing-md);
-  padding-top: var(--spacing-md);
-  border-top: 1px solid var(--color-border-light);
 }
 
 .detail-label {

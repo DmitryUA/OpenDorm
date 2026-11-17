@@ -10,9 +10,10 @@
         <el-avatar :size="42" class="occupant-avatar">
           {{ initials }}
         </el-avatar>
-        <span class="status-badge" :class="occupant.isActive ? 'status-active' : 'status-inactive'">
-          {{ occupant.isActive ? 'Активен' : 'Неактивен' }}
-        </span>
+        <StatusTag
+          :text="occupant.isActive ? 'Активен' : 'Неактивен'"
+          :is-active="occupant.isActive"
+        />
       </div>
 
       <h2>{{ fullName }}</h2>
@@ -37,6 +38,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import StatusTag from '@/components/StatusTag.vue'
 import type { OccupantListDto } from '@/shared/api/generated/models'
 
 const props = defineProps<{
@@ -127,25 +129,6 @@ const formattedBirthDate = computed(() => {
   background: linear-gradient(135deg, var(--color-primary), #7bb7ff);
   color: white;
   font-weight: 600;
-}
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.status-active {
-  color: #1b8e5a;
-  background: rgba(39, 174, 96, 0.12);
-}
-
-.status-inactive {
-  color: #5c6877;
-  background: rgba(96, 109, 128, 0.12);
 }
 
 .card-main h2 {

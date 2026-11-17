@@ -8,9 +8,10 @@
     >
       <header class="room-card-header">
         <h3 class="room-name">Комната {{ room.name }}</h3>
-        <el-tag :type="room.isActive ? 'success' : 'info'" effect="light">
-          {{ room.isActive ? 'Активна' : 'Неактивна' }}
-        </el-tag>
+        <StatusTag
+          :text="room.isActive ? 'Активна' : 'Неактивна'"
+          :is-active="room.isActive"
+        />
       </header>
       <dl class="room-details">
         <div>
@@ -32,6 +33,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import StatusTag from '@/components/StatusTag.vue'
 import type { RoomListDto } from '@/shared/api/generated/models'
 
 const props = defineProps<{

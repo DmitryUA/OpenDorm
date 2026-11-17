@@ -22,11 +22,12 @@
           <div>
             <div class="room-title-row">
               <h1 class="page-title">Комната {{ room.name }}</h1>
-              <el-tag :type="room.isActive ? 'success' : 'info'" effect="light">
-                {{ room.isActive ? 'Активна' : 'Неактивна' }}
-              </el-tag>
+              <StatusTag
+                :text="room.isActive ? 'Активна' : 'Неактивна'"
+                :is-active="room.isActive"
+                size="large"
+              />
             </div>
-            <p class="page-subtitle">{{ genderLabel(room.gender) }} комната</p>
           </div>
 
           <div class="room-actions">
@@ -54,18 +55,18 @@
           </div>
         </header>
 
-        <dl class="room-summary">
+        <dl class="room-summary" :class="{ 'room-summary--admin': isAdmin }">
           <div v-if="isAdmin">
             <dt>ID комнаты</dt>
             <dd><CopyableId :id="room.id" label="комнаты" /></dd>
           </div>
           <div>
-            <dt>Этаж</dt>
-            <dd>{{ room.floorNumber }}</dd>
+            <dt>Тип комнаты</dt>
+            <dd>{{ genderLabel(room.gender) }} комната</dd>
           </div>
           <div>
-            <dt>Вместимость</dt>
-            <dd>{{ room.capacity }}</dd>
+            <dt>Этаж</dt>
+            <dd>{{ room.floorNumber }}</dd>
           </div>
           <div>
             <dt>Проживает</dt>
@@ -130,6 +131,7 @@
             value-format="YYYY-MM-DD"
             placeholder="Начальная дата"
             clearable
+            :disabled-date="isStartCheckInDateDisabled"
           />
         </el-form-item>
         <el-form-item label="Заезд по">
@@ -139,6 +141,7 @@
             value-format="YYYY-MM-DD"
             placeholder="Конечная дата"
             clearable
+            :disabled-date="isEndCheckInDateDisabled"
           />
         </el-form-item>
         <el-form-item label="Сортировка">
@@ -245,6 +248,7 @@ import { reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { ArrowLeft, Edit } from '@element-plus/icons-vue'
+import StatusTag from '@/components/StatusTag.vue'
 import CopyableId from '@/components/CopyableId.vue'
 import RetryErrorAlert from '@/components/RetryErrorAlert.vue'
 import { getDormitories } from '@/shared/api/generated/dormitories'
@@ -295,8 +299,8 @@ const isUpdating = ref(false)
 const isEditDialogVisible = ref(false)
 const editFormRef = ref<FormInstance>()
 const historyPage = ref(1)
-const startCheckInDate = ref<string>()
-const endCheckInDate = ref<string>()
+const startCheckInDate = ref<string | null>(null)
+const endCheckInDate = ref<string | null>(null)
 const sortOrder = ref<SortOrder>(1)
 
 const editForm = reactive<RoomEditForm>({
@@ -329,6 +333,15 @@ const formatDate = (value: string) => {
   const date = new Date(value)
   return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString('ru-RU')
 }
+
+const dateKey = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+
+const isStartCheckInDateDisabled = (date: Date) =>
+  endCheckInDate.value != null && dateKey(date) > endCheckInDate.value
+
+const isEndCheckInDateDisabled = (date: Date) =>
+  startCheckInDate.value != null && dateKey(date) < startCheckInDate.value
 
 const loadRoom = async () => {
   const currentDormitoryId = dormitoryId()
@@ -557,7 +570,6 @@ watch(
   overflow-wrap: anywhere;
 }
 
-.page-subtitle,
 .section-subtitle {
   margin: var(--spacing-xs) 0 0;
   color: var(--color-text-secondary);
@@ -566,9 +578,13 @@ watch(
 .room-summary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 0;
+  margin: var(--spacing-xl) 0 0;
   border-top: 1px solid var(--color-border);
   border-bottom: 1px solid var(--color-border);
+}
+
+.room-summary--admin {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .room-summary > div {

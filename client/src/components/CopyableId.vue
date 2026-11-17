@@ -2,11 +2,11 @@
   <el-button
     class="copy-id-button"
     text
-    :title="`Скопировать ID ${label} ${id}`"
-    :aria-label="`Скопировать ID ${label} ${id}`"
+    :title="`Скопировать ID ${label}`"
+    :aria-label="`Скопировать ID ${label}`"
     @click="copyId"
   >
-    <span>{{ id }}</span>
+    <span>{{ id.slice(0, 8) }}</span>
     <el-icon><CopyDocument /></el-icon>
   </el-button>
 </template>
