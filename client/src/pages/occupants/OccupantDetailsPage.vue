@@ -282,6 +282,7 @@ import type {
   UpdateOccupantRequest,
 } from '@/shared/api/generated/models'
 import { usePermissions } from '@/shared/composables/usePermissions'
+import { getApiErrorMessage } from '@/shared/api/getApiErrorMessage'
 
 interface RoomSelectOption extends RoomListDto {
   label: string
@@ -374,10 +375,8 @@ const loadOccupantData = async () => {
 
     occupant.value = found
     await Promise.all([loadHistory(), loadAvailableRooms()])
-  } catch (caughtError) {
-    const apiError = caughtError as { response?: { data?: { title?: string } }; message?: string }
-    error.value =
-      apiError.response?.data?.title || apiError.message || 'Не удалось загрузить данные жильца'
+  } catch (caughtError: unknown) {
+    error.value = getApiErrorMessage(caughtError, 'Не удалось загрузить данные жильца')
   } finally {
     isLoading.value = false
   }
@@ -394,9 +393,8 @@ const loadHistory = async () => {
     const { getApiOccupantsIdAccommodations } = getOccupants()
     const result = await getApiOccupantsIdAccommodations(id)
     history.value = Array.isArray(result) ? result : []
-  } catch (caughtError) {
-    const apiError = caughtError as { response?: { data?: { title?: string } } }
-    historyError.value = apiError.response?.data?.title || 'Не удалось загрузить историю заселений'
+  } catch (caughtError: unknown) {
+    historyError.value = getApiErrorMessage(caughtError, 'Не удалось загрузить историю заселений')
   } finally {
     isHistoryLoading.value = false
   }
@@ -419,8 +417,9 @@ const loadAvailableRooms = async () => {
     )
 
     availableRooms.value = roomGroups.flat().filter((room) => room.isActive)
-  } catch {
+  } catch (caughtError: unknown) {
     availableRooms.value = []
+    ElMessage.error(getApiErrorMessage(caughtError, 'Не удалось загрузить список комнат'))
   }
 }
 
@@ -457,23 +456,8 @@ const handleOccupantUpdate = async () => {
     ElMessage.success('Данные жильца обновлены')
     isEditDialogVisible.value = false
     await loadOccupantData()
-  } catch (caughtError) {
-    const apiError = caughtError as {
-      response?: {
-        data?: {
-          title?: string
-          detail?: string
-          errors?: Record<string, string[]>
-        }
-      }
-    }
-    const validationMessages = Object.values(apiError.response?.data?.errors ?? {}).flat()
-    const message =
-      apiError.response?.data?.detail ||
-      validationMessages.join('; ') ||
-      apiError.response?.data?.title ||
-      'Не удалось обновить данные жильца'
-    ElMessage.error(message)
+  } catch (caughtError: unknown) {
+    ElMessage.error(getApiErrorMessage(caughtError, 'Не удалось обновить данные жильца'))
   } finally {
     isOccupantUpdating.value = false
   }
@@ -512,9 +496,8 @@ const handleCheckIn = async () => {
     ElMessage.success('Жилец успешно заселен')
     isCheckInDialogVisible.value = false
     await loadOccupantData()
-  } catch (caughtError) {
-    const apiError = caughtError as { response?: { data?: { title?: string } } }
-    ElMessage.error(apiError.response?.data?.title || 'Не удалось заселить жильца')
+  } catch (caughtError: unknown) {
+    ElMessage.error(getApiErrorMessage(caughtError, 'Не удалось заселить жильца'))
   } finally {
     isActionLoading.value = false
   }
@@ -530,14 +513,18 @@ const handleCheckOut = async () => {
       cancelButtonText: 'Отмена',
       type: 'warning',
     })
+  } catch {
+    return
+  }
 
-    isStatusUpdating.value = true
+  isStatusUpdating.value = true
+  try {
     const { postApiOccupantsIdCheckOut } = getOccupants()
     await postApiOccupantsIdCheckOut(id)
     ElMessage.success('Жилец выселен')
     await loadOccupantData()
-  } catch {
-    // Пользователь отменил действие.
+  } catch (caughtError: unknown) {
+    ElMessage.error(getApiErrorMessage(caughtError, 'Не удалось выселить жильца'))
   } finally {
     isStatusUpdating.value = false
   }
@@ -562,9 +549,8 @@ const handleTransfer = async () => {
     ElMessage.success('Жилец переселен')
     isTransferDialogVisible.value = false
     await loadOccupantData()
-  } catch (caughtError) {
-    const apiError = caughtError as { response?: { data?: { title?: string } } }
-    ElMessage.error(apiError.response?.data?.title || 'Не удалось переселить жильца')
+  } catch (caughtError: unknown) {
+    ElMessage.error(getApiErrorMessage(caughtError, 'Не удалось переселить жильца'))
   } finally {
     isActionLoading.value = false
   }
@@ -586,9 +572,8 @@ const toggleStatus = async (nextActive: boolean) => {
       ElMessage.success('Жилец деактивирован')
     }
     await loadOccupantData()
-  } catch (caughtError) {
-    const apiError = caughtError as { response?: { data?: { title?: string } } }
-    ElMessage.error(apiError.response?.data?.title || 'Не удалось изменить статус жильца')
+  } catch (caughtError: unknown) {
+    ElMessage.error(getApiErrorMessage(caughtError, 'Не удалось изменить статус жильца'))
   } finally {
     isStatusUpdating.value = false
   }

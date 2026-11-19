@@ -171,6 +171,7 @@ import CopyableId from '@/components/CopyableId.vue'
 import RetryErrorAlert from '@/components/RetryErrorAlert.vue'
 import RoomCard from '@/components/rooms/RoomCard.vue'
 import { getDormitories } from '@/shared/api/generated/dormitories'
+import { getApiErrorMessage } from '@/shared/api/getApiErrorMessage'
 import type {
   CreateRoomRequest,
   DormitoryDetailsDto,
@@ -233,9 +234,8 @@ const loadDetails = async () => {
   detailsError.value = null
   try {
     details.value = await getApiDormitoriesIdDetails(dormitoryId.value)
-  } catch (error) {
-    const apiError = error as { response?: { data?: { title?: string } } }
-    detailsError.value = apiError.response?.data?.title || 'Не удалось загрузить общежитие'
+  } catch (error: unknown) {
+    detailsError.value = getApiErrorMessage(error, 'Не удалось загрузить общежитие')
   } finally {
     isDetailsLoading.value = false
   }
@@ -256,9 +256,8 @@ const loadRooms = async (page = 1) => {
 
   try {
     roomsResult.value = await getApiDormitoriesIdRooms(dormitoryId.value, params)
-  } catch (error) {
-    const apiError = error as { response?: { data?: { title?: string } } }
-    roomsError.value = apiError.response?.data?.title || 'Не удалось загрузить комнаты'
+  } catch (error: unknown) {
+    roomsError.value = getApiErrorMessage(error, 'Не удалось загрузить комнаты')
   } finally {
     isRoomsLoading.value = false
   }
@@ -310,9 +309,8 @@ const handleCreate = async () => {
     ElMessage.success('Комната добавлена')
     isCreateDialogVisible.value = false
     await Promise.all([loadDetails(), loadRooms(currentPage.value)])
-  } catch (error) {
-    const apiError = error as { response?: { data?: { title?: string } } }
-    ElMessage.error(apiError.response?.data?.title || 'Не удалось добавить комнату')
+  } catch (error: unknown) {
+    ElMessage.error(getApiErrorMessage(error, 'Не удалось добавить комнату'))
   } finally {
     isSubmitting.value = false
   }

@@ -95,6 +95,7 @@ import RetryErrorAlert from '@/components/RetryErrorAlert.vue'
 import { useAuthStore } from '@/entities/auth/store/authStore'
 import { getOpenDormAPIV1 } from '@/shared/api/generated/endpoints'
 import type { SummaryDto } from '@/shared/api/generated/models'
+import { getApiErrorMessage } from '@/shared/api/getApiErrorMessage'
 
 const authStore = useAuthStore()
 const summary = ref<SummaryDto | null>(null)
@@ -108,12 +109,8 @@ const loadSummary = async () => {
   try {
     const { getApiDashboardsSummary } = getOpenDormAPIV1()
     summary.value = await getApiDashboardsSummary()
-  } catch (caughtError) {
-    const apiError = caughtError as { response?: { data?: { title?: string; detail?: string } } }
-    summaryError.value =
-      apiError.response?.data?.detail ||
-      apiError.response?.data?.title ||
-      'Не удалось загрузить статистику'
+  } catch (caughtError: unknown) {
+    summaryError.value = getApiErrorMessage(caughtError, 'Не удалось загрузить статистику')
   } finally {
     isSummaryLoading.value = false
   }

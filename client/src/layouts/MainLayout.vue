@@ -116,6 +116,7 @@ import {
 } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/entities/auth/store/authStore'
 import { menuItems } from '@/shared/config/menu'
+import { getApiErrorMessage } from '@/shared/api/getApiErrorMessage'
 
 const route = useRoute()
 const router = useRouter()
@@ -176,11 +177,17 @@ const handleUserCommand = async (command: string) => {
         cancelButtonText: 'Отмена',
         type: 'warning',
       })
+    } catch {
+      return
+    }
+
+    try {
       await authStore.logout()
       ElMessage.success('Вы вышли из системы')
-      router.push('/login')
-    } catch {
-      // Пользователь отменил
+    } catch (error: unknown) {
+      ElMessage.error(getApiErrorMessage(error, 'Не удалось завершить сеанс на сервере'))
+    } finally {
+      await router.push('/login')
     }
   }
 }

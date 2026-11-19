@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { isAxiosError } from 'axios'
 import { AXIOS_INSTANCE, setTokenRefreshHandler } from '@/shared/api/axiosInstance'
+import { getApiErrorMessage } from '@/shared/api/getApiErrorMessage'
 import { getAuth } from '@/shared/api/generated/auth'
 import { decodeToken, isTokenExpired } from '@/shared/lib/jwt'
 import type { LoginRequest, LoginResponse, LogoutCommand } from '@/shared/api/generated/models'
@@ -95,8 +96,9 @@ export const useAuthStore = defineStore('auth', () => {
     if (refreshPromise) return refreshPromise
     if (!refreshToken.value) {
       clearTokens()
-      window.dispatchEvent(new Event('auth:session-expired'))
-      throw new Error('Refresh token is unavailable.')
+      const message = 'Сессия истекла. Войдите в систему снова.'
+      window.dispatchEvent(new CustomEvent('auth:session-expired', { detail: message }))
+      throw new Error(message)
     }
 
     refreshPromise = postApiAuthRefresh({ refreshToken: refreshToken.value })
@@ -106,8 +108,9 @@ export const useAuthStore = defineStore('auth', () => {
       })
       .catch((error: unknown) => {
         if (isAxiosError(error) && [400, 401].includes(error.response?.status ?? 0)) {
+          const message = getApiErrorMessage(error, 'Сессия истекла. Войдите в систему снова.')
           clearTokens()
-          window.dispatchEvent(new Event('auth:session-expired'))
+          window.dispatchEvent(new CustomEvent('auth:session-expired', { detail: message }))
         }
         throw error
       })
@@ -141,16 +144,21 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const logout = async () => {
+    let logoutFailed = false
+    let logoutError: unknown
     try {
       if (refreshToken.value) {
         const logoutCommand: LogoutCommand = { refreshToken: refreshToken.value }
         await postApiAuthLogout(logoutCommand)
       }
-    } catch {
-      // Игнорируем ошибки при выходе — всё равно очищаем локальное состояние
+    } catch (error: unknown) {
+      logoutFailed = true
+      logoutError = error
     } finally {
       clearTokens()
     }
+
+    if (logoutFailed) throw logoutError
   }
 
   const init = async () => {

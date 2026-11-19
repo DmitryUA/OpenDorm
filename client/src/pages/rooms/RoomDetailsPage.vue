@@ -261,6 +261,7 @@ import CopyableId from '@/components/CopyableId.vue'
 import RetryErrorAlert from '@/components/RetryErrorAlert.vue'
 import { getDormitories } from '@/shared/api/generated/dormitories'
 import { getRooms } from '@/shared/api/generated/rooms/rooms'
+import { getApiErrorMessage } from '@/shared/api/getApiErrorMessage'
 import type {
   GetApiRoomsIdHistoryParams,
   PagedResultOfRoomOccupancyHistoryListDto,
@@ -389,9 +390,8 @@ const loadRoom = async () => {
     }
 
     room.value = foundRoom
-  } catch (error) {
-    const apiError = error as { response?: { data?: { title?: string } } }
-    roomError.value = apiError.response?.data?.title || 'Не удалось загрузить комнату'
+  } catch (error: unknown) {
+    roomError.value = getApiErrorMessage(error, 'Не удалось загрузить комнату')
   } finally {
     isRoomLoading.value = false
   }
@@ -404,9 +404,8 @@ const loadOccupants = async () => {
   occupantsError.value = null
   try {
     occupants.value = await getApiRoomsIdOccupants(room.value.id)
-  } catch (error) {
-    const apiError = error as { response?: { data?: { title?: string } } }
-    occupantsError.value = apiError.response?.data?.title || 'Не удалось загрузить список жильцов'
+  } catch (error: unknown) {
+    occupantsError.value = getApiErrorMessage(error, 'Не удалось загрузить список жильцов')
   } finally {
     isOccupantsLoading.value = false
   }
@@ -428,9 +427,8 @@ const loadHistory = async (page = 1) => {
 
   try {
     historyResult.value = await getApiRoomsIdHistory(room.value.id, params)
-  } catch (error) {
-    const apiError = error as { response?: { data?: { title?: string } } }
-    historyError.value = apiError.response?.data?.title || 'Не удалось загрузить историю заселений'
+  } catch (error: unknown) {
+    historyError.value = getApiErrorMessage(error, 'Не удалось загрузить историю заселений')
   } finally {
     isHistoryLoading.value = false
   }
@@ -491,9 +489,8 @@ const handleUpdate = async () => {
     ElMessage.success('Данные комнаты обновлены')
     isEditDialogVisible.value = false
     await loadRoomAndRelatedData()
-  } catch (error) {
-    const apiError = error as { response?: { data?: { title?: string } } }
-    ElMessage.error(apiError.response?.data?.title || 'Не удалось обновить комнату')
+  } catch (error: unknown) {
+    ElMessage.error(getApiErrorMessage(error, 'Не удалось обновить комнату'))
   } finally {
     isUpdating.value = false
   }
@@ -522,9 +519,8 @@ const changeRoomStatus = async (activate: boolean) => {
     }
     ElMessage.success(activate ? 'Комната активирована' : 'Комната деактивирована')
     await loadRoomAndRelatedData()
-  } catch (error) {
-    const apiError = error as { response?: { data?: { title?: string } } }
-    ElMessage.error(apiError.response?.data?.title || `Не удалось ${action} комнату`)
+  } catch (error: unknown) {
+    ElMessage.error(getApiErrorMessage(error, `Не удалось ${action} комнату`))
   } finally {
     isStatusUpdating.value = false
   }

@@ -39,7 +39,7 @@
       </el-form-item>
 
       <el-form-item label="Статус">
-        <el-select v-model="filters.status" clearable @change="loadOccupants(1)">
+        <el-select v-model="filters.status" @change="loadOccupants(1)">
           <el-option label="Все" value="all" />
           <el-option label="Активные" value="active" />
           <el-option label="Неактивные" value="inactive" />
@@ -47,7 +47,7 @@
       </el-form-item>
 
       <el-form-item label="Пол">
-        <el-select v-model="filters.gender" clearable @change="loadOccupants(1)">
+        <el-select v-model="filters.gender" @change="loadOccupants(1)">
           <el-option label="Все" value="all" />
           <el-option label="Мужской" :value="0" />
           <el-option label="Женский" :value="1" />
@@ -157,6 +157,7 @@ import RetryErrorAlert from '@/components/RetryErrorAlert.vue'
 import { getOccupants } from '@/shared/api/generated/occupants/occupants'
 import type { GetApiOccupantsParams, OccupantListDto } from '@/shared/api/generated/models'
 import { usePermissions } from '@/shared/composables/usePermissions'
+import { getApiErrorMessage } from '@/shared/api/getApiErrorMessage'
 
 interface OccupantForm {
   lastName: string
@@ -236,9 +237,8 @@ const loadOccupants = async (targetPage = page.value) => {
     occupants.value = response.items ?? []
     totalCount.value = Number(response.totalCount ?? 0)
     page.value = Number(response.page ?? targetPage)
-  } catch (caughtError) {
-    const apiError = caughtError as { response?: { data?: { title?: string } } }
-    error.value = apiError.response?.data?.title || 'Не удалось загрузить список жильцов'
+  } catch (caughtError: unknown) {
+    error.value = getApiErrorMessage(caughtError, 'Не удалось загрузить список жильцов')
   } finally {
     loading.value = false
   }
@@ -291,24 +291,8 @@ const handleCreate = async () => {
     ElMessage.success('Жилец добавлен')
     isCreateDialogVisible.value = false
     await loadOccupants(1)
-  } catch (caughtError) {
-    const apiError = caughtError as {
-      response?: {
-        data?: {
-          title?: string
-          detail?: string
-          errors?: Record<string, string[]>
-        }
-      }
-    }
-    const problem = apiError.response?.data
-    const validationMessages = Object.values(problem?.errors ?? {}).flat()
-    ElMessage.error(
-      problem?.detail ||
-        validationMessages.join('; ') ||
-        problem?.title ||
-        'Не удалось добавить жильца',
-    )
+  } catch (caughtError: unknown) {
+    ElMessage.error(getApiErrorMessage(caughtError, 'Не удалось добавить жильца'))
   } finally {
     isSubmitting.value = false
   }

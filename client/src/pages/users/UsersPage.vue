@@ -238,6 +238,7 @@ import UserCard from '@/components/users/UserCard.vue'
 import { getUsers } from '@/shared/api/generated/users/users'
 import type { CreateUserRequest, UpdateUserRequest, UserDto } from '@/shared/api/generated/models'
 import { usePermissions } from '@/shared/composables/usePermissions'
+import { getApiErrorMessage } from '@/shared/api/getApiErrorMessage'
 
 interface UserForm extends CreateUserRequest {
   patronymic: string | null
@@ -427,9 +428,8 @@ const loadUsers = async () => {
   error.value = null
   try {
     users.value = await getApiUsers()
-  } catch (caughtError) {
-    const apiError = caughtError as { response?: { data?: { title?: string } } }
-    error.value = apiError.response?.data?.title || 'Не удалось загрузить список пользователей'
+  } catch (caughtError: unknown) {
+    error.value = getApiErrorMessage(caughtError, 'Не удалось загрузить список пользователей')
   } finally {
     isLoading.value = false
   }
@@ -497,24 +497,8 @@ const handleCreate = async () => {
     ElMessage.success('Пользователь добавлен')
     isCreateDialogVisible.value = false
     await loadUsers()
-  } catch (caughtError) {
-    const apiError = caughtError as {
-      response?: {
-        data?: {
-          title?: string
-          detail?: string
-          errors?: Record<string, string[]>
-        }
-      }
-    }
-    const problem = apiError.response?.data
-    const validationMessages = Object.values(problem?.errors ?? {}).flat()
-    ElMessage.error(
-      problem?.detail ||
-        validationMessages.join('; ') ||
-        problem?.title ||
-        'Не удалось добавить пользователя',
-    )
+  } catch (caughtError: unknown) {
+    ElMessage.error(getApiErrorMessage(caughtError, 'Не удалось добавить пользователя'))
   } finally {
     isSubmitting.value = false
   }
@@ -551,9 +535,8 @@ const handleUpdate = async () => {
     ElMessage.success('Данные пользователя обновлены')
     isEditDialogVisible.value = false
     await loadUsers()
-  } catch (caughtError) {
-    const apiError = caughtError as { response?: { data?: { title?: string } } }
-    ElMessage.error(apiError.response?.data?.title || 'Не удалось обновить пользователя')
+  } catch (caughtError: unknown) {
+    ElMessage.error(getApiErrorMessage(caughtError, 'Не удалось обновить пользователя'))
   } finally {
     isEditSubmitting.value = false
   }
@@ -588,7 +571,7 @@ const handleRolesUpdate = async () => {
     await loadUsers()
     ElMessage.success('Роли пользователя обновлены')
     isRolesDialogVisible.value = false
-  } catch (caughtError) {
+  } catch (caughtError: unknown) {
     await loadUsers()
     const updatedUser = users.value.find((item) => item.id === user.id)
     if (updatedUser) {
@@ -599,8 +582,7 @@ const handleRolesUpdate = async () => {
         ),
       ]
     }
-    const apiError = caughtError as { response?: { data?: { title?: string } } }
-    ElMessage.error(apiError.response?.data?.title || 'Не удалось обновить роли пользователя')
+    ElMessage.error(getApiErrorMessage(caughtError, 'Не удалось обновить роли пользователя'))
   } finally {
     isRolesSubmitting.value = false
   }
@@ -631,9 +613,8 @@ const changeUserStatus = async (user: UserDto, activate: boolean) => {
     }
     ElMessage.success(activate ? 'Пользователь активирован' : 'Пользователь деактивирован')
     await loadUsers()
-  } catch (caughtError) {
-    const apiError = caughtError as { response?: { data?: { title?: string } } }
-    ElMessage.error(apiError.response?.data?.title || `Не удалось ${action} пользователя`)
+  } catch (caughtError: unknown) {
+    ElMessage.error(getApiErrorMessage(caughtError, `Не удалось ${action} пользователя`))
   } finally {
     statusUpdatingId.value = null
   }

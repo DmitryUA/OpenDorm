@@ -29,16 +29,29 @@
       </div>
       <span class="created-date">Создан {{ formatDate(user.createdAt) }}</span>
       <div class="user-actions">
-        <el-button v-if="can('users.update')" text @click="emit('edit-roles', user)">
+        <el-button
+          v-if="can('users.update')"
+          size="small"
+          type="primary"
+          plain
+          @click="emit('edit-roles', user)"
+        >
           Роли
         </el-button>
-        <el-button v-if="can('users.update')" text @click="emit('edit', user)">
+        <el-button
+          v-if="can('users.update')"
+          size="small"
+          type="primary"
+          plain
+          @click="emit('edit', user)"
+        >
           Редактировать
         </el-button>
         <el-button
           v-if="user.isActive && can('users.deactivate')"
-          text
+          size="small"
           type="danger"
+          plain
           :loading="isUpdating"
           @click="emit('change-status', user, false)"
         >
@@ -46,8 +59,9 @@
         </el-button>
         <el-button
           v-else-if="!user.isActive && can('users.activate')"
-          text
+          size="small"
           type="success"
+          plain
           :loading="isUpdating"
           @click="emit('change-status', user, true)"
         >
@@ -166,9 +180,12 @@ const formatDate = (value: string) => {
 
 .user-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--spacing-xs);
-  margin: 0 calc(var(--spacing-sm) * -1);
+}
+
+.user-actions :deep(.el-button) {
+  margin: 0;
 }
 
 .role-list {

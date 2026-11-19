@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { getDormitories } from '@/shared/api/generated/dormitories'
 import type { DormitoryListDto, CreateDormitoryRequest } from '@/shared/api/generated/models'
+import { getApiErrorMessage } from '@/shared/api/getApiErrorMessage'
 
 export const useDormitoryStore = defineStore('dormitory', () => {
   // Получаем функции из сгенерированного объекта
@@ -16,9 +17,9 @@ export const useDormitoryStore = defineStore('dormitory', () => {
     error.value = null
     try {
       dormitories.value = await getApiDormitories()
-    } catch (e: any) {
-      error.value = e.response?.data?.title || 'Ошибка загрузки общежитий'
-      throw e
+    } catch (caughtError: unknown) {
+      error.value = getApiErrorMessage(caughtError, 'Не удалось загрузить список общежитий')
+      throw caughtError
     } finally {
       isLoading.value = false
     }

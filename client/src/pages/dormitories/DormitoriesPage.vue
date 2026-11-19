@@ -85,6 +85,7 @@ import RetryErrorAlert from '@/components/RetryErrorAlert.vue'
 import DormitoryCard from '@/components/dormitories/DormitoryCard.vue'
 import { useDormitoryStore } from '@/entities/dormitory/store/dormitoryStore'
 import { usePermissions } from '@/shared/composables/usePermissions'
+import { getApiErrorMessage } from '@/shared/api/getApiErrorMessage'
 
 interface DormitoryForm {
   city: string
@@ -163,9 +164,8 @@ const handleCreate = async () => {
     })
     ElMessage.success('Общежитие добавлено')
     isCreateDialogVisible.value = false
-  } catch (error) {
-    const apiError = error as { response?: { data?: { title?: string } } }
-    ElMessage.error(apiError.response?.data?.title || 'Не удалось добавить общежитие')
+  } catch (error: unknown) {
+    ElMessage.error(getApiErrorMessage(error, 'Не удалось добавить общежитие'))
   } finally {
     isSubmitting.value = false
   }

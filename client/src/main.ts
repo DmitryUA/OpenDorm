@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import ElementPlus from 'element-plus'
+import ElementPlus, { ElMessage } from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import ru from 'element-plus/es/locale/lang/ru'
@@ -23,15 +23,35 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 
 // Инициализируем auth store (восстановление сессии из localStorage)
 const authStore = useAuthStore()
+let isAppReady = false
+let pendingSessionExpiredMessage: string | null = null
+
+window.addEventListener('auth:session-expired', (event) => {
+  const message =
+    event instanceof CustomEvent && typeof event.detail === 'string'
+      ? event.detail
+      : 'Сессия истекла. Войдите в систему снова.'
+
+  if (!isAppReady) {
+    pendingSessionExpiredMessage = message
+    return
+  }
+
+  void router.replace('/login')
+  ElMessage.error(message)
+})
 
 const startApp = async () => {
   await authStore.init()
-  window.addEventListener('auth:session-expired', () => {
-    void router.replace('/login')
-  })
-
   app.use(router)
   app.mount('#app')
+  isAppReady = true
+
+  if (pendingSessionExpiredMessage) {
+    void router.replace('/login')
+    ElMessage.error(pendingSessionExpiredMessage)
+    pendingSessionExpiredMessage = null
+  }
 }
 
 void startApp()
